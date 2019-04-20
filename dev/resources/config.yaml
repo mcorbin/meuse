@@ -1,0 +1,13 @@
+database:
+  user: "meuse"
+  password: "meuse"
+  subname: "//127.0.0.1:5432/meuse"
+http:
+  address: 127.0.0.1
+  port: 8855
+logging:
+  level: debug
+  console: true
+git:
+  path: "/home/mathieu/prog/rust/testregistry"
+  target: "origin/master"
