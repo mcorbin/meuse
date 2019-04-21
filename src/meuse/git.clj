@@ -21,14 +21,15 @@
   (git-cmd [this args]
     (debug "command" args)
     (let [result (apply shell/sh "git" "-C" path args)]
-      (debug (:exit result) (:out result) (:err result))
+      (debug "exit="(:exit result)
+             "out="(:out result)
+             "err="(:err result))
       (when (not= 0 (:exit result))
         (throw (ex-info "error executing git command"
-                        {:status 500
-                         :exit-code (:exit result)
-                         :stdout (:out result)
-                         :stderr (:err result)
-                         :command args})))))
+                        :exit-code (:exit result)
+                        :stdout (:out result)
+                        :stderr (:err result)
+                        :command args)))))
   (add-crate [this crate]
     (c/write-metadata path crate))
   (commit [this crate]

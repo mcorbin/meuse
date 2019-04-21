@@ -18,6 +18,8 @@
   (:import java.io.Closeable
            java.util.UUID))
 
+(def default-error-msg "internal error.")
+
 (def routes
   ["/"
    [["api/v1/crates" crates-routes]
@@ -37,33 +39,40 @@
   [request]
   {:status 400})
 
+(defn handle-req-errors
+  [request ^Exception e]
+  (let [data (ex-data e)
+        ;; cargo expects a status 200 OK even for errors x_x
+        status (if (= (:subsystem request) :meuse.api.crates.http)
+                 200
+                 (:status data))
+        request-id (:request-id request)
+        message (if status
+                  (.getMessage e)
+                  default-error-msg)]
+    (error request-id e "http error" (pr-str data))
+    {:status (or status 500)
+     :body {:errors [{:detail message}]}}))
+
 (defn get-handler
   [database git]
   (fn handler
     [request]
     (let [uri (:uri request)
           ;; add a request id
-          request (->>
-                   (assoc request :request-id (str (UUID/randomUUID)))
-                   (match-route* routes uri))]
-      (-> request
-          (assoc :database database
-                 :git git
-                 :subsystem (-> request :handler namespace keyword)
-                 :action (-> request :handler name keyword))
-          route!))))
-
-(comment (defn get-handler
-           [database]
-           (fn handler [req]
-             (let [req (-> (h/insert-into :test)
-                           (h/columns :test)
-                           (h/values [["test1"] ["test2"]])
-                           sql/format)]
-               (jdbc/execute! database req))
-             {:status 200
-              :headers {"content-type" "text/plain"}
-              :body "hello!!"})))
+          request (->> (assoc request :request-id (str (UUID/randomUUID)))
+                       (match-route* routes uri))
+          ;; todo: clean this mess
+          request (assoc request
+                         :database database
+                         :git git
+                         :subsystem (-> request :handler namespace keyword)
+                         :action (-> request :handler name keyword))
+          ]
+      (try
+        (route! request)
+        (catch Exception e
+          (handle-req-errors request e))))))
 
 (defn start-server
   [config database git]

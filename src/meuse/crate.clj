@@ -11,8 +11,7 @@
   [request byte-array size]
   (when (< (alength byte-array) size)
     (throw (ex-info (format "invalid request size %d" (alength byte-array))
-                    {:status 401
-                     :request-id (:request-id request)}))))
+                    {}))))
 
 (defn request->crate
   "Takes an HTTP publish request. Converts the payload to a map containing
@@ -57,8 +56,7 @@
     (when-not (.exists (io/file dir))
       (when-not (io/make-parents crate-file)
         (throw (ex-info "fail to create directory for crate"
-                        {:status 500
-                         :crate {:name crate-name
+                        {:crate {:name crate-name
                                  :directory dir}}))))
     (spit crate-file
           (-> (:metadata crate)

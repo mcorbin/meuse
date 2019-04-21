@@ -12,20 +12,20 @@ user_id uuid
 );
 
 CREATE TABLE crates (
-id UUID,
-name TEXT
-
+id UUID PRIMARY KEY,
+name TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE crate_versions(
-id UUID,
-version TEXT,
+id UUID PRIMARY KEY,
+version TEXT NOT NULL,
 description TEXT,
-yanked BOOLEAN,
-created_at TIMESTAMP,
-updated_at TIMESTAMP,
+yanked BOOLEAN NOT NULL,
+created_at TIMESTAMP NOT NULL,
+updated_at TIMESTAMP NOT NULL,
 document_vectors TSVECTOR,
-crate_name TEXT
+crate_id UUID,
+FOREIGN KEY (crate_id) REFERENCES crates(id)
 );
 
 CREATE INDEX idx_crate_versions_document_vectors ON crate_versions USING gin(document_vectors);
