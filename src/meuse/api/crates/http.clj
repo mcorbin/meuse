@@ -1,5 +1,6 @@
 (ns meuse.api.crates.http
-  (:require [meuse.crate :as crate]
+  (:require [meuse.db.crate :as dbc]
+            [meuse.crate :as crate]
             [meuse.api.default :as default]
             [meuse.git :as git]
             [clojure.tools.logging :refer [debug info error]]))
@@ -19,6 +20,7 @@
         (crate/request->crate request)]
     (info "publishing crate" (:name metadata)
           "version" (:vers metadata))
+    (dbc/new-crate request crate)
     (git/add-crate (:git request) crate)
     (git/add (:git request))
     (git/commit (:git request) crate)

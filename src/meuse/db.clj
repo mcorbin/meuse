@@ -25,3 +25,4 @@
   :stop (do (debug "stopping db pool")
             (.close (:datasource database))
             (debug "db pool stopped")))
+
