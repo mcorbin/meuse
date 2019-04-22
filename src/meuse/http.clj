@@ -55,7 +55,7 @@
      :body {:errors [{:detail message}]}}))
 
 (defn get-handler
-  [database git]
+  [crate-config database git]
   (fn handler
     [request]
     (let [uri (:uri request)
@@ -66,23 +66,23 @@
           request (assoc request
                          :database database
                          :git git
+                         :crate-config crate-config
                          :subsystem (-> request :handler namespace keyword)
-                         :action (-> request :handler name keyword))
-          ]
+                         :action (-> request :handler name keyword))]
       (try
         (route! request)
         (catch Exception e
           (handle-req-errors request e))))))
 
 (defn start-server
-  [config database git]
-  (info "starting http server")
-  (http/start-server (-> (get-handler database git)
+  [config crate-config database git]
+  (debug "starting http server")
+  (http/start-server (-> (get-handler crate-config database git)
                          wrap-json
                          wrap-keyword-params) config))
 
 (defstate http-server
-  :start (start-server (:http config) database git)
+  :start (start-server (:http config) (:crate config) database git)
   :stop (do (debug "stopping http server")
             (.close ^Closeable http-server)
             (Thread/sleep 4)

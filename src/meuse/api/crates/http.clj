@@ -6,8 +6,9 @@
             [clojure.tools.logging :refer [debug info error]]))
 
 (def crates-routes
-  {#"/new/?" {:put ::new
-              :get {"/" ::aaa}}})
+  {#"/new/?" {:put ::new}
+   ["/" :crate-name "/" :crate-version "/yank"] {:delete ::yank}
+   ["/" :crate-name "/" :crate-version "/unyank"] {:put ::unyank}})
 
 (defmulti crates-api!
   "Handle crates API calls"
@@ -25,10 +26,26 @@
     (git/add (:git request))
     (git/commit (:git request) crate)
     (git/push (:git request))
+    (crate/save-crate-file (get-in request [:crate-config :path]) crate)
     {:status 200
      :body {:warning {:invalid_categories []
                       :invalid_badges []
                       :other []}}}))
+
+(defn update-yank
+  [request yanked?]
+  (let [{:keys [crate-name crate-version]} (:route-params request)]
+    (dbc/update-yank request crate-name crate-version yanked?)
+    {:status 200
+     :body {:ok true}}))
+
+(defmethod crates-api! :yank
+  [request]
+  (update-yank request true))
+
+(defmethod crates-api! :unyank
+  [request]
+  (update-yank request false))
 
 (defmethod crates-api! :default
   [request]

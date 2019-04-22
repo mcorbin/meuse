@@ -11,3 +11,5 @@ logging:
 git:
   path: "/home/mathieu/prog/rust/testregistry"
   target: "origin/master"
+crate:
+  path: "/home/mathieu/prog/rust/crates"

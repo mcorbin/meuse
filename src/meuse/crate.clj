@@ -37,7 +37,7 @@
      :crate-file crate-file}))
 
 (defn crate-dir
-  "takes a crate name and returns the directory on which the metadata
+  "Takes a crate name and returns the directory on which the metadata
   file should be created"
   [crate-name]
   (condp = (count crate-name)
@@ -52,22 +52,29 @@
   [path crate]
   (let [crate-name (get-in crate [:metadata :name])
         dir (str path "/" (crate-dir crate-name))
-        crate-file (str dir "/" crate-name)]
+        metadata-path (str dir "/" crate-name)]
     (when-not (.exists (io/file dir))
-      (when-not (io/make-parents crate-file)
+      (when-not (io/make-parents metadata-path)
         (throw (ex-info "fail to create directory for crate"
                         {:crate {:name crate-name
                                  :directory dir}}))))
-    (spit crate-file
+    (spit metadata-path
           (-> (:metadata crate)
               json/generate-string
               (str "\n"))
           :append true)))
 
 (defn commit-msg
-  "creates a commit message from a crate"
+  "Creates a commit message from a crate"
   [{:keys [metadata]}]
   [(format "%s %s" (:name metadata) (:vers metadata))
    (format "meuse pushed %s %s" (:name metadata) (:vers metadata))])
 
+(defn save-crate-file
+  "Takes a crate file and its metadata, saves the crate file on disk."
+  [path {:keys [metadata crate-file]}]
+  (let [path (str path "/" (:name metadata) "/" (:vers metadata) "/download")]
+    (io/make-parents path)
+    (spit path
+          (String. crate-file java.nio.charset.StandardCharsets/UTF_8))))
 
