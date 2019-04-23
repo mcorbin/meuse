@@ -1,8 +1,18 @@
 (ns meuse.crate-test
   (:require [meuse.crate :refer :all]
             [cheshire.core :as json]
+            [clojure.java.io :as io]
             [clojure.test :refer :all])
-  (:import clojure.lang.ExceptionInfo))
+  (:import clojure.lang.ExceptionInfo
+           org.apache.commons.io.FileUtils))
+
+(def tmp-dir "test/resources/tmp/")
+
+(defn tmp-fixture [f]
+  (FileUtils/deleteDirectory (io/file tmp-dir))
+  (f))
+
+(use-fixtures :each tmp-fixture)
 
 (deftest check-size-test
   (is (nil? (check-size (byte-array 10) 10)))
@@ -44,6 +54,29 @@
   (is (= ["/foo/repo/3/a" "/foo/repo/3/a/aze"] (metadata-file-path "/foo/repo" "aze")))
   (is (= ["/foo/repo/to/to" "/foo/repo/to/to/toto"] (metadata-file-path "/foo/repo" "toto"))))
 
+(deftest write-metadata-test
+  (let [crate1 {:metadata {:name "foobar"
+                           :version "1.0.0"}}
+        crate2 {:metadata {:name "foobar"
+                           :version "1.0.1"}}]
+    (write-metadata tmp-dir crate1)
+    (is (= (slurp (str tmp-dir "/fo/ob/foobar"))
+           (str (json/generate-string (:metadata crate1)) "\n")))
+    (write-metadata tmp-dir crate2)
+    (is (= (slurp (str tmp-dir "/fo/ob/foobar"))
+           (str (json/generate-string (:metadata crate1)) "\n"
+                (json/generate-string (:metadata crate2)) "\n")))))
+
+(deftest yanked?->msg-test
+  (is (= "yank" (yanked?->msg true)))
+  (is (= "unyank" (yanked?->msg false))))
+
+(deftest publush-commit-msg-test
+  (is (= ["foo 1.1.2"
+          "meuse published foo 1.1.2"]
+         (publish-commit-msg {:metadata {:name "foo"
+                                         :vers "1.1.2"}}))))
+
 (deftest yank-commit-msg-test
   (is (= ["foo 1.1.2"
           "meuse yank foo 1.1.2"]
@@ -51,3 +84,30 @@
   (is (= ["foo 1.1.2"
           "meuse unyank foo 1.1.2"]
          (yank-commit-msg "foo" "1.1.2" false))))
+
+(deftest crate-file-path-test
+  (is (= "/tmp/foo/foobar/1.0.0/download"
+         (crate-file-path "/tmp/foo" "foobar" "1.0.0")))
+  (is (= "/tmp/foo/foobaz/1.0.3/download"
+         (crate-file-path "/tmp/foo" "foobaz" "1.0.3"))))
+
+(deftest save-crate-file-test
+  (let [crate {:metadata {:name "test1"
+                          :vers "2.3.2"}
+               :crate-file (.getBytes "this is the crate file content")}]
+    (save-crate-file tmp-dir crate)
+    (is (= (slurp (str tmp-dir "/test1/2.3.2/download"))
+           (String. (:crate-file crate) java.nio.charset.StandardCharsets/UTF_8)))))
+
+(deftest update-yank-test
+  (let [crate {:metadata {:name "test1"
+                          :vers "2.3.2"
+                          :yanked false}}
+        check (fn [s] (= s (-> (slurp (str tmp-dir "/te/st/test1"))
+                               (json/parse-string true))))]
+    (write-metadata tmp-dir crate)
+    (is (check (:metadata crate)))
+    (update-yank tmp-dir "test1" "2.3.2" true)
+    (is (check (assoc (:metadata crate) :yanked true)))
+    (update-yank tmp-dir "test1" "2.3.2" false)
+    (is (check (:metadata crate)))))

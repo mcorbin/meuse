@@ -66,10 +66,11 @@
                         {:crate {:name crate-name
                                  :directory dir}}))))
     (spit metadata-path
-          (->> (remove #(nil? (second %)) (:metadata crate))
-               (into {})
-               json/generate-string
-               (str "\n"))
+          (str (->> (:metadata crate)
+                    (remove #(nil? (second %)))
+                    (into {})
+                    json/generate-string)
+               "\n")
           :append true)))
 
 (defn yanked?->msg
@@ -82,7 +83,7 @@
   "Creates a commit message from a crate"
   [{:keys [metadata]}]
   [(format "%s %s" (:name metadata) (:vers metadata))
-   (format "meuse pushed %s %s" (:name metadata) (:vers metadata))])
+   (format "meuse published %s %s" (:name metadata) (:vers metadata))])
 
 (defn yank-commit-msg
   "creates a commit message from a crate"

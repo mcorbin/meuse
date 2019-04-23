@@ -27,7 +27,8 @@
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [pjstadig/humane-test-output "0.8.2"]
                                   [tortue/spy "1.6.0"]
-                                  [ring/ring-mock "0.3.0"]]
+                                  [ring/ring-mock "0.3.0"]
+                                  [commons-io/commons-io 2.6]]
                    :env {:meuse-configuration "dev/resources/config.yaml"}
                    :plugins [[lein-environ "1.1.0"]]
                    :injections [(require 'pjstadig.humane-test-output)
