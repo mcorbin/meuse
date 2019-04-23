@@ -24,7 +24,7 @@
     (dbc/new-crate request crate)
     (git/add-crate (:git request) crate)
     (git/add (:git request))
-    (git/commit (:git request) crate)
+    (apply git/commit (:git request) (crate/publish-commit-msg crate))
     (git/push (:git request))
     (crate/save-crate-file (get-in request [:crate-config :path]) crate)
     {:status 200
@@ -36,6 +36,13 @@
   [request yanked?]
   (let [{:keys [crate-name crate-version]} (:route-params request)]
     (dbc/update-yank request crate-name crate-version yanked?)
+    (git/update-yank (:git request) crate-name crate-version yanked?)
+    (git/add (:git request))
+    (apply git/commit (:git request) (crate/yank-commit-msg
+                                      crate-name
+                                      crate-version
+                                      yanked?))
+    (git/push (:git request))
     {:status 200
      :body {:ok true}}))
 

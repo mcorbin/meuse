@@ -4,15 +4,17 @@
             [mount.core :refer [defstate]]
             [clojure.string :as string]
             [clojure.java.shell :as shell]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.tools.logging :refer [debug info error]]
+            [meuse.crate :as crate]))
 
 (defprotocol Git
   (add [this])
   (git-cmd [this args])
   (add-crate [this crate])
-  (commit [this msg])
+  (commit [this msg-header msg-body])
   (pull [this])
-  (push [this]))
+  (push [this])
+  (update-yank [this crate-name crate-version yanked]))
 
 (defrecord LocalRepository [path target]
   Git
@@ -24,21 +26,22 @@
       (debug "exit="(:exit result)
              "out="(:out result)
              "err="(:err result))
-      (when (not= 0 (:exit result))
+      (when-not (= 0 (:exit result))
         (throw (ex-info "error executing git command"
-                        :exit-code (:exit result)
-                        :stdout (:out result)
-                        :stderr (:err result)
-                        :command args)))))
+                        {:exit-code (:exit result)
+                         :stdout (:out result)
+                         :stderr (:err result)
+                         :command args})))))
   (add-crate [this crate]
     (c/write-metadata path crate))
-  (commit [this crate]
-    (let [[header body] (c/commit-msg crate)]
-      (git-cmd this ["commit" "-m" header "-m" body])))
+  (commit [this msg-header msg-body]
+    (git-cmd this ["commit" "-m" msg-header "-m" msg-body]))
   (push [this]
     (git-cmd this (concat ["push"] (string/split target #"/"))))
   (pull [this]
-    (git-cmd this ["pull" target])))
+    (git-cmd this ["pull" target]))
+  (update-yank [this crate-name crate-version yanked]
+    (crate/update-yank path crate-name crate-version yanked)))
 
 (defstate git
   :start (map->LocalRepository (:git config)))

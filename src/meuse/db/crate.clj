@@ -2,7 +2,8 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]
             [honeysql.core :as sql]
-            [honeysql.helpers :as h])
+            [honeysql.helpers :as h]
+            [meuse.crate :refer [yanked?->msg]])
   (:import java.sql.Timestamp
            java.util.Date
            java.util.UUID))
@@ -107,12 +108,6 @@
             create-version (create-version-req metadata crate-id)]
         (jdbc/execute! db-tx create-crate)
         (jdbc/execute! db-tx create-version)))))
-
-(defn yanked?->msg
-  [yanked?]
-  (if yanked?
-    "yank"
-    "unyank"))
 
 (defn update-yank
   [request crate-name crate-version yanked?]

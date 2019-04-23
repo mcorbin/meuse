@@ -3,6 +3,8 @@
             [cheshire.core :as json]))
 
 (defn wrap-json
+  "converts the response body into json and set the content type as
+  `application/json`"
   [handler]
   (fn [request]
     (d/chain
