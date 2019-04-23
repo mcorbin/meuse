@@ -8,7 +8,8 @@
 
 (def tmp-dir "test/resources/tmp/")
 
-(defn tmp-fixture [f]
+(defn tmp-fixture
+  [f]
   (FileUtils/deleteDirectory (io/file tmp-dir))
   (f))
 
