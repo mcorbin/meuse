@@ -9,7 +9,7 @@
             [mount.core :refer [defstate]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.content-type :refer [wrap-content-type]]
-            [meuse.api.crates.http :refer [crates-routes crates-api!]]
+            [meuse.api.crate :refer [crates-routes crates-api!]]
             [meuse.api.default :refer [default-api!]]
             [meuse.config :refer [config]]
             [meuse.db :refer [database]]
@@ -27,7 +27,7 @@
 
 (defmulti route! :subsystem)
 
-(defmethod route! :meuse.api.crates.http
+(defmethod route! :meuse.api.crate
   [request]
   (crates-api! request))
 
@@ -37,13 +37,13 @@
 
 (defmethod route! :default
   [request]
-  {:status 400})
+  {:status 404})
 
 (defn handle-req-errors
   [request ^Exception e]
   (let [data (ex-data e)
         ;; cargo expects a status 200 OK even for errors x_x
-        status (if (= (:subsystem request) :meuse.api.crates.http)
+        status (if (= (:subsystem request) :meuse.api.crate)
                  200
                  (:status data))
         request-id (:request-id request)

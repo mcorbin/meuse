@@ -1,4 +1,4 @@
-(ns meuse.api.crates.http
+(ns meuse.api.crate
   (:require [meuse.db.crate :as dbc]
             [meuse.crate :as crate]
             [meuse.api.default :as default]

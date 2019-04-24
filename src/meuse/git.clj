@@ -21,9 +21,9 @@
   (add [this]
     (git-cmd this ["add" "."]))
   (git-cmd [this args]
-    (debug "command" args)
+    (debug "git command" (string/join " " args))
     (let [result (apply shell/sh "git" "-C" path args)]
-      (debug "exit="(:exit result)
+      (debug "git command status code="(:exit result)
              "out="(:out result)
              "err="(:err result))
       (when-not (= 0 (:exit result))

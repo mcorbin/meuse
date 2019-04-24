@@ -1,2 +1,0 @@
-(ns meuse.api.error)
-
