@@ -53,3 +53,45 @@
         false (:version-yanked crate-db)
         nil (:version-description crate-db)
         (:crate-id crate-db) (:version-crate-id crate-db)))))
+
+(deftest ^:integration update-yank-test
+  (let [request {:database database}
+        crate {:metadata {:name "test1"
+                          :vers "0.1.3"
+                          :yanked false}}]
+    (new-crate request crate)
+    (let [crate-db (get-crate-version database "test1" "0.1.3")]
+      (is (uuid? (:crate-id crate-db)))
+      (is (uuid? (:version-id crate-db)))
+      (is (inst? (:version-created-at crate-db)))
+      (is (inst? (:version-updated-at crate-db)))
+      (are [x y] (= x y)
+        "test1" (:crate-name crate-db)
+        "0.1.3" (:version-version crate-db)
+        false (:version-yanked crate-db)
+        nil (:version-description crate-db)
+        (:crate-id crate-db) (:version-crate-id crate-db)))
+    (update-yank request "test1" "0.1.3" true)
+    (let [crate-db (get-crate-version database "test1" "0.1.3")]
+      (is (uuid? (:crate-id crate-db)))
+      (is (uuid? (:version-id crate-db)))
+      (is (inst? (:version-created-at crate-db)))
+      (is (inst? (:version-updated-at crate-db)))
+      (are [x y] (= x y)
+        "test1" (:crate-name crate-db)
+        "0.1.3" (:version-version crate-db)
+        true (:version-yanked crate-db)
+        nil (:version-description crate-db)
+        (:crate-id crate-db) (:version-crate-id crate-db)))
+    (update-yank request "test1" "0.1.3" false)
+    (let [crate-db (get-crate-version database "test1" "0.1.3")]
+      (is (uuid? (:crate-id crate-db)))
+      (is (uuid? (:version-id crate-db)))
+      (is (inst? (:version-created-at crate-db)))
+      (is (inst? (:version-updated-at crate-db)))
+      (are [x y] (= x y)
+        "test1" (:crate-name crate-db)
+        "0.1.3" (:version-version crate-db)
+        false (:version-yanked crate-db)
+        nil (:version-description crate-db)
+        (:crate-id crate-db) (:version-crate-id crate-db)))))

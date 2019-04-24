@@ -55,7 +55,7 @@
                     (yanked?->msg yanked?))
             {:crate-name crate-name
              :crate-version crate-version})))
-        (jdbc/execute! db-tx (update-yanked-req (:version-id crate) yanked?)))
+        (jdbc/execute! db-tx (queries/update-yanked (:version-id crate) yanked?)))
       (throw (ex-info (format "cannot %s the crate: the crate does not exist"
                               (yanked?->msg yanked?))
                       {:crate-name crate-name
