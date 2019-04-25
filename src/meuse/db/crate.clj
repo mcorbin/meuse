@@ -55,6 +55,14 @@
                     (yanked?->msg yanked?))
             {:crate-name crate-name
              :crate-version crate-version})))
+        (when (= yanked? (:version-yanked crate))
+          (throw
+           (ex-info
+            (format "cannot %s the crate: crate state is already %s"
+                    (yanked?->msg yanked?)
+                    (yanked?->msg yanked?))
+            {:crate-name crate-name
+             :crate-version crate-version})))
         (jdbc/execute! db-tx (queries/update-yanked (:version-id crate) yanked?)))
       (throw (ex-info (format "cannot %s the crate: the crate does not exist"
                               (yanked?->msg yanked?))

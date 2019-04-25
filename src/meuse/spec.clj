@@ -18,14 +18,14 @@
 (s/def :http/http (s/keys :req-un [:http/port
                                    :http/address]))
 
-(s/def :git/path ::non-empty-string)
-(s/def :git/target ::non-empty-string)
+(s/def :metadata/path ::non-empty-string)
+(s/def :metadata/target ::non-empty-string)
 
 (s/def :crate/path ::non-empty-string)
 
 (s/def ::crate (s/keys :req-un [:crate/path]))
 
-(s/def ::git (s/keys :req-un [:git/path :git/target]))
+(s/def ::metadata (s/keys :req-un [:git/path :git/target]))
 
 (s/def ::level #{"debug" "info"})
 (s/def ::encoder #{"json"})
@@ -36,6 +36,6 @@
 
 (s/def ::config (s/keys :req-un [:http/http
                                  :db/database
-                                 ::git
+                                 ::metadata
                                  ::crate
                                  ::logging]))

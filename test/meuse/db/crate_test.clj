@@ -3,6 +3,7 @@
             [meuse.db :refer [database]]
             [meuse.db.crate :refer :all]
             [meuse.fixtures :refer :all]
+            [meuse.message :as message]
             [mount.core :as mount]
             [clojure.java.jdbc :as jdbc]
             [clojure.test :refer :all])
@@ -84,4 +85,8 @@
         "0.1.3" (:version-version crate-db)
         false (:version-yanked crate-db)
         nil (:version-description crate-db)
-        (:crate-id crate-db) (:version-crate-id crate-db)))))
+        (:crate-id crate-db) (:version-crate-id crate-db)))
+    (is (thrown-with-msg? ExceptionInfo
+                          (re-pattern (str "crate state is already "
+                                           (message/yanked?->msg false)))
+                          (update-yank request "test1" "0.1.3" false)))))

@@ -10,7 +10,6 @@
 (defprotocol Git
   (add [this])
   (git-cmd [this args])
-  (add-crate [this crate])
   (commit [this msg-header msg-body])
   (pull [this])
   (push [this])
@@ -32,8 +31,6 @@
                          :stdout (:out result)
                          :stderr (:err result)
                          :command args})))))
-  (add-crate [this crate]
-    (metadata/write-metadata path crate))
   (commit [this msg-header msg-body]
     (git-cmd this ["commit" "-m" msg-header "-m" msg-body]))
   (push [this]
@@ -44,4 +41,4 @@
     (metadata/update-yank path crate-name crate-version yanked)))
 
 (defstate git
-  :start (map->LocalRepository (:git config)))
+  :start (map->LocalRepository (:metadata config)))

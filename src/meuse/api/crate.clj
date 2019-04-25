@@ -1,9 +1,10 @@
 (ns meuse.api.crate
-  (:require [meuse.db.crate :as dbc]
+  (:require [meuse.db.crate :as crate-db]
             [meuse.crate :as crate]
             [meuse.crate-file :as crate-file]
             [meuse.api.default :as default]
             [meuse.git :as git]
+            [meuse.metadata :as metadata]
             [meuse.message :as msg]
             [clojure.tools.logging :refer [debug info error]]))
 
@@ -23,12 +24,12 @@
         (crate/request->crate request)]
     (info "publishing crate" (:name metadata)
           "version" (:vers metadata))
-    (dbc/new-crate request crate)
-    (git/add-crate (:git request) crate)
+    (crate-db/new-crate request crate)
+    (metadata/write-metadata (get-in request [:config :metadata :path]) crate)
+    (crate-file/save-crate-file (get-in request [:config :crate :path]) crate)
     (git/add (:git request))
     (apply git/commit (:git request) (msg/publish-commit-msg crate))
     (git/push (:git request))
-    (crate-file/save-crate-file (get-in request [:crate-config :path]) crate)
     {:status 200
      :body {:warning {:invalid_categories []
                       :invalid_badges []
@@ -37,8 +38,11 @@
 (defn update-yank
   [request yanked?]
   (let [{:keys [crate-name crate-version]} (:route-params request)]
-    (dbc/update-yank request crate-name crate-version yanked?)
-    (git/update-yank (:git request) crate-name crate-version yanked?)
+    (crate-db/update-yank request crate-name crate-version yanked?)
+    (metadata/update-yank (get-in request [:config :metadata :path])
+                          crate-name
+                          crate-version
+                          yanked?)
     (git/add (:git request))
     (apply git/commit (:git request) (msg/yank-commit-msg
                                       crate-name

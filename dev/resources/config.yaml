@@ -8,7 +8,7 @@ http:
 logging:
   level: debug
   console: true
-git:
+metadata:
   path: "/home/mathieu/prog/rust/testregistry"
   target: "origin/master"
 crate:
