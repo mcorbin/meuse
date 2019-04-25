@@ -1,6 +1,6 @@
 (ns meuse.api.crate-test
   (:require [meuse.api.crate :refer :all]
-            [meuse.crate :refer [publish-commit-msg]]
+            [meuse.message :refer [publish-commit-msg]]
             [meuse.db :refer [database]]
             [meuse.crate-test :refer [create-publish-request]]
             [meuse.fixtures :refer :all]

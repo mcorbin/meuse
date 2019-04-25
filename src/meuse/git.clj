@@ -1,6 +1,6 @@
 (ns meuse.git
   (:require [meuse.config :refer [config]]
-            [meuse.crate :as c]
+            [meuse.metadata :as metadata]
             [mount.core :refer [defstate]]
             [clojure.string :as string]
             [clojure.java.shell :as shell]
@@ -33,7 +33,7 @@
                          :stderr (:err result)
                          :command args})))))
   (add-crate [this crate]
-    (c/write-metadata path crate))
+    (metadata/write-metadata path crate))
   (commit [this msg-header msg-body]
     (git-cmd this ["commit" "-m" msg-header "-m" msg-body]))
   (push [this]
@@ -41,7 +41,7 @@
   (pull [this]
     (git-cmd this ["pull" target]))
   (update-yank [this crate-name crate-version yanked]
-    (crate/update-yank path crate-name crate-version yanked)))
+    (metadata/update-yank path crate-name crate-version yanked)))
 
 (defstate git
   :start (map->LocalRepository (:git config)))

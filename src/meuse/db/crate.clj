@@ -2,7 +2,7 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]
             [meuse.db.queries :as queries]
-            [meuse.crate :refer [yanked?->msg]])
+            [meuse.message :refer [yanked?->msg]])
   (:import java.util.UUID))
 
 (defn get-crate-version
