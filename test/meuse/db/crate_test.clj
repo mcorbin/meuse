@@ -2,21 +2,11 @@
   (:require [meuse.config :refer [config]]
             [meuse.db :refer [database]]
             [meuse.db.crate :refer :all]
+            [meuse.fixtures :refer :all]
             [mount.core :as mount]
             [clojure.java.jdbc :as jdbc]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
-
-(defn db-fixture
-  [f]
-  (mount/start #'meuse.config/config #'meuse.db/database)
-  (f)
-  (mount/stop #'meuse.config/config #'meuse.db/database))
-
-(defn table-fixture
-  [f]
-  (jdbc/execute! database ["TRUNCATE TABLE CRATES CASCADE;"])
-  (f))
 
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
