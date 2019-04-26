@@ -1,6 +1,7 @@
 (ns meuse.crate-file-test
   (:require [meuse.crate-file :refer :all]
-            [meuse.fixtures :refer :all]
+            [meuse.helpers.fixtures :refer :all]
+            [meuse.helpers.files :refer :all]
             [clojure.test :refer :all]))
 
 (use-fixtures :each tmp-fixture)
@@ -16,7 +17,5 @@
                           :vers "2.3.2"}
                :crate-file (.getBytes "this is the crate file content")}]
     (save-crate-file tmp-dir crate)
-    (is (= (slurp (str tmp-dir "/test1/2.3.2/download"))
-           (String. (:crate-file crate) java.nio.charset.StandardCharsets/UTF_8)))))
-
-
+    (test-crate-file (str tmp-dir "/test1/2.3.2/download")
+                     (:crate-file crate))))

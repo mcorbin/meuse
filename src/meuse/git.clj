@@ -12,8 +12,7 @@
   (git-cmd [this args])
   (commit [this msg-header msg-body])
   (pull [this])
-  (push [this])
-  (update-yank [this crate-name crate-version yanked]))
+  (push [this]))
 
 (defrecord LocalRepository [path target]
   Git
@@ -36,9 +35,7 @@
   (push [this]
     (git-cmd this (concat ["push"] (string/split target #"/"))))
   (pull [this]
-    (git-cmd this ["pull" target]))
-  (update-yank [this crate-name crate-version yanked]
-    (metadata/update-yank path crate-name crate-version yanked)))
+    (git-cmd this ["pull" target])))
 
 (defstate git
   :start (map->LocalRepository (:metadata config)))

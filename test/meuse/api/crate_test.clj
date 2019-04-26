@@ -1,14 +1,18 @@
 (ns meuse.api.crate-test
   (:require [meuse.api.crate :refer :all]
             [meuse.db.crate :as crate-db]
-            [meuse.message :refer [publish-commit-msg]]
+            [meuse.message :refer [publish-commit-msg
+                                   yank-commit-msg]]
             [meuse.db :refer [database]]
             [meuse.crate-test :refer [create-publish-request]]
-            [meuse.fixtures :refer :all]
+            [meuse.helpers.db :refer :all]
+            [meuse.helpers.fixtures :refer :all]
+            [meuse.helpers.files :refer :all]
             [meuse.git :refer [Git]]
             [clojure.test :refer :all]
             [cheshire.core :as json]
-            [meuse.db.crate :as crate-db]))
+            [meuse.db.crate :as crate-db])
+  (:import clojure.lang.ExceptionInfo))
 
 (use-fixtures :each tmp-fixture)
 
@@ -30,7 +34,7 @@
   (pull [this]
     (swap! state conj {:cmd "pull"})))
 
-(deftest crates-api-new-test
+(deftest crates-api-new-and-yank-test
   (let [name "toto"
         version "1.0.1"
         metadata {:name name :vers version :yanked false}
@@ -50,9 +54,30 @@
                          {:cmd "push"}]))
     (is (= (slurp (str tmp-dir "/toto/1.0.1/download"))
            crate-file))
-    (let [crate (crate-db/get-crate-version database name version)]
-      (is (uuid? (:crate-id crate))))))
-
-
-
-
+    (test-db-state database {:crate-name "toto"
+                             :version-version "1.0.1"
+                             :version-yanked false
+                             :version-description nil})
+    (is (thrown-with-msg? ExceptionInfo
+                            #"already exists$"
+                            (crates-api! request)))
+    (let [yank-request (assoc request
+                              :route-params {:crate-name "toto"
+                                             :crate-version "1.0.1"}
+                              :action :yank)]
+      (crates-api! yank-request)
+      (test-db-state database {:crate-name "toto"
+                               :version-version "1.0.1"
+                               :version-yanked true
+                               :version-description nil})
+      (is (thrown-with-msg? ExceptionInfo
+                            #"crate state is already yank$"
+                            (crates-api! (assoc yank-request :action :yank))))
+      (crates-api! (assoc yank-request :action :unyank))
+      (is (thrown-with-msg? ExceptionInfo
+                            #"crate state is already unyank$"
+                            (crates-api! (assoc yank-request :action :unyank))))
+      (test-db-state database {:crate-name "toto"
+                               :version-version "1.0.1"
+                               :version-yanked false
+                               :version-description nil}))))

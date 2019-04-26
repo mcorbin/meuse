@@ -1,6 +1,7 @@
 (ns meuse.metadata-test
   (:require [cheshire.core :as json]
-            [meuse.fixtures :refer :all]
+            [meuse.helpers.fixtures :refer :all]
+            [meuse.helpers.files :refer :all]
             [meuse.metadata :refer :all]
             [clojure.test :refer :all]))
 
@@ -26,23 +27,40 @@
         crate2 {:metadata {:name "foobar"
                            :version "1.0.1"}}]
     (write-metadata tmp-dir crate1)
-    (is (= (slurp (str tmp-dir "/fo/ob/foobar"))
-           (str (json/generate-string (:metadata crate1)) "\n")))
+    (test-metadata-file (str tmp-dir "/fo/ob/foobar")
+                        [(:metadata crate1)])
     (write-metadata tmp-dir crate2)
-    (is (= (slurp (str tmp-dir "/fo/ob/foobar"))
-           (str (json/generate-string (:metadata crate1)) "\n"
-                (json/generate-string (:metadata crate2)) "\n")))))
+        (test-metadata-file (str tmp-dir "/fo/ob/foobar")
+                            [(:metadata crate1)
+                             (:metadata crate2)])))
+
+(deftest replace-yank-test
+  (is (= "{\"name\":\"test1\",\"vers\":\"2.3.2\",\"yanked\":false}\n"
+         (replace-yank "2.3.2"
+                       false
+                       "{\"name\":\"test1\",\"vers\":\"2.3.2\",\"yanked\":true}\n")))
+  (is (= "{\"name\":\"test1\",\"vers\":\"2.3.2\",\"yanked\":true}\n"
+         (replace-yank "2.3.2"
+                       true
+                       "{\"name\":\"test1\",\"vers\":\"2.3.2\",\"yanked\":false}\n")))
+  (is (= (str "{\"name\":\"test1\",\"vers\":\"2.3.1\",\"yanked\":true}\n"
+              "{\"name\":\"test1\",\"vers\":\"2.3.2\",\"yanked\":false}\n"
+              "{\"name\":\"test1\",\"vers\":\"2.3.3\",\"yanked\":true}\n")
+         (replace-yank "2.3.2"
+                       false
+                       (str "{\"name\":\"test1\",\"vers\":\"2.3.1\",\"yanked\":true}\n"
+                            "{\"name\":\"test1\",\"vers\":\"2.3.2\",\"yanked\":true}\n"
+                            "{\"name\":\"test1\",\"vers\":\"2.3.3\",\"yanked\":true}\n")))))
 
 (deftest update-yank-test
   (let [crate {:metadata {:name "test1"
                           :vers "2.3.2"
                           :yanked false}}
-        check (fn [s] (= s (-> (slurp (str tmp-dir "/te/st/test1"))
-                               (json/parse-string true))))]
+        path (str tmp-dir "/te/st/test1")]
     (write-metadata tmp-dir crate)
-    (is (check (:metadata crate)))
+    (test-metadata-file path [(:metadata crate)])
     (update-yank tmp-dir "test1" "2.3.2" true)
-    (is (check (assoc (:metadata crate) :yanked true)))
+    (test-metadata-file path [(assoc (:metadata crate) :yanked true)])
     (update-yank tmp-dir "test1" "2.3.2" false)
-    (is (check (:metadata crate)))))
+    (test-metadata-file path [(:metadata crate)])))
 

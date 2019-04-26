@@ -38,19 +38,25 @@
                "\n")
           :append true)))
 
+(defn replace-yank
+  [crate-version yanked? file-content]
+  (str (->> (string/split file-content #"\n")
+            (map
+             (fn [line]
+               ;; worst way to patch a file ever
+               ;; todo: do something more robust
+               (if (string/includes? line (str "\"vers\":\""crate-version"\""))
+                 (string/replace line
+                                 (re-pattern (str "\"yanked\":" (not yanked?)))
+                                 (str "\"yanked\":" yanked?))
+                 line)))
+            (string/join "\n"))
+       "\n"))
+
 (defn update-yank
   "updates the `yanked` field in the metadata file for a crate version"
   [base-path crate-name crate-version yanked?]
   (let [[_ metadata-path] (metadata-file-path base-path crate-name)]
-    (->> (string/split (slurp metadata-path) #"\n")
-         (map
-          (fn [line]
-            ;; worst way to patch a file ever
-            ;; todo: do something more robust
-            (if (string/includes? line (str "\"vers\":\""crate-version"\""))
-              (string/replace line
-                              (re-pattern (str "\"yanked\":" (not yanked?)))
-                              (str "\"yanked\":" yanked?))
-              line)))
-         (string/join "\n")
+    (->> (slurp metadata-path)
+         ((partial replace-yank crate-version yanked?))
          (spit metadata-path))))

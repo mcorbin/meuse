@@ -1,6 +1,6 @@
 (ns meuse.crate-test
   (:require [meuse.crate :refer :all]
-            [meuse.fixtures :refer :all]
+            [meuse.helpers.fixtures :refer :all]
             [cheshire.core :as json]
             [clojure.java.io :as io]
             [clojure.test :refer :all])

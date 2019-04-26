@@ -1,4 +1,4 @@
-(ns meuse.fixtures
+(ns meuse.helpers.fixtures
   (:require [meuse.db :refer [database]]
             [clojure.java.io :as io]
             [clojure.java.jdbc :as jdbc]
