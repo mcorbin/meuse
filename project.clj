@@ -1,7 +1,8 @@
 (defproject meuse "0.1.0-SNAPSHOT"
   :description "A Rust registry"
   :url "https://github.com/mcorbin/meuse"
-  :license {:url "https://www.eclipse.org/legal/epl-2.0/"}
+  :license {:name "CeCILL version 2.1"
+            :url "http://www.cecill.info/licences.fr.html"}
   :maintainer {:name "Mathieu Corbin"
                :website "https://mcorbin.fr"}
   :dependencies [[org.clojure/clojure "1.10.0"]
