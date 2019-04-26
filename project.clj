@@ -30,9 +30,10 @@
                                   [ring/ring-mock "0.3.0"]
                                   [commons-io/commons-io 2.6]]
                    :env {:meuse-configuration "dev/resources/config.yaml"}
-                   :plugins [[lein-environ "1.1.0"]]
+                   :plugins [[lein-environ "1.1.0"]
+                             [lein-cloverage "1.1.1"]]
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
                    :repl-options {:init-ns user}
-                   :source-paths ["dev" "test/meuse"]}
+                   :source-paths ["dev"]}
              :uberjar {:aot :all}})
