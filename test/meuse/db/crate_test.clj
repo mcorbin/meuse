@@ -33,22 +33,35 @@
                              :version-description nil})))
 
 (deftest ^:integration update-yank-test
-  (let [request {:database database}
-        crate {:metadata {:name "test1"
-                          :vers "0.1.3"
-                          :yanked false}}]
-    (new-crate request crate)
-    (test-db-state database {:crate-name "test1"
-                             :version-version "0.1.3"
-                             :version-yanked false
-                             :version-description nil})
-    (update-yank request "test1" "0.1.3" true)
-    (test-db-state database {:crate-name "test1"
-                             :version-version "0.1.3"
-                             :version-yanked true
-                             :version-description nil})
-    (update-yank request "test1" "0.1.3" false)
-    (test-db-state database {:crate-name "test1"
-                             :version-version "0.1.3"
-                             :version-yanked false
-                             :version-description nil})))
+  (testing "success"
+    (let [request {:database database}
+          crate {:metadata {:name "test1"
+                            :vers "0.1.3"
+                            :yanked false}}]
+      (new-crate request crate)
+      (test-db-state database {:crate-name "test1"
+                               :version-version "0.1.3"
+                               :version-yanked false
+                               :version-description nil})
+      (update-yank request "test1" "0.1.3" true)
+      (test-db-state database {:crate-name "test1"
+                               :version-version "0.1.3"
+                               :version-yanked true
+                               :version-description nil})
+      (update-yank request "test1" "0.1.3" false)
+      (test-db-state database {:crate-name "test1"
+                               :version-version "0.1.3"
+                               :version-yanked false
+                               :version-description nil})))
+  (testing "error"
+    (let [request {:database database}
+          crate {:metadata {:name "test3"
+                            :vers "0.1.3"
+                            :yanked false}}]
+      (is (thrown-with-msg? ExceptionInfo
+                          #"the crate does not exist$"
+                          (update-yank request "test3" "0.1.3" false)))
+      (new-crate request crate)
+      (is (thrown-with-msg? ExceptionInfo
+                          #"the version does not exist$"
+                          (update-yank request "test3" "0.1.4" false))))))

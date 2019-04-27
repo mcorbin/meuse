@@ -10,6 +10,10 @@
   {:classname "org.postgresql.Driver"
    :subprotocol "postgresql"})
 
+(defn stop!
+  []
+  (System/exit 1))
+
 (defn load-config
   [path]
   (let [config (-> (yummy/load-config {:program-name :meuse
@@ -23,7 +27,7 @@
                                                      "\n"
                                                      "config path = "
                                                      path))
-                                         (System/exit 1))})
+                                         (stop!))})
                    (update :database #(merge default-db-config %)))]
     (start-logging! (:logging config))
     (debug "config loaded, logger started !")

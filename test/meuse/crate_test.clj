@@ -28,7 +28,10 @@
 (deftest check-size-test
   (is (nil? (check-size (byte-array 10) 10)))
   (is (nil? (check-size (byte-array 10) 9)))
-  (is (thrown? ExceptionInfo (nil? (check-size (byte-array 10) 11)))))
+  (is (thrown-with-msg?
+       ExceptionInfo
+       #"^invalid request size"
+       (nil? (check-size (byte-array 10) 11)))))
 
 (deftest request->crate-test
   (testing "valid request"
@@ -40,6 +43,7 @@
              (-> (request->crate request)
                  (update :crate-file #(String. %)))))))
   (testing "size issue"
-    (is (thrown? ExceptionInfo (request->crate {:body
-                                               (byte-array
-                                                [(byte 20) (byte 0)])})))))
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"^invalid request size"
+         (request->crate {:body (byte-array [(byte 20) (byte 0)])})))))

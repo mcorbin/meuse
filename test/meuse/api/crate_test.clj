@@ -11,7 +11,8 @@
             [meuse.git :refer [Git]]
             [clojure.test :refer :all]
             [cheshire.core :as json]
-            [meuse.db.crate :as crate-db])
+            [meuse.db.crate :as crate-db]
+            [meuse.crate :as crate])
   (:import clojure.lang.ExceptionInfo))
 
 (use-fixtures :each tmp-fixture)
@@ -34,7 +35,7 @@
   (pull [this]
     (swap! state conj {:cmd "pull"})))
 
-(deftest crates-api-new-and-yank-test
+(deftest ^:integration crates-api-new-and-yank-test
   (let [name "toto"
         version "1.0.1"
         metadata {:name name :vers version :yanked false}
@@ -47,7 +48,11 @@
                   :config {:crate {:path tmp-dir}
                            :metadata {:path tmp-dir}}
                   :database database})]
-    (crates-api! request)
+    (= (crates-api! request)
+       {:status 200
+        :body {:warning {:invalid_categories []
+                         :invalid_badges []
+                         :other []}}})
     (is (= @git-actions [{:cmd "add"}
                          {:cmd "commit"
                           :args (publish-commit-msg {:metadata metadata})}
@@ -81,3 +86,7 @@
                                :version-version "1.0.1"
                                :version-yanked false
                                :version-description nil}))))
+
+(deftest default-not-found-test
+  (is (= meuse.api.default/not-found
+         (crates-api! {:action :random}))))
