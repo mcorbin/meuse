@@ -30,6 +30,8 @@
                                   [tortue/spy "1.6.0"]
                                   [ring/ring-mock "0.3.0"]
                                   [commons-io/commons-io 2.6]]
+                   :cloverage {:ns-exclude-regex [#"meuse.core"
+                                                  #"user"]}
                    :env {:meuse-configuration "dev/resources/config.yaml"}
                    :plugins [[lein-environ "1.1.0"]
                              [lein-cloverage "1.1.1"]]

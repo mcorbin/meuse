@@ -1,15 +1,15 @@
-CREATE TABLE users(
-id UUID,
-name TEXT,
-password TEXT,
-informations TEXT,
-);
+-- CREATE TABLE users(
+-- id UUID,
+-- name TEXT,
+-- password TEXT,
+-- informations TEXT,
+-- );
 
-CREATE TABLE tokens(
-token TEXT,
-expired_at timestamp,
-user_id uuid
-);
+-- CREATE TABLE tokens(
+-- token TEXT,
+-- expired_at timestamp,
+-- user_id uuid
+-- );
 
 CREATE TABLE crates (
 id UUID PRIMARY KEY,
