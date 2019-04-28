@@ -1,4 +1,5 @@
 (ns meuse.middleware
+  "HTTP middlewares"
   (:require [manifold.deferred :as d]
             [cheshire.core :as json]))
 

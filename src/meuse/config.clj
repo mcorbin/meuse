@@ -1,4 +1,5 @@
 (ns meuse.config
+  "Load the project configuration."
   (:require [clojure.tools.logging :refer [debug info error]]
             [environ.core :refer [env]]
             [mount.core :refer [defstate]]
@@ -11,10 +12,12 @@
    :subprotocol "postgresql"})
 
 (defn stop!
+  "Stop the application."
   []
   (System/exit 1))
 
 (defn load-config
+  "Takes a path and loads the configuration."
   [path]
   (let [config (-> (yummy/load-config {:program-name :meuse
                                        :path path

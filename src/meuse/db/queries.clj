@@ -1,4 +1,5 @@
 (ns meuse.db.queries
+  "Database queries."
   (:require [honeysql.core :as sql]
             [honeysql.helpers :as h])
   (:import java.sql.Timestamp
@@ -69,3 +70,22 @@
                     crate-id]])
         sql/format)))
 
+(defn get-category
+  [category-name]
+  (-> (h/select [:c.id "category_id"]
+                [:c.name "category_name"]
+                [:c.description "category_description"])
+      (h/from [:categories :c])
+      (h/where [:= :c.name category-name])
+      sql/format))
+
+(defn create-category
+  [category-name description]
+  (-> (h/insert-into :categories)
+      (h/columns :id
+                 :name
+                 :description)
+      (h/values [[(UUID/randomUUID)
+                  category-name
+                  description]])
+      sql/format))

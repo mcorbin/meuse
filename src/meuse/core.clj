@@ -6,6 +6,7 @@
   (:gen-class))
 
 (defn stop!
+  "Stops the application"
   []
   (mount/stop))
 
@@ -13,10 +14,11 @@
   "Start the application using mount."
   []
   (mount/start)
+  (info "Ecoute, on t'connaît pas, mais laisse nous t'dire que tu t'prépares des nuits blanches, des migraines... des «nervous breakdown» comme on dit de nos jours.")
   :ready)
 
 (defn -main
-  "I don't do a whole lot ... yet."
+  "Starts the application"
   [& args]
   (with-handler :term
       (info "SIGTERM, stopping")

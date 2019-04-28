@@ -22,4 +22,5 @@
 (defn table-fixture
   [f]
   (jdbc/execute! database ["TRUNCATE TABLE CRATES CASCADE;"])
+  (jdbc/execute! database ["TRUNCATE TABLE CATEGORIES CASCADE;"])
   (f))

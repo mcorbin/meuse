@@ -1,4 +1,5 @@
 (ns meuse.spec
+  "Specs of the project"
   (:require [clojure.spec.alpha :as s]))
 
 (s/def ::non-empty-string (s/and string? not-empty))

@@ -1,5 +1,7 @@
-(ns meuse.api.crate-test
-  (:require [meuse.api.crate :refer :all]
+(ns meuse.api.crate.crate-test
+  (:require [meuse.api.crate.http :refer :all]
+            [meuse.api.crate.new :refer :all]
+            [meuse.api.crate.yank :refer :all]
             [meuse.db.crate :as crate-db]
             [meuse.message :refer [publish-commit-msg
                                    yank-commit-msg]]

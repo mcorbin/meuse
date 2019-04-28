@@ -1,4 +1,5 @@
 (ns meuse.db.crate
+  "Manages crates in the database."
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]
             [meuse.db.queries :as queries]
@@ -6,6 +7,7 @@
   (:import java.util.UUID))
 
 (defn get-crate-version
+  "Takes a crate name and version and returns the crate version if it exists."
   [db-tx crate-name crate-version]
   (-> (jdbc/query db-tx (queries/get-crate-version crate-name crate-version))
       first
@@ -21,8 +23,9 @@
                                 :version_crate_id :version-crate-id})))
 
 (defn new-crate
-  [request {:keys [metadata]}]
-  (jdbc/with-db-transaction [db-tx (:database request)]
+  "Creates a crate in the database."
+  [database {:keys [metadata]}]
+  (jdbc/with-db-transaction [db-tx database]
     (if-let [crate (get-crate-version db-tx
                                       (:name metadata)
                                       (:vers metadata))]
@@ -43,9 +46,10 @@
         (jdbc/execute! db-tx create-version)))))
 
 (defn update-yank
-  [request crate-name crate-version yanked?]
+  "Updates the `yanked` field in the database for a crate version."
+  [database crate-name crate-version yanked?]
   (info (yanked?->msg yanked?) "crate" crate-name crate-version)
-  (jdbc/with-db-transaction [db-tx (:database request)]
+  (jdbc/with-db-transaction [db-tx database]
     (if-let [crate (get-crate-version db-tx crate-name crate-version)]
       (do
         (when-not (:version-version crate)

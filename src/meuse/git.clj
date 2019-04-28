@@ -1,4 +1,5 @@
 (ns meuse.git
+  "Interacts with a git repository"
   (:require [meuse.config :refer [config]]
             [meuse.metadata :as metadata]
             [mount.core :refer [defstate]]

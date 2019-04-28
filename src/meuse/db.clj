@@ -1,4 +1,5 @@
 (ns meuse.db
+  "The database content"
   (:require [clojure.java.jdbc :as j]
             [clojure.tools.logging :refer [debug info error]]
             [aleph.http :as http]

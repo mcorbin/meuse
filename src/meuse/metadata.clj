@@ -1,4 +1,5 @@
 (ns meuse.metadata
+  "Functions to interacts with the crate metadata file."
   (:require [cheshire.core :as json]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]
@@ -6,7 +7,7 @@
 
 (defn metadata-dir
   "Takes a crate name and returns the directory on which the metadata
-  file should be created"
+  file should be created."
   [crate-name]
   (condp = (count crate-name)
     1 "1"
@@ -16,6 +17,7 @@
 
 ;; todo: creating path with str is not nice
 (defn metadata-file-path
+  "Takes a path and a crate name, returns the path to the metadata file."
   [base-path crate-name]
   (let [dir (str base-path "/" (metadata-dir crate-name))]
     [dir (str dir "/" crate-name)]))
@@ -39,6 +41,9 @@
           :append true)))
 
 (defn replace-yank
+  "Takes a crate version, a boolean indicating if the crate should be
+  yanked or not, and the content of the metadata file for this crate.
+  Returns the file content with the `yanked` field updated."
   [crate-version yanked? file-content]
   (str (->> (string/split file-content #"\n")
             (map

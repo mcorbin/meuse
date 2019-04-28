@@ -1,20 +1,25 @@
 (ns meuse.http
+  "HTTP server and handlers"
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]
             [aleph.http :as http]
             [aleph.netty :as netty]
             [bidi.bidi :refer [match-route*]]
-            [honeysql.core :as sql]
-            [honeysql.helpers :as h]
+            [byte-streams :as bs]
             [mount.core :refer [defstate]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.content-type :refer [wrap-content-type]]
-            [meuse.api.crate :refer [crates-routes crates-api!]]
+            [meuse.api.crate.http :refer [crates-routes crates-api!]]
+            meuse.api.crate.new
+            meuse.api.crate.yank
+            [meuse.api.meuse.http :refer [meuse-routes meuse-api!]]
+            meuse.api.meuse.category
             [meuse.api.default :refer [default-api!]]
             [meuse.config :refer [config]]
             [meuse.db :refer [database]]
             [meuse.git :refer [git]]
-            [meuse.middleware :refer [wrap-json]])
+            [meuse.middleware :refer [wrap-json]]
+            [cheshire.core :as json])
   (:import java.io.Closeable
            java.util.UUID))
 
@@ -23,13 +28,33 @@
 (def routes
   ["/"
    [["api/v1/crates" crates-routes]
+    ["api/v1/meuse" meuse-routes]
     [true :meuse.api.default/not-found]]])
+
+(defn convert-body-edn
+  "Takes a request, tries to convert the body in edn."
+  [request]
+  (if (:body request)
+    (try
+      (update request :body
+              (fn [body]
+                (-> (bs/convert body String)
+                    (json/parse-string true))))
+      (catch Exception e
+        (error e "fail to convert the request body to json")
+        (throw (ex-info "fail to convert the request body to json"
+                        {}))))
+    request))
 
 (defmulti route! :subsystem)
 
-(defmethod route! :meuse.api.crate
+(defmethod route! :meuse.api.crate.http
   [request]
   (crates-api! request))
+
+(defmethod route! :meuse.api.meuse.http
+  [request]
+  (meuse-api! (convert-body-edn request)))
 
 (defmethod route! :meuse.api.default
   [request]
@@ -40,6 +65,7 @@
   {:status 404})
 
 (defn handle-req-errors
+  "Handles HTTP exceptions."
   [request ^Exception e]
   (let [data (ex-data e)
         ;; cargo expects a status 200 OK even for errors x_x
@@ -55,6 +81,7 @@
      :body {:errors [{:detail message}]}}))
 
 (defn get-handler
+  "Returns the main handler for the HTTP server."
   [crate-config metadata-config database git]
   (fn handler
     [request]

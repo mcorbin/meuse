@@ -29,3 +29,17 @@ FOREIGN KEY (crate_id) REFERENCES crates(id)
 );
 
 CREATE INDEX idx_crate_versions_document_vectors ON crate_versions USING gin(document_vectors);
+
+CREATE TABLE categories (
+id UUID PRIMARY KEY,
+description TEXT,
+name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE crate_categories (
+category_id UUID,
+crate_id UUID,
+PRIMARY KEY(category_id, crate_id),
+FOREIGN KEY (crate_id) REFERENCES crates(id),
+FOREIGN KEY (category_id) REFERENCES categories(id)
+);
