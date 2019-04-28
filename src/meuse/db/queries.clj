@@ -1,16 +1,28 @@
 (ns meuse.db.queries
   "Database queries."
   (:require [honeysql.core :as sql]
-            [honeysql.helpers :as h])
+            [honeysql.helpers :as h]
+            [meuse.auth.password :as password])
   (:import java.sql.Timestamp
            java.util.Date
            java.util.UUID))
+
+;; todo: split in multiple ns
+;; crate
 
 (defn update-yanked
   [version-id yanked?]
   (-> (h/update :crate_versions)
       (h/sset {:yanked yanked?})
       (h/where [:= :id version-id])
+      sql/format))
+
+(defn get-crate
+  [crate-name]
+  (-> (h/select [:c.id "crate_id"]
+                [:c.name "crate_name"])
+      (h/from [:crates :c])
+      (h/where [:= :c.name crate-name])
       sql/format))
 
 (defn get-crate-version
@@ -70,6 +82,8 @@
                     crate-id]])
         sql/format)))
 
+;; categories
+
 (defn get-category
   [category-name]
   (-> (h/select [:c.id "category_id"]
@@ -77,6 +91,16 @@
                 [:c.description "category_description"])
       (h/from [:categories :c])
       (h/where [:= :c.name category-name])
+      sql/format))
+
+(defn get-crate-category
+  [crate-id category-id]
+  (-> (h/select [:c.crate_id "crate_id"]
+                [:c.category_id "category_id"])
+      (h/from [:crate_categories :c])
+      (h/where [:and
+                [:= :c.crate_id crate-id]
+                [:= :c.category_id category-id]])
       sql/format))
 
 (defn create-category
@@ -88,4 +112,76 @@
       (h/values [[(UUID/randomUUID)
                   category-name
                   description]])
+      sql/format))
+
+(defn add-crate-category
+  [crate-id category-id]
+  (-> (h/insert-into :crate_categories)
+      (h/columns :crate_id
+                 :category_id)
+      (h/values [[crate-id
+                  category-id]])
+      sql/format))
+
+;; users and roles and owners
+
+(defn get-role-by-name
+  [role-name]
+  (-> (h/select [:r.id "role_id"]
+                [:r.name "role_name"])
+      (h/from [:roles :r])
+      (h/where [:= :r.name role-name])
+      sql/format))
+
+(defn get-user-by-name
+  [user-name]
+  (-> (h/select [:u.id "user_id"]
+                [:u.name "user_name"]
+                [:u.password "user_password"]
+                [:u.description "user_description"]
+                [:u.role_id "user_role_id"])
+      (h/from [:users :u])
+      (h/where [:= :u.name user-name])
+      sql/format))
+
+(defn create-user
+  [user role-id]
+  (-> (h/insert-into :users)
+      (h/columns :id
+                 :name
+                 :password
+                 :description
+                 :role_id)
+      (h/values [[(UUID/randomUUID)
+                  (:name user)
+                  (password/encrypt (:password user))
+                  (:description user)
+                  role-id]])
+      sql/format))
+
+(defn add-crate-user
+  [crate-id user-id]
+  (-> (h/insert-into :crate_users)
+      (h/columns :crate_id
+                 :user_id)
+      (h/values [[crate-id
+                  user-id]])
+      sql/format))
+
+(defn delete-crate-user
+  [crate-id user-id]
+  (-> (h/delete-from :crate_users)
+      (h/where [:and
+                [:= :crate_id crate-id]
+                [:= :user_id user-id]])
+      sql/format))
+
+(defn get-crate-user
+  [crate-id user-id]
+  (-> (h/select [:c.crate_id "crate_id"]
+                [:c.user_id "user_id"])
+      (h/from [:crate_users :c])
+      (h/where [:and
+                [:= :c.crate_id crate-id]
+                [:= :c.user_id user-id]])
       sql/format))

@@ -2,7 +2,7 @@
   (:require [meuse.db.crate :as crate-db]
             [clojure.test :refer :all]))
 
-(defn test-db-state
+(defn test-crate-version
   [database expected]
   (let [crate (crate-db/get-crate-version database
                                           (:crate-name expected)
@@ -17,3 +17,10 @@
         (:version-yanked expected) (:version-yanked crate)
         (:version-description expected) (:version-description crate)
         (:crate-id crate) (:version-crate-id crate))))
+
+(defn test-crate
+  [database expected]
+  (let [crate (crate-db/get-crate database
+                                  (:crate-name expected))]
+    (is (uuid? (:crate-id crate)))
+    (is (= (:crate-name expected) (:crate-name crate)))))

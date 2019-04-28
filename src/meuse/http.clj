@@ -5,7 +5,6 @@
             [aleph.http :as http]
             [aleph.netty :as netty]
             [bidi.bidi :refer [match-route*]]
-            [byte-streams :as bs]
             [mount.core :refer [defstate]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.content-type :refer [wrap-content-type]]
@@ -19,7 +18,7 @@
             [meuse.db :refer [database]]
             [meuse.git :refer [git]]
             [meuse.middleware :refer [wrap-json]]
-            [cheshire.core :as json])
+            [meuse.request :refer [convert-body-edn]])
   (:import java.io.Closeable
            java.util.UUID))
 
@@ -30,21 +29,6 @@
    [["api/v1/crates" crates-routes]
     ["api/v1/meuse" meuse-routes]
     [true :meuse.api.default/not-found]]])
-
-(defn convert-body-edn
-  "Takes a request, tries to convert the body in edn."
-  [request]
-  (if (:body request)
-    (try
-      (update request :body
-              (fn [body]
-                (-> (bs/convert body String)
-                    (json/parse-string true))))
-      (catch Exception e
-        (error e "fail to convert the request body to json")
-        (throw (ex-info "fail to convert the request body to json"
-                        {}))))
-    request))
 
 (defmulti route! :subsystem)
 

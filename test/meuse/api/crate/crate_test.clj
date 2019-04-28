@@ -61,22 +61,22 @@
                          {:cmd "push"}]))
     (is (= (slurp (str tmp-dir "/toto/1.0.1/download"))
            crate-file))
-    (test-db-state database {:crate-name "toto"
-                             :version-version "1.0.1"
-                             :version-yanked false
-                             :version-description nil})
+    (test-crate-version database {:crate-name "toto"
+                                  :version-version "1.0.1"
+                                  :version-yanked false
+                                  :version-description nil})
     (is (thrown-with-msg? ExceptionInfo
-                            #"already exists$"
-                            (crates-api! request)))
+                          #"already exists$"
+                          (crates-api! request)))
     (let [yank-request (assoc request
                               :route-params {:crate-name "toto"
                                              :crate-version "1.0.1"}
                               :action :yank)]
       (crates-api! yank-request)
-      (test-db-state database {:crate-name "toto"
-                               :version-version "1.0.1"
-                               :version-yanked true
-                               :version-description nil})
+      (test-crate-version database {:crate-name "toto"
+                                    :version-version "1.0.1"
+                                    :version-yanked true
+                                    :version-description nil})
       (is (thrown-with-msg? ExceptionInfo
                             #"crate state is already yank$"
                             (crates-api! (assoc yank-request :action :yank))))
@@ -84,10 +84,10 @@
       (is (thrown-with-msg? ExceptionInfo
                             #"crate state is already unyank$"
                             (crates-api! (assoc yank-request :action :unyank))))
-      (test-db-state database {:crate-name "toto"
-                               :version-version "1.0.1"
-                               :version-yanked false
-                               :version-description nil}))))
+      (test-crate-version database {:crate-name "toto"
+                                    :version-version "1.0.1"
+                                    :version-yanked false
+                                    :version-description nil}))))
 
 (deftest default-not-found-test
   (is (= meuse.api.default/not-found

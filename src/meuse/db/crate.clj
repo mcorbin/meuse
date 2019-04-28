@@ -6,6 +6,14 @@
             [meuse.message :refer [yanked?->msg]])
   (:import java.util.UUID))
 
+(defn get-crate
+  "Takes a crate name and returns the crate if it exists."
+  [db-tx crate-name]
+  (-> (jdbc/query db-tx (queries/get-crate crate-name))
+      first
+      (clojure.set/rename-keys {:crate_id :crate-id
+                                :crate_name :crate-name})))
+
 (defn get-crate-version
   "Takes a crate name and version and returns the crate version if it exists."
   [db-tx crate-name crate-version]

@@ -23,4 +23,5 @@
   [f]
   (jdbc/execute! database ["TRUNCATE TABLE CRATES CASCADE;"])
   (jdbc/execute! database ["TRUNCATE TABLE CATEGORIES CASCADE;"])
+  (jdbc/execute! database ["TRUNCATE TABLE USERS CASCADE;"])
   (f))
