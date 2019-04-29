@@ -17,7 +17,7 @@
       (h/where [:= :id version-id])
       sql/format))
 
-(defn get-crate
+(defn get-crate-by-name
   [crate-name]
   (-> (h/select [:c.id "crate_id"]
                 [:c.name "crate_name"])
@@ -25,7 +25,7 @@
       (h/where [:= :c.name crate-name])
       sql/format))
 
-(defn get-crate-version
+(defn get-crate-join-version
   [crate-name crate-version]
   (-> (h/select [:c.id "crate_id"]
                 [:c.name "crate_name"]
@@ -84,7 +84,7 @@
 
 ;; categories
 
-(defn get-category
+(defn get-category-by-name
   [category-name]
   (-> (h/select [:c.id "category_id"]
                 [:c.name "category_name"]
@@ -114,7 +114,7 @@
                   description]])
       sql/format))
 
-(defn add-crate-category
+(defn create-crate-category
   [crate-id category-id]
   (-> (h/insert-into :crate_categories)
       (h/columns :crate_id
@@ -159,7 +159,7 @@
                   role-id]])
       sql/format))
 
-(defn add-crate-user
+(defn create-crate-user
   [crate-id user-id]
   (-> (h/insert-into :crate_users)
       (h/columns :crate_id

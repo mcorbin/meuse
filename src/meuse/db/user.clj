@@ -18,7 +18,7 @@
                                 :user_description :user-description
                                 :user_role_id :user-role-id})))
 
-(defn create
+(defn create-user
   "Crates an user."
   [database user]
   (jdbc/with-db-transaction [db-tx database]
@@ -40,19 +40,19 @@
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :user_id :user-id})))
 
-(defn add-owner
+(defn create-crate-user
   "Add an user as a owner of a crate"
   [database crate-name user-name]
   (jdbc/with-db-transaction [db-tx database]
     (if-let [user (get-user-by-name database user-name)]
-      (if-let [crate (crate/get-crate db-tx crate-name)]
+      (if-let [crate (crate/get-crate-by-name db-tx crate-name)]
         (do
           (when (get-crate-user db-tx (:crate-id crate) (:user-id user))
             (throw (ex-info (format "the user %s already owns the crate %s"
                                     user-name
                                     crate-name)
                             {})))
-          (jdbc/execute! db-tx (queries/add-crate-user
+          (jdbc/execute! db-tx (queries/create-crate-user
                                 (:crate-id crate)
                                 (:user-id user))))
         (throw (ex-info (format "the crate %s does not exist"
@@ -63,12 +63,12 @@
                       {})))))
 
 ;; todo: mutualize code with add-owner
-(defn remove-owner
+(defn delete-crate-user
   "Remove an user as a owner of a crate"
   [database crate-name user-name]
   (jdbc/with-db-transaction [db-tx database]
     (if-let [user (get-user-by-name database user-name)]
-      (if-let [crate (crate/get-crate db-tx crate-name)]
+      (if-let [crate (crate/get-crate-by-name db-tx crate-name)]
         (do
           (when-not (get-crate-user db-tx (:crate-id crate) (:user-id user))
             (throw (ex-info (format "the user %s does not own the crate %s"

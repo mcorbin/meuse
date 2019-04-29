@@ -20,7 +20,7 @@
 
 (defn test-crate
   [database expected]
-  (let [crate (crate-db/get-crate database
-                                  (:crate-name expected))]
+  (let [crate (crate-db/get-crate-by-name database
+                                          (:crate-name expected))]
     (is (uuid? (:crate-id crate)))
     (is (= (:crate-name expected) (:crate-name crate)))))
