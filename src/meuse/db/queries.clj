@@ -103,6 +103,18 @@
                 [:= :c.category_id category-id]])
       sql/format))
 
+(defn get-crate-categories
+  [crate-id]
+  (-> (h/select [:c.id "category_id"]
+                [:c.name "category_name"]
+                [:c.description "category_description"])
+      (h/from [:categories :c])
+      (h/left-join [:crate_categories :cc]
+                   [:and
+                    [:= :cc.category_id :c.id]
+                    [:= :cc.crate_id crate-id]])
+      sql/format))
+
 (defn create-category
   [category-name description]
   (-> (h/insert-into :categories)

@@ -17,11 +17,19 @@
 
 (defn get-crate-category
   "Get the crate/category relation for a crate and a category."
-  [database crate-id category-id]
-  (-> (jdbc/query database (queries/get-crate-category crate-id category-id))
+  [db-tx crate-id category-id]
+  (-> (jdbc/query db-tx (queries/get-crate-category crate-id category-id))
       first
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :category_id :category-id})))
+
+(defn get-crate-categories
+  "Get the crate/category relation for a crate and a category."
+  [db-tx crate-id]
+  (->> (jdbc/query db-tx (queries/get-crate-categories crate-id))
+       (map #(clojure.set/rename-keys % {:category_id :category-id
+                                         :category_name :category-name
+                                         :category_description :category-description}))))
 
 (defn create-crate-category
   "Assigns a crate to a category."
