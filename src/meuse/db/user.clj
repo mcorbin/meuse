@@ -4,7 +4,8 @@
             [meuse.db.crate :as crate]
             [meuse.db.queries :as queries]
             [meuse.db.role :as role]
-            [meuse.message :refer [yanked?->msg]])
+            [meuse.message :refer [yanked?->msg]]
+            [clojure.set :as set])
   (:import java.util.UUID))
 
 (defn get-user-by-name
@@ -42,25 +43,31 @@
 
 (defn create-crate-user
   "Add an user as a owner of a crate"
-  [database crate-name user-name]
+  [db-tx crate-name user-name]
+  (if-let [user (get-user-by-name db-tx user-name)]
+    (if-let [crate (crate/get-crate-by-name db-tx crate-name)]
+      (do
+        (when (get-crate-user db-tx (:crate-id crate) (:user-id user))
+          (throw (ex-info (format "the user %s already owns the crate %s"
+                                  user-name
+                                  crate-name)
+                          {})))
+        (jdbc/execute! db-tx (queries/create-crate-user
+                              (:crate-id crate)
+                              (:user-id user))))
+      (throw (ex-info (format "the crate %s does not exist"
+                              crate-name)
+                      {})))
+    (throw (ex-info (format "the user %s does not exist"
+                            user-name)
+                    {}))))
+
+(defn create-crate-users
+  "Add multiple users as owner of a crate"
+  [database crate-name users]
   (jdbc/with-db-transaction [db-tx database]
-    (if-let [user (get-user-by-name database user-name)]
-      (if-let [crate (crate/get-crate-by-name db-tx crate-name)]
-        (do
-          (when (get-crate-user db-tx (:crate-id crate) (:user-id user))
-            (throw (ex-info (format "the user %s already owns the crate %s"
-                                    user-name
-                                    crate-name)
-                            {})))
-          (jdbc/execute! db-tx (queries/create-crate-user
-                                (:crate-id crate)
-                                (:user-id user))))
-        (throw (ex-info (format "the crate %s does not exist"
-                                crate-name)
-                        {})))
-      (throw (ex-info (format "the user %s does not exist"
-                              user-name)
-                      {})))))
+    (doseq [user users]
+      (create-crate-user db-tx crate-name user))))
 
 ;; todo: mutualize code with add-owner
 (defn delete-crate-user
@@ -83,4 +90,25 @@
                         {})))
       (throw (ex-info (format "the user %s does not exist"
                               user-name)
+                      {})))))
+
+(defn delete-crate-users
+  "Remove multiple users as owner of a crate"
+  [database crate-name users]
+  (jdbc/with-db-transaction [db-tx database]
+    (doseq [user users]
+      (delete-crate-user db-tx crate-name user))))
+
+(defn get-crate-users
+  "Get the crate users"
+  [database crate-name]
+  (jdbc/with-db-transaction [db-tx database]
+    (if-let [crate (crate/get-crate-by-name db-tx crate-name)]
+      (->> (jdbc/query db-tx (queries/get-crate-users (:crate-id crate)))
+           (map #(set/rename-keys % {:crate_id :crate-id
+                                     :user_id :user-id
+                                     :user_cargo_id :user-cargo-id
+                                     :user_name :user-name})))
+      (throw (ex-info (format "the crate %s does not exist"
+                              crate-name)
                       {})))))

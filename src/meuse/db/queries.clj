@@ -197,3 +197,14 @@
                 [:= :c.crate_id crate-id]
                 [:= :c.user_id user-id]])
       sql/format))
+
+(defn get-crate-users
+  [crate-id]
+  (-> (h/select [:u.id "user_id"]
+                [:u.name "user_name"]
+                [:u.cargo_id "user_cargo_id"]
+                [:c.crate_id "crate_id"])
+      (h/from [:users :u])
+      (h/join [:crate_users :c] [:= :c.user_id :u.id])
+      (h/where [:= :c.crate_id crate-id])
+      sql/format))

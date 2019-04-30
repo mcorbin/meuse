@@ -45,7 +45,6 @@
                             category-name)
                     {}))))
 
-
 (defn create-crate-categories
   "Creates categories for a crate."
   [db-tx crate-id categories]

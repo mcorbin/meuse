@@ -11,12 +11,19 @@ VALUES ('a5435b66-69ba-11e9-8385-8b7c3810e186', 'tech');
 
 CREATE TABLE users(
 id UUID PRIMARY KEY,
+cargo_id SERIAL,
 name TEXT UNIQUE,
 password TEXT,
 description TEXT,
 role_id UUID,
 FOREIGN KEY (role_id) REFERENCES roles(id)
 );
+
+INSERT INTO users(id, name, password, description, role_id)
+VALUES ('fe9dd8f0-6ac6-11e9-8607-1f7cdd916f75', 'user1', '$2a$11$cI.kgSttkrag3Mdj3Zg9gupv4dZ4kFisomeWauZqSDCXa2ZSL3MwK', 'desc 1', 'a5435b66-69ba-11e9-8385-8b7c3810e186');
+
+INSERT INTO users(id, name, password, description, role_id)
+VALUES ('1dbdeb3a-6ac7-11e9-b2dc-dbb2118a325d', 'user2', '$2a$11$YEHP9DkYTPlMVZKhlHQQWulanfJHyjjYp0pyfmWngSR0rpmIcqb2i', 'desc 2', 'a5435b66-69ba-11e9-8385-8b7c3810e186');
 
 CREATE TABLE tokens(
 id UUID PRIMARY KEY,

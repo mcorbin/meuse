@@ -10,6 +10,7 @@
             [ring.middleware.content-type :refer [wrap-content-type]]
             [meuse.api.crate.http :refer [crates-routes crates-api!]]
             meuse.api.crate.new
+            meuse.api.crate.owner
             meuse.api.crate.yank
             [meuse.api.meuse.http :refer [meuse-routes meuse-api!]]
             meuse.api.meuse.category
@@ -53,7 +54,7 @@
   [request ^Exception e]
   (let [data (ex-data e)
         ;; cargo expects a status 200 OK even for errors x_x
-        status (if (= (:subsystem request) :meuse.api.crate)
+        status (if (= (:subsystem request) :meuse.api.crate.http)
                  200
                  (:status data))
         request-id (:request-id request)

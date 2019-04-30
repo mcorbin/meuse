@@ -94,3 +94,84 @@
                             (re-pattern (format "does not own the crate %s$"
                                                 (:name crate)))
                             (delete-crate-user database (:name crate) (:name user)))))))
+
+(deftest ^:integration create-crate-users-test
+  (let [users [{:name "mathieu"
+                :password "foobar"
+                :description "it's me mathieu"
+                :role "admin"}
+               {:name "lapin"
+                :password "toto"
+                :description "( )_( )
+                              (='.'=)
+                              (o)_(o)"
+                :role "admin"}]
+        crate {:name "foo"
+               :vers "1.0.1"}]
+    (testing "success"
+      (doseq [user users]
+        (create-user database user))
+      (crate-db/create-crate database {:metadata crate})
+      (create-crate-users database
+                          (:name crate)
+                          [(:name (first users))
+                           (:name (second users))])
+      (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+                                    database
+                                    (:name crate)))
+            user1-db-id (:user-id (get-user-by-name database (:name (first users))))
+            user2-db-id (:user-id (get-user-by-name database (:name (second users))))
+            crate-user1 (get-crate-user
+                         database
+                         crate-db-id
+                         user1-db-id)
+            crate-user2 (get-crate-user
+                         database
+                         crate-db-id
+                         user2-db-id)]
+        (is (= {:crate-id crate-db-id
+                :user-id user1-db-id}
+               crate-user1))
+        (is (= {:crate-id crate-db-id
+                :user-id user2-db-id}
+               crate-user2))
+        (let [crate-users (get-crate-users database (:name crate))]
+          (is (int? (:user-cargo-id (first crate-users))))
+          (is (int? (:user-cargo-id (second crate-users))))
+          (is (= [{:user-id user1-db-id
+                   :user-name (:name (first users))
+                   :crate-id crate-db-id}
+                  {:user-id user2-db-id
+                   :user-name (:name (second users))
+                   :crate-id crate-db-id}]
+                 (map #(dissoc % :user-cargo-id) crate-users))))))))
+
+(deftest ^:integration delete-crate-users-test
+  (let [users [{:name "mathieu"
+                :password "foobar"
+                :description "it's me mathieu"
+                :role "admin"}
+               {:name "lapin"
+                :password "toto"
+                :description "( )_( )
+                              (='.'=)
+                              (o)_(o)"
+                :role "admin"}]
+        crate {:name "foo"
+               :vers "1.0.1"}]
+    (testing "success"
+      (crate-db/create-crate database {:metadata crate})
+      (doseq [user users]
+        (create-user database user)
+        (create-crate-user database (:name crate) (:name user)))
+      (delete-crate-users database
+                          (:name crate)
+                          [(:name (first users))
+                           (:name (second users))])
+      (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+                                    database
+                                    (:name crate)))
+            user1-db-id (:user-id (get-user-by-name database (:name (first users))))
+            user2-db-id (:user-id (get-user-by-name database (:name (second users))))]
+        (is (nil? (get-crate-user database crate-db-id user1-db-id)))
+        (is (nil? (get-crate-user database crate-db-id user2-db-id)))))))

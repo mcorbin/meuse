@@ -12,5 +12,5 @@
   [base-path {:keys [metadata crate-file]}]
   (let [path (crate-file-path base-path (:name metadata) (:vers metadata))]
     (io/make-parents path)
-    (spit path
-          (String. crate-file java.nio.charset.StandardCharsets/UTF_8))))
+    (with-open [w (io/output-stream path)]
+      (.write w crate-file))))
