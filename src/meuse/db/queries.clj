@@ -2,6 +2,7 @@
   "Database queries."
   (:require [honeysql.core :as sql]
             [honeysql.helpers :as h]
+            [honeysql.format :refer [fn-handler to-sql expand-binary-ops]]
             [meuse.auth.password :as password])
   (:import java.sql.Timestamp
            java.util.Date
@@ -70,6 +71,7 @@
                     (:yanked metadata false)
                     now
                     now
+                    ;; todo: important: use parameters
                     (sql/raw (format
                               (str
                                "("
@@ -208,3 +210,32 @@
       (h/join [:crate_users :c] [:= :c.user_id :u.id])
       (h/where [:= :c.crate_id crate-id])
       sql/format))
+
+;; search
+
+;; tsvector_matches
+(defmethod fn-handler "@@"
+  [_ a b & more]
+  (if (seq more)
+    (expand-binary-ops "@@" a b more)
+    (str (to-sql a) " @@ " (to-sql b))))
+
+(defn search-crates
+  [query]
+  (-> (h/select [:c.id "crate_id"]
+                [:c.name "crate_name"]
+                [:v.id "version_id"]
+                [:v.version "version_version"]
+                [:v.description "version_description"]
+                [:v.yanked "version_yanked"]
+                [:v.created_at "version_created_at"]
+                [:v.updated_at "version_updated_at"]
+                [:v.document_vectors "version_document_vectors"]
+                [:v.crate_id "version_crate_id"])
+      (h/from [:crates :c])
+      (h/join [:crate_versions :v] [:and
+                                    [:= :c.id :v.crate_id]
+                                    (sql/raw "document_vectors @@ to_tsquery(?)")])
+      sql/format
+      (conj query)))
+

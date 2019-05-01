@@ -3,6 +3,7 @@
 
 (def crates-routes
   {#"/new/?" {:put ::new}
+   #"/?" {:get ::search}
    ["/" :crate-name #"/owners/?"] {:put ::add-owner}
    ["/" :crate-name #"/owners/?"] {:delete ::remove-owner}
    ["/" :crate-name #"/owners/?"] {:get ::list-owners}

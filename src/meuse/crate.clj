@@ -4,7 +4,8 @@
             [cheshire.core :as json]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [digest :as digest])
   (:import java.util.Arrays))
 
 (defn check-size
@@ -34,8 +35,10 @@
         _ (check-size byte-array (+ metadata-size 4 crate-size))
         crate-file (Arrays/copyOfRange byte-array
                                        (+ 4 metadata-size 4)
-                                       (+ 4 metadata-size 4 crate-size))]
+                                       (+ 4 metadata-size 4 crate-size))
+        sha256sum (digest/sha-256 crate-file)]
     {:metadata (-> (String. metadata)
                    (json/parse-string true)
-                   (assoc :yanked false))
+                   (assoc :yanked false)
+                   (assoc :cksum sha256sum))
      :crate-file crate-file}))

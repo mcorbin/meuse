@@ -21,7 +21,8 @@
                  [org.postgresql/postgresql "42.2.5"]
                  [ring/ring-core "1.7.1"]
                  [spootnik/signal "0.2.2"]
-                 [spootnik/unilog "0.7.24"]]
+                 [spootnik/unilog "0.7.24"]
+                 [digest "1.4.9"]]
   :main ^:skip-aot meuse.core
   :target-path "target/%s"
   :source-paths ["src"]

@@ -6,12 +6,16 @@
             [aleph.netty :as netty]
             [bidi.bidi :refer [match-route*]]
             [mount.core :refer [defstate]]
+            [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.content-type :refer [wrap-content-type]]
             [meuse.api.crate.http :refer [crates-routes crates-api!]]
+            [meuse.api.default :refer [not-found]]
             meuse.api.crate.new
             meuse.api.crate.owner
             meuse.api.crate.yank
+            meuse.api.crate.download
+            meuse.api.crate.search
             [meuse.api.meuse.http :refer [meuse-routes meuse-api!]]
             meuse.api.meuse.category
             [meuse.api.default :refer [default-api!]]
@@ -47,7 +51,7 @@
 
 (defmethod route! :default
   [request]
-  {:status 404})
+  not-found)
 
 (defn handle-req-errors
   "Handles HTTP exceptions."
@@ -83,6 +87,9 @@
                          :subsystem (-> request :handler namespace keyword)
                          :action (-> request :handler name keyword))]
       (try
+        (debug "request " (:request-id request)
+               "with subsystem" (:subsystem request)
+               "with action" (:action request))
         (route! request)
         (catch Exception e
           (handle-req-errors request e))))))
@@ -95,7 +102,8 @@
                                       database
                                       git)
                          wrap-json
-                         wrap-keyword-params)
+                         wrap-keyword-params
+                         wrap-params)
                      http-config))
 
 (defstate http-server
