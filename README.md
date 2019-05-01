@@ -2,7 +2,7 @@
 
 A Rust registry written in Clojure.
 
-WIP, more infos soon !
+WIP, cf https://mcorbin.fr/posts/2019-05-01-meuse-rust-registry/
 
 ## Run PG
 
