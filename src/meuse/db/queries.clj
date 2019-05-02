@@ -63,26 +63,25 @@
                    :yanked
                    :created_at
                    :updated_at
+                   :crate_id
                    :document_vectors
-                   :crate_id)
+                   )
         (h/values [[(UUID/randomUUID)
                     (:vers metadata)
                     (:description metadata)
                     (:yanked metadata false)
                     now
                     now
-                    ;; todo: important: use parameters
-                    (sql/raw (format
-                              (str
-                               "("
-                               "to_tsvector('%s') || "
-                               "to_tsvector('%s')"
-                               ")")
-                              (:name metadata)
-                              (:description metadata)
-                              ))
-                    crate-id]])
-        sql/format)))
+                    crate-id
+                    (sql/raw (str
+                              "("
+                              "to_tsvector(?) || "
+                              "to_tsvector(?)"
+                              ")")
+                              )]])
+        sql/format
+        (conj (:name metadata))
+        (conj (:description metadata)))))
 
 ;; categories
 
