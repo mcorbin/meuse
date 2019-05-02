@@ -29,10 +29,10 @@ Meuse needs a `yaml` configuration file. An example file exists in `dev/resource
   - port: the Meuse HTTP port.
 * logging: logging configuration, cf the [https://github.com/pyr/unilog/](unilog) library doc.
 * metadata:
-  - path: the path to your Git repository. The Meuse process should be able to access and write in it.
+  - path: the directory path to your Git repository. The Meuse process should be able to access and write in it.
   - target: the target branch, the format should be `<remote>/<branch>`
 * crate:
-  - path: The direcotyr where Meuse will save crates files. Meuse will also expose this directory for Cargo.
+  - path: The directory where Meuse will save crates files. Meuse will also expose this directory for Cargo.
 
 ### Run meuse
 
