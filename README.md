@@ -53,7 +53,16 @@ Add an entry for your custom registry in your `.cargo/config` file:
 index = "https://github.com/mcorbin/testregistry.git"
 ```
 
-Add a tandom token for this registry in `.cargo/credentials` (currently, token management is not implemented in Meuse ^^):
+Your Git repository should contain a `config.json` file which will contain the URL of the Meuse API (as described in the Cargo (https://doc.rust-lang.org/nightly/cargo/reference/registries.html)[registries] documentation), for example:
+
+```
+{
+    "dl": "http://localhost:8855/api/v1/crates",
+    "api": "http://localhost:8855"
+}
+```
+
+Next, Add a random token for this registry in `.cargo/credentials` (currently, token management is not implemented in Meuse ^^):
 
 ```
 [registries.custom]
