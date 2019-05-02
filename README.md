@@ -18,7 +18,7 @@ Crates metadata are stored in a Git repository. You need a git repository on the
 
 ### Meuse configuration
 
-Meuse needs a `yaml` configuration file. An example file exists in `dev/resources/config.yaml` (this is the one I use work I work on the project). The configuration sections are:
+Meuse needs a `yaml` configuration file. An example file exists in `dev/resources/config.yaml` (this is the one I use when I work on the project). The configuration sections are:
 
 * database:
   - user: the database user.
