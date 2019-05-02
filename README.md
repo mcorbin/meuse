@@ -27,7 +27,7 @@ Meuse needs a `yaml` configuration file. An example file exists in `dev/resource
 * http:
   - address: the IP address on which Meuse will listen.
   - port: the Meuse HTTP port.
-* logging: logging configuration, cf the https://github.com/pyr/unilog/[unilog] library doc.
+* logging: logging configuration, cf the [https://github.com/pyr/unilog/](unilog) library doc.
 * metadata:
   - path: the path to your Git repository. The Meuse process should be able to access and write in it.
   - target: the target branch, the format should be `<remote>/<branch>`
@@ -36,7 +36,7 @@ Meuse needs a `yaml` configuration file. An example file exists in `dev/resource
 
 ### Run meuse
 
-You currently need https://leiningen.org/[Leiningen], a Clojure build tool, to run the project. In the future, I will release `Meuse` jars for Meuse versions.
+You currently need [https://leiningen.org/](Leiningen), a Clojure build tool, to run the project. In the future, I will release `Meuse` jars for Meuse versions.
 
 The `MEUSE_CONFIGURATION` variable should be the path of your yaml configuration file. You can then run the project with `lein run` in the project directory:
 
