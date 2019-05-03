@@ -1,6 +1,6 @@
 (ns meuse.db.category
   "Manage categories in the database"
-  (:require [meuse.db.queries :as queries]
+  (:require [meuse.db.queries.category :as queries]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]))
 

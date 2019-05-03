@@ -34,7 +34,7 @@ Meuse needs a `yaml` configuration file. An example file exists in `dev/resource
 * crate:
   - path: The directory where Meuse will save crates files. Meuse will also expose this directory for Cargo.
 
-### Run meuse
+### Run Meuse
 
 You currently need [https://leiningen.org/](Leiningen), a Clojure build tool, to run the project. In the future, I will release `Meuse` jars for Meuse versions.
 

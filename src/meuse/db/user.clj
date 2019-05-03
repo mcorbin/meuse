@@ -2,7 +2,7 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]
             [meuse.db.crate :as crate]
-            [meuse.db.queries :as queries]
+            [meuse.db.queries.user :as user-queries]
             [meuse.db.role :as role]
             [meuse.message :refer [yanked?->msg]]
             [clojure.set :as set])
@@ -11,7 +11,7 @@
 (defn get-user-by-name
   "Get an user by username."
   [db-tx user-name]
-  (-> (jdbc/query db-tx (queries/get-user-by-name user-name))
+  (-> (jdbc/query db-tx (user-queries/get-user-by-name user-name))
       first
       (clojure.set/rename-keys {:user_id :user-id
                                 :user_name :user-name
@@ -28,7 +28,7 @@
         (throw (ex-info (format "the user %s already exists"
                                 (:name user))
                         {:status 400}))
-        (jdbc/execute! db-tx (queries/create-user user (:role-id role))))
+        (jdbc/execute! db-tx (user-queries/create-user user (:role-id role))))
       (throw (ex-info (format "the role %s does not exist"
                               (:role user))
                       {:status 400})))))
@@ -36,7 +36,7 @@
 (defn get-crate-user
   "Get the crate/user relation for a crate and an user."
   [db-tx crate-id user-id]
-  (-> (jdbc/query db-tx (queries/get-crate-user crate-id user-id))
+  (-> (jdbc/query db-tx (user-queries/get-crate-user crate-id user-id))
       first
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :user_id :user-id})))
@@ -52,7 +52,7 @@
                                   user-name
                                   crate-name)
                           {})))
-        (jdbc/execute! db-tx (queries/create-crate-user
+        (jdbc/execute! db-tx (user-queries/create-crate-user
                               (:crate-id crate)
                               (:user-id user))))
       (throw (ex-info (format "the crate %s does not exist"
@@ -82,7 +82,7 @@
                                     user-name
                                     crate-name)
                             {})))
-          (jdbc/execute! db-tx (queries/delete-crate-user
+          (jdbc/execute! db-tx (user-queries/delete-crate-user
                                 (:crate-id crate)
                                 (:user-id user))))
         (throw (ex-info (format "the crate %s does not exist"
@@ -104,7 +104,7 @@
   [database crate-name]
   (jdbc/with-db-transaction [db-tx database]
     (if-let [crate (crate/get-crate-by-name db-tx crate-name)]
-      (->> (jdbc/query db-tx (queries/get-crate-users (:crate-id crate)))
+      (->> (jdbc/query db-tx (user-queries/get-crate-users (:crate-id crate)))
            (map #(set/rename-keys % {:crate_id :crate-id
                                      :user_id :user-id
                                      :user_cargo_id :user-cargo-id

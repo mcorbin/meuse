@@ -2,7 +2,7 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.string :as string]
             [clojure.tools.logging :refer [debug info error]]
-            [meuse.db.queries :as queries]))
+            [meuse.db.queries.search :as search-queries]))
 
 (defn format-query-string
   [query-string]
@@ -13,7 +13,7 @@
   "Search crates, returns the first `nb` results."
   [database query-string]
   (->> (jdbc/query database
-                   (queries/search-crates (format-query-string query-string)))
+                   (search-queries/search-crates (format-query-string query-string)))
        (map #(clojure.set/rename-keys
               %
               {:crate_id :crate-id

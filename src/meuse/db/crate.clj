@@ -2,7 +2,8 @@
   "Manages crates in the database."
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]
-            [meuse.db.queries :as queries]
+            [meuse.db.queries.crate :as crate-queries]
+            [meuse.db.queries.category :as category-queries]
             [meuse.db.category :as category]
             [meuse.message :refer [yanked?->msg]])
   (:import java.util.UUID))
@@ -10,7 +11,7 @@
 (defn get-crate-by-name
   "Takes a crate name and returns the crate if it exists."
   [db-tx crate-name]
-  (-> (jdbc/query db-tx (queries/get-crate-by-name crate-name))
+  (-> (jdbc/query db-tx (crate-queries/get-crate-by-name crate-name))
       first
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :crate_name :crate-name})))
@@ -18,7 +19,7 @@
 (defn get-crate-category
   "Get the crate/category relation for a crate and a category."
   [db-tx crate-id category-id]
-  (-> (jdbc/query db-tx (queries/get-crate-category crate-id category-id))
+  (-> (jdbc/query db-tx (category-queries/get-crate-category crate-id category-id))
       first
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :category_id :category-id})))
@@ -26,7 +27,7 @@
 (defn get-crate-categories
   "Get the crate/category relation for a crate and a category."
   [db-tx crate-id]
-  (->> (jdbc/query db-tx (queries/get-crate-categories crate-id))
+  (->> (jdbc/query db-tx (category-queries/get-crate-categories crate-id))
        (map #(clojure.set/rename-keys % {:category_id :category-id
                                          :category_name :category-name
                                          :category_description :category-description}))))
@@ -38,7 +39,7 @@
     (when-not (get-crate-category db-tx
                                   crate-id
                                   (:category-id category))
-      (jdbc/execute! db-tx (queries/create-crate-category
+      (jdbc/execute! db-tx (category-queries/create-crate-category
                             crate-id
                             (:category-id category))))
     (throw (ex-info (format "the category %s does not exist"
@@ -54,7 +55,7 @@
 (defn get-crate-version
   "Takes a crate name and version and returns the crate version if it exists."
   [db-tx crate-name crate-version]
-  (-> (jdbc/query db-tx (queries/get-crate-join-version crate-name crate-version))
+  (-> (jdbc/query db-tx (crate-queries/get-crate-join-version crate-name crate-version))
       first
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :crate_name :crate-name
@@ -82,14 +83,16 @@
                                   (:vers metadata))
                           {})))
         ;; insert the new version
-        (jdbc/execute! db-tx (queries/create-version metadata (:crate-id crate)))
+        (jdbc/execute! db-tx (crate-queries/create-version
+                              metadata
+                              (:crate-id crate)))
         (create-crate-categories db-tx
                                  (:crate-id crate)
                                  (:categories metadata)))
       ;; the crate does not exist
       (let [crate-id (UUID/randomUUID)
-            create-crate (queries/create-crate metadata crate-id)
-            create-version (queries/create-version metadata crate-id)]
+            create-crate (crate-queries/create-crate metadata crate-id)
+            create-version (crate-queries/create-version metadata crate-id)]
         (jdbc/execute! db-tx create-crate)
         (jdbc/execute! db-tx create-version)
         (create-crate-categories db-tx
@@ -118,7 +121,7 @@
                     (yanked?->msg yanked?))
             {:crate-name crate-name
              :crate-version crate-version})))
-        (jdbc/execute! db-tx (queries/update-yanked (:version-id crate) yanked?)))
+        (jdbc/execute! db-tx (crate-queries/update-yanked (:version-id crate) yanked?)))
       (throw (ex-info (format "cannot %s the crate: the crate does not exist"
                               (yanked?->msg yanked?))
                       {:crate-name crate-name
