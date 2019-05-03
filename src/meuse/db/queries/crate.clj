@@ -7,7 +7,7 @@
 
 (defn update-yanked
   [version-id yanked?]
-  (-> (h/update :crate_versions)
+  (-> (h/update :crates_versions)
       (h/sset {:yanked yanked?})
       (h/where [:= :id version-id])
       sql/format))
@@ -33,9 +33,9 @@
                 [:v.document_vectors "version_document_vectors"]
                 [:v.crate_id "version_crate_id"])
       (h/from [:crates :c])
-      (h/left-join [:crate_versions :v] [:and
-                                         [:= :c.id :v.crate_id]
-                                         [:= :v.version crate-version]])
+      (h/left-join [:crates_versions :v] [:and
+                                          [:= :c.id :v.crate_id]
+                                          [:= :v.version crate-version]])
       (h/where [:= :c.name crate-name])
       sql/format))
 
@@ -50,7 +50,7 @@
 (defn create-version
   [metadata crate-id]
   (let [now (new Timestamp (.getTime (new Date)))]
-    (-> (h/insert-into :crate_versions)
+    (-> (h/insert-into :crates_versions)
         (h/columns :id
                    :version
                    :description
@@ -72,7 +72,7 @@
                               "to_tsvector(?) || "
                               "to_tsvector(?)"
                               ")")
-                              )]])
+                             )]])
         sql/format
         (conj (:name metadata))
         (conj (:description metadata)))))

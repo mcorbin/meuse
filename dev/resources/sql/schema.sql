@@ -38,7 +38,7 @@ id UUID PRIMARY KEY,
 name TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE crate_versions(
+CREATE TABLE crates_versions(
 id UUID PRIMARY KEY,
 version TEXT NOT NULL,
 description TEXT,
@@ -50,9 +50,9 @@ crate_id UUID,
 FOREIGN KEY (crate_id) REFERENCES crates(id)
 );
 
-CREATE INDEX idx_crate_versions_document_vectors ON crate_versions USING gin(document_vectors);
+CREATE INDEX idx_crates_versions_document_vectors ON crates_versions USING gin(document_vectors);
 
-CREATE TABLE crate_users(
+CREATE TABLE crates_users(
 crate_id UUID,
 user_id UUID,
 PRIMARY KEY(crate_id, user_id),
@@ -66,7 +66,7 @@ description TEXT,
 name TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE crate_categories (
+CREATE TABLE crates_categories (
 crate_id UUID,
 category_id UUID,
 PRIMARY KEY(category_id, crate_id),

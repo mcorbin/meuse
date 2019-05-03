@@ -40,7 +40,7 @@
 
 (defn create-crate-user
   [crate-id user-id]
-  (-> (h/insert-into :crate_users)
+  (-> (h/insert-into :crates_users)
       (h/columns :crate_id
                  :user_id)
       (h/values [[crate-id
@@ -49,7 +49,7 @@
 
 (defn delete-crate-user
   [crate-id user-id]
-  (-> (h/delete-from :crate_users)
+  (-> (h/delete-from :crates_users)
       (h/where [:and
                 [:= :crate_id crate-id]
                 [:= :user_id user-id]])
@@ -59,7 +59,7 @@
   [crate-id user-id]
   (-> (h/select [:c.crate_id "crate_id"]
                 [:c.user_id "user_id"])
-      (h/from [:crate_users :c])
+      (h/from [:crates_users :c])
       (h/where [:and
                 [:= :c.crate_id crate-id]
                 [:= :c.user_id user-id]])
@@ -72,6 +72,6 @@
                 [:u.cargo_id "user_cargo_id"]
                 [:c.crate_id "crate_id"])
       (h/from [:users :u])
-      (h/join [:crate_users :c] [:= :c.user_id :u.id])
+      (h/join [:crates_users :c] [:= :c.user_id :u.id])
       (h/where [:= :c.crate_id crate-id])
       sql/format))

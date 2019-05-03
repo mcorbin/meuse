@@ -15,8 +15,8 @@
                 [:v.document_vectors "version_document_vectors"]
                 [:v.crate_id "version_crate_id"])
       (h/from [:crates :c])
-      (h/join [:crate_versions :v] [:and
-                                    [:= :c.id :v.crate_id]
-                                    (sql/raw "document_vectors @@ to_tsquery(?)")])
+      (h/join [:crates_versions :v] [:and
+                                     [:= :c.id :v.crate_id]
+                                     (sql/raw "document_vectors @@ to_tsquery(?)")])
       sql/format
       (conj query)))
