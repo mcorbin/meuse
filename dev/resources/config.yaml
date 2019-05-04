@@ -6,7 +6,7 @@ http:
   address: 127.0.0.1
   port: 8855
 logging:
-  level: debug
+  level: info
   console: true
 metadata:
   path: "/home/mathieu/prog/rust/testregistry"

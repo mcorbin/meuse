@@ -68,12 +68,12 @@
                                         :route-params {:crate-name (:name crate)}})]
           (is (= (update-in crate-users
                             [:body :users]
-                            (fn [u] (map #(dissoc % :id) u)))
+                            (fn [u] (set (map #(dissoc % :id) u))))
                  {:status 200
-                  :body {:users [{:login (:name (first users))
-                                  :name (:name (first users))}
-                                 {:login (:name (second users))
-                                  :name (:name (second users))}]}})))))))
+                  :body {:users (set [{:login (:name (first users))
+                                       :name (:name (first users))}
+                                      {:login (:name (second users))
+                                       :name (:name (second users))}])}})))))))
 
 (deftest ^:integration remove-owner-test
   (let [users [{:name "mathieu"

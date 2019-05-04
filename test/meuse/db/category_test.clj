@@ -9,18 +9,18 @@
 (use-fixtures :each table-fixture)
 
 (deftest test-create-categories
-  (create-category database "email" "category description")
+  (create-category database "cat1" "category description")
   (is (thrown-with-msg? ExceptionInfo
                         #"already exists$"
                         (create-category database "email" "category description")))
-  (let [category (get-category-by-name database "email")]
+  (let [category (get-category-by-name database "cat1")]
     (is (uuid? (:category-id category)))
-    (is (= "email" (:category-name category)))
+    (is (= "cat1" (:category-name category)))
     (is (= "category description" (:category-description category))))
-  (create-category database "food" "another category")
-  (let [category (get-category-by-name database "food")]
+  (create-category database "cat2" "another category")
+  (let [category (get-category-by-name database "cat2")]
     (is (uuid? (:category-id category)))
-    (is (= "food" (:category-name category)))
+    (is (= "cat2" (:category-name category)))
     (is (= "another category" (:category-description category)))))
 
 

@@ -1,5 +1,6 @@
 (ns meuse.helpers.fixtures
   (:require [meuse.db :refer [database]]
+            [meuse.helpers.db :as helpers]
             [clojure.java.io :as io]
             [clojure.java.jdbc :as jdbc]
             [clojure.test :refer :all]
@@ -24,4 +25,5 @@
   (jdbc/execute! database ["TRUNCATE TABLE CRATES CASCADE;"])
   (jdbc/execute! database ["TRUNCATE TABLE CATEGORIES CASCADE;"])
   (jdbc/execute! database ["TRUNCATE TABLE USERS CASCADE;"])
+  (helpers/create-test-db! database)
   (f))

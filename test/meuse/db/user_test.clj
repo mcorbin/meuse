@@ -138,13 +138,13 @@
         (let [crate-users (get-crate-users database (:name crate))]
           (is (int? (:user-cargo-id (first crate-users))))
           (is (int? (:user-cargo-id (second crate-users))))
-          (is (= [{:user-id user1-db-id
-                   :user-name (:name (first users))
-                   :crate-id crate-db-id}
-                  {:user-id user2-db-id
-                   :user-name (:name (second users))
-                   :crate-id crate-db-id}]
-                 (map #(dissoc % :user-cargo-id) crate-users))))))))
+          (is (= (set [{:user-id user1-db-id
+                        :user-name (:name (first users))
+                        :crate-id crate-db-id}
+                       {:user-id user2-db-id
+                        :user-name (:name (second users))
+                        :crate-id crate-db-id}])
+                 (set (map #(dissoc % :user-cargo-id) crate-users)))))))))
 
 (deftest ^:integration delete-crate-users-test
   (let [users [{:name "mathieu"

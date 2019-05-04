@@ -58,8 +58,7 @@
                    :created_at
                    :updated_at
                    :crate_id
-                   :document_vectors
-                   )
+                   :document_vectors)
         (h/values [[(UUID/randomUUID)
                     (:vers metadata)
                     (:description metadata)
@@ -71,8 +70,7 @@
                               "("
                               "to_tsvector(?) || "
                               "to_tsvector(?)"
-                              ")")
-                             )]])
+                              ")"))]])
         sql/format
         (conj (:name metadata))
         (conj (:description metadata)))))

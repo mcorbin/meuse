@@ -34,31 +34,31 @@
 (deftest ^:integration create-crate-with-categories
   (let [crate {:metadata {:name "test1"
                           :vers "0.1.3"
-                          :categories ["email" "system"]
+                          :categories ["cat1" "cat2"]
                           :yanked false}}]
-    (category-db/create-category database "email" "description 1")
-    (category-db/create-category database "system" "description 2")
+    (category-db/create-category database "cat1" "description 1")
+    (category-db/create-category database "cat2" "description 2")
     (create-crate database crate)
     (let [crate-db (get-crate-by-name database "test1")
           [c1 c2 :as categories] (->> (get-crate-categories database
                                                             (:crate-id crate-db))
                                       (sort-by :category-name))]
-      (is (= 2 (count categories)))
+      (is (= 4 (count categories)))
       (is (uuid? (:category-id c1)))
-      (is (= {:category-name "email" :category-description "description 1"}
+      (is (= {:category-name "cat1" :category-description "description 1"}
              (dissoc c1 :category-id)))
       (is (uuid? (:category-id c2)))
-      (is (= {:category-name "system" :category-description "description 2"}
+      (is (= {:category-name "cat2" :category-description "description 2"}
              (dissoc c2 :category-id))))))
 
 (deftest ^:integration create-crate-with-categories-error
   (let [crate {:metadata {:name "test1"
                           :vers "0.1.3"
-                          :categories ["email" "system"]
+                          :categories ["cat1" "cat2"]
                           :yanked false}}]
-    (category-db/create-category database "system" "description 2")
+    (category-db/create-category database "cat1" "description 2")
     (is (thrown-with-msg? ExceptionInfo
-                            #"the category email does not exist"
+                            #"the category cat2 does not exist"
                             (create-crate database crate)))))
 
 (deftest ^:integration update-yank-test
@@ -96,7 +96,7 @@
 (deftest ^:integration create-crate-category-test
   (let [crate {:name "foo"
                :vers "1.0.1"}
-        category-name "email"
+        category-name "cat1"
         category-description "another category"]
     (testing "success"
       (category-db/create-category database
