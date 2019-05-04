@@ -36,21 +36,6 @@
                          (string/join ", " users)
                          crate-name)}}))
 
-(defmethod crates-api! :remove-owner
-  [request]
-  (let [crate-name (get-in request [:route-params
-                                    :crate-name])
-        users (-> (convert-body-edn request)
-                  (get-in [:body :users]))]
-    (user-db/delete-crate-users (:database request)
-                                crate-name
-                                users)
-    {:status 200
-     :body {:ok true
-            :msg (format "removed user(s) %s as owner(s) of crate %s"
-                         (string/join ", " users)
-                         crate-name)}}))
-
 (defmethod crates-api! :list-owners
   [request]
   (let [crate-name (get-in request [:route-params

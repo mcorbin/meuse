@@ -12,5 +12,6 @@
               crate-name
               crate-version)]
     (debug "serving crate file" path)
+    ;; todo: check if file exists
     {:status 200
      :body (io/file path)}))

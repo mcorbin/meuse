@@ -98,12 +98,12 @@
                      :msg (format "removed user(s) %s as owner(s) of crate %s"
                                   (string/join ", " (map :name users))
                                   (:name crate))}}
-          (crates-api! {:action :remove-owner
-                        :database database
-                        :route-params {:crate-name "foo"}
-                        :body (json/generate-string
-                               {:users [(:name (first users))
-                                        (:name (second users))]})})))
+             (crates-api! {:action :remove-owner
+                           :database database
+                           :route-params {:crate-name "foo"}
+                           :body (json/generate-string
+                                  {:users [(:name (first users))
+                                           (:name (second users))]})})))
       (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
                                     database
                                     (:name crate)))

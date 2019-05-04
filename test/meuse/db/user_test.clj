@@ -129,3 +129,8 @@
           user2-db-id (:user-id (get-user-by-name database "user3"))]
       (is (nil? (get-crate-user database crate-db-id user1-db-id)))
       (is (nil? (get-crate-user database crate-db-id user2-db-id))))))
+
+(deftest ^:integration get-crate-users-error-test
+  (is (thrown-with-msg? ExceptionInfo
+                        #"the crate foobar does not exist"
+                        (get-crate-users database "foobar"))))
