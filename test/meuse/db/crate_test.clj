@@ -62,61 +62,41 @@
 
 (deftest ^:integration update-yank-test
   (testing "success"
-    (let [crate {:name "test1"
-                 :vers "0.1.3"
-                 :yanked false}]
-      (create-crate database crate)
-      (test-crate-version database {:crate-name "test1"
-                                    :version-version "0.1.3"
-                                    :version-yanked false
-                                    :version-description nil})
-      (update-yank database "test1" "0.1.3" true)
-      (test-crate-version database {:crate-name "test1"
-                                    :version-version "0.1.3"
-                                    :version-yanked true
-                                    :version-description nil})
-      (update-yank database "test1" "0.1.3" false)
-      (test-crate-version database {:crate-name "test1"
-                                    :version-version "0.1.3"
-                                    :version-yanked false
-                                    :version-description nil})))
+    (update-yank database "crate1" "1.1.0" true)
+    (test-crate-version database {:crate-name "crate1"
+                                  :version-version "1.1.0"
+                                  :version-yanked true
+                                  :version-description "the crate1 description, this crate is for foobar"})
+    (update-yank database "crate1" "1.1.0" false)
+    (test-crate-version database {:crate-name "crate1"
+                                  :version-version "1.1.0"
+                                  :version-yanked false
+                                  :version-description "the crate1 description, this crate is for foobar"}))
   (testing "error"
-    (let [crate {:name "test3"
-                 :vers "0.1.3"
-                 :yanked false}]
-      (is (thrown-with-msg? ExceptionInfo
-                            #"the crate does not exist$"
-                            (update-yank database "test3" "0.1.3" false)))
-      (create-crate database crate)
-      (is (thrown-with-msg? ExceptionInfo
-                            #"the version does not exist$"
-                            (update-yank database "test3" "0.1.4" false))))))
+    (is (thrown-with-msg? ExceptionInfo
+                          #"the crate does not exist$"
+                          (update-yank database "doesnotexist" "0.1.3" false)))
+    (is (thrown-with-msg? ExceptionInfo
+                          #"the version does not exist$"
+                          (update-yank database "crate1" "0.1.4" false)))))
 
 (deftest ^:integration create-crate-category-test
-  (let [crate {:name "foo"
-               :vers "1.0.1"}
-        category-name "cat1"
-        category-description "another category"]
-    (testing "success"
-      (category-db/create-category database
-                       category-name
-                       category-description)
-      (create-crate database crate)
-      (let [crate-db-id (:crate-id (get-crate-by-name
-                                    database (:name crate)))
-            category-db-id (:category-id (category-db/get-category-by-name
-                                          database
-                                          category-name))
-            _  (create-crate-category database crate-db-id category-name)
-            crate-category (get-crate-category database
-                                               crate-db-id
-                                               category-db-id)]
-        (is (= (:category-id crate-category) category-db-id))
-        (is (= (:crate-id crate-category) crate-db-id))
-        (create-crate-category database crate-db-id category-name)))
-    (testing "errors"
-      (is (thrown-with-msg? ExceptionInfo
-                            #"the category foo does not exist$"
-                            (create-crate-category database
-                                                   (UUID/randomUUID)
-                                                   "foo"))))))
+  (let [crate-db-id (:crate-id (get-crate-by-name
+                                database
+                                "crate2"))
+        category-db-id (:category-id (category-db/get-category-by-name
+                                      database
+                                      "email"))
+        _ (create-crate-category database crate-db-id "email")
+        crate-category (get-crate-category database
+                                           crate-db-id
+                                           category-db-id)]
+    (is (= (:category-id crate-category) category-db-id))
+    (is (= (:crate-id crate-category) crate-db-id))
+    (create-crate-category database crate-db-id "email"))
+  (testing "errors"
+    (is (thrown-with-msg? ExceptionInfo
+                          #"the category foo does not exist$"
+                          (create-crate-category database
+                                                 (UUID/randomUUID)
+                                                 "foo")))))

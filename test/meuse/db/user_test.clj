@@ -36,16 +36,13 @@
   (let [user {:name "mathieu"
               :password "foobar"
               :description "it's me mathieu"
-              :role "admin"}
-        crate {:name "foo"
-               :vers "1.0.1"}]
+              :role "admin"}]
     (testing "success"
       (create-user database user)
-      (crate-db/create-crate database crate)
-      (create-crate-user database (:name crate) (:name user))
+      (create-crate-user database "crate1" (:name user))
       (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
                                     database
-                                    (:name crate)))
+                                    "crate1"))
             user-db-id (:user-id (get-user-by-name database (:name user)))
             crate-user (get-crate-user
                         database
@@ -60,118 +57,75 @@
                             (create-crate-user database "oups" (:name user))))
       (is (thrown-with-msg? ExceptionInfo
                             #"does not exist$"
-                            (create-crate-user database (:name crate) "oups")))
+                            (create-crate-user database "crate1" "oups")))
       (is (thrown-with-msg? ExceptionInfo
                             (re-pattern (format "already owns the crate %s$"
-                                                (:name crate)))
-                            (create-crate-user database (:name crate) (:name user)))))))
+                                                "crate1"))
+                            (create-crate-user database "crate1" (:name user)))))))
 
 (deftest ^:integration delete-crate-user-test
-  (let [user {:name "mathieu"
-              :password "foobar"
-              :description "it's me mathieu"
-              :role "admin"}
-        crate {:name "foo"
-               :vers "1.0.1"}]
-    (testing "success"
-      (create-user database user)
-      (crate-db/create-crate database crate)
-      (create-crate-user database (:name crate) (:name user))
-      (delete-crate-user database (:name crate) (:name user))
-      (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
-                                    database
-                                    (:name crate)))
-            user-db-id (:user-id (get-user-by-name database (:name user)))]
-        (is (nil? (get-crate-user database crate-db-id user-db-id)))))
-    (testing "error"
-      (is (thrown-with-msg? ExceptionInfo
-                            #"does not exist$"
-                            (delete-crate-user database "oups" (:name user))))
-      (is (thrown-with-msg? ExceptionInfo
-                            #"does not exist$"
-                            (delete-crate-user database (:name crate) "oups")))
-      (is (thrown-with-msg? ExceptionInfo
-                            (re-pattern (format "does not own the crate %s$"
-                                                (:name crate)))
-                            (delete-crate-user database (:name crate) (:name user)))))))
+  (testing "success"
+    (delete-crate-user database "crate1" "user2")
+    (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+                                  database
+                                  "crate1"))
+          user-db-id (:user-id (get-user-by-name database "user2"))]
+      (is (nil? (get-crate-user database crate-db-id user-db-id)))))
+  (testing "error"
+    (is (thrown-with-msg? ExceptionInfo
+                          #"the crate oups does not exist$"
+                          (delete-crate-user database "oups" "user2")))
+    (is (thrown-with-msg? ExceptionInfo
+                          #"the user oups does not exist$"
+                          (delete-crate-user database "crate1" "oups")))
+    (is (thrown-with-msg? ExceptionInfo
+                          #"the user user2 does not own the crate crate1"
+                          (delete-crate-user database "crate1" "user2")))))
 
 (deftest ^:integration create-crate-users-test
-  (let [users [{:name "mathieu"
-                :password "foobar"
-                :description "it's me mathieu"
-                :role "admin"}
-               {:name "lapin"
-                :password "toto"
-                :description "( )_( )
-                              (='.'=)
-                              (o)_(o)"
-                :role "admin"}]
-        crate {:name "foo"
-               :vers "1.0.1"}]
-    (testing "success"
-      (doseq [user users]
-        (create-user database user))
-      (crate-db/create-crate database crate)
-      (create-crate-users database
-                          (:name crate)
-                          [(:name (first users))
-                           (:name (second users))])
-      (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
-                                    database
-                                    (:name crate)))
-            user1-db-id (:user-id (get-user-by-name database (:name (first users))))
-            user2-db-id (:user-id (get-user-by-name database (:name (second users))))
-            crate-user1 (get-crate-user
-                         database
-                         crate-db-id
-                         user1-db-id)
-            crate-user2 (get-crate-user
-                         database
-                         crate-db-id
-                         user2-db-id)]
-        (is (= {:crate-id crate-db-id
-                :user-id user1-db-id}
-               crate-user1))
-        (is (= {:crate-id crate-db-id
-                :user-id user2-db-id}
-               crate-user2))
-        (let [crate-users (get-crate-users database (:name crate))]
-          (is (int? (:user-cargo-id (first crate-users))))
-          (is (int? (:user-cargo-id (second crate-users))))
-          (is (= (set [{:user-id user1-db-id
-                        :user-name (:name (first users))
-                        :crate-id crate-db-id}
-                       {:user-id user2-db-id
-                        :user-name (:name (second users))
-                        :crate-id crate-db-id}])
-                 (set (map #(dissoc % :user-cargo-id) crate-users)))))))))
+  (testing "success"
+    (create-crate-users database
+                        "crate2"
+                        ["user2" "user3"])
+    (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+                                  database
+                                  "crate2"))
+          user1-db-id (:user-id (get-user-by-name database "user2"))
+          user2-db-id (:user-id (get-user-by-name database "user3"))
+          crate-user1 (get-crate-user
+                       database
+                       crate-db-id
+                       user1-db-id)
+          crate-user2 (get-crate-user
+                       database
+                       crate-db-id
+                       user2-db-id)]
+      (is (= {:crate-id crate-db-id
+              :user-id user1-db-id}
+             crate-user1))
+      (is (= {:crate-id crate-db-id
+              :user-id user2-db-id}
+             crate-user2))
+      (let [crate-users (get-crate-users database "crate2")]
+        (is (int? (:user-cargo-id (first crate-users))))
+        (is (int? (:user-cargo-id (second crate-users))))
+        (is (= (set [{:user-id user1-db-id
+                      :user-name "user2"
+                      :crate-id crate-db-id}
+                     {:user-id user2-db-id
+                      :user-name "user3"
+                      :crate-id crate-db-id}])
+               (set (map #(dissoc % :user-cargo-id) crate-users))))))))
 
 (deftest ^:integration delete-crate-users-test
-  (let [users [{:name "mathieu"
-                :password "foobar"
-                :description "it's me mathieu"
-                :role "admin"}
-               {:name "lapin"
-                :password "toto"
-                :description "( )_( )
-                              (='.'=)
-                              (o)_(o)"
-                :role "admin"}]
-        crate {:name "foo"
-               :vers "1.0.1"}]
-    (testing "success"
-      (crate-db/create-crate database crate)
-      (doseq [user users]
-        (create-user database user)
-        (create-crate-user database (:name crate) (:name user)))
-      (delete-crate-users database
-                          (:name crate)
-                          [(:name (first users))
-                           (:name (second users))])
-      (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
-                                    database
-                                    (:name crate)))
-            user1-db-id (:user-id (get-user-by-name database (:name (first users))))
-            user2-db-id (:user-id (get-user-by-name database (:name (second users))))]
-        (is (nil? (get-crate-user database crate-db-id user1-db-id)))
-        (is (nil? (get-crate-user database crate-db-id user2-db-id)))))))
+  (testing "success"
+    (delete-crate-users database
+                        "crate1"
+                        ["user2" "user3"])
+    (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+                                  database
+                                  "crate1"))
+          user1-db-id (:user-id (get-user-by-name database "user2"))
+          user2-db-id (:user-id (get-user-by-name database "user3"))]
+      (is (nil? (get-crate-user database crate-db-id user1-db-id)))
+      (is (nil? (get-crate-user database crate-db-id user2-db-id))))))

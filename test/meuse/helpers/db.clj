@@ -4,9 +4,6 @@
             [meuse.db.user :as user-db]
             [clojure.test :refer :all]))
 
-
-;; users
-
 (def db-state
   {:users [{:role "admin" :name "user1" :password "user1" :description "desc1"}
            {:role "tech" :name "user2" :password "user2" :description "desc2"}
@@ -37,8 +34,6 @@
    :crates-users [{:crate "crate1"
                    :users ["user2" "user3"]}]})
 
-;; creates_users
-
 (defn create-test-db!
   "Create entities in the test database."
   [database]
@@ -54,6 +49,7 @@
     (user-db/create-crate-users database (:crate crate-user) (:users crate-user))))
 
 (defn test-crate-version
+  "Takes a crate with its version, checks if the crate/version exists in the database."
   [database expected]
   (let [crate (crate-db/get-crate-version database
                                           (:crate-name expected)
@@ -70,6 +66,7 @@
         (:crate-id crate) (:version-crate-id crate))))
 
 (defn test-crate
+  "Takes a crate, checks if the crate exists in the database."
   [database expected]
   (let [crate (crate-db/get-crate-by-name database
                                           (:crate-name expected))]
