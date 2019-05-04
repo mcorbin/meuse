@@ -8,11 +8,12 @@
 (defn format-query-string
   "Takes a string, format it to be usable for search."
   [query-string]
-  (-> (string/split query-string #" ")
-      (string/join " | ")))
+  (->> (string/split query-string #" ")
+       (string/join " | ")))
 
 (defn search
-  "Search crates."
+  "Takes a query string, and returns crates (with their versions) matching the
+  query."
   [database query-string]
   (->> (jdbc/query database
                    (search-queries/search-crates (format-query-string query-string)))

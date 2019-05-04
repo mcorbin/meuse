@@ -4,7 +4,6 @@
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all]))
 
-
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
 
