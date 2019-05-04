@@ -1,16 +1,18 @@
 (ns meuse.db.search
+  "Search crates in the database."
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.string :as string]
             [clojure.tools.logging :refer [debug info error]]
             [meuse.db.queries.search :as search-queries]))
 
 (defn format-query-string
+  "Takes a string, format it to be usable for search."
   [query-string]
   (-> (string/split query-string #" ")
       (string/join " | ")))
 
 (defn search
-  "Search crates, returns the first `nb` results."
+  "Search crates."
   [database query-string]
   (->> (jdbc/query database
                    (search-queries/search-crates (format-query-string query-string)))

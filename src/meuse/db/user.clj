@@ -1,4 +1,5 @@
 (ns meuse.db.user
+  "Manage users in the database."
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]
             [meuse.db.crate :as crate]

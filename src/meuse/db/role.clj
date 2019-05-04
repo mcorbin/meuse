@@ -1,4 +1,5 @@
 (ns meuse.db.role
+  "Manage roles in the database"
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]
             [meuse.db.queries.user :as user-queries]
