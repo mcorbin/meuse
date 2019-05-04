@@ -40,6 +40,7 @@
 ;; creates_users
 
 (defn create-test-db!
+  "Create entities in the test database."
   [database]
   (doseq [user (:users db-state)]
     (user-db/create-user database user))
@@ -48,7 +49,7 @@
                                  (:name category)
                                  (:description category)))
   (doseq [crate (:crates db-state)]
-    (crate-db/create-crate database {:metadata crate}))
+    (crate-db/create-crate database crate))
   (doseq [crate-user (:crates-users db-state)]
     (user-db/create-crate-users database (:crate crate-user) (:users crate-user))))
 

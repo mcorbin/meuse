@@ -28,7 +28,7 @@
     (testing "success"
       (doseq [user users]
         (user-db/create-user database user))
-      (crate-db/create-crate database {:metadata crate})
+      (crate-db/create-crate database crate)
       (is (= {:status 200
               :body {:ok true
                      :msg (format "added user(s) %s as owner(s) of crate %s"
@@ -89,7 +89,7 @@
         crate {:name "foo"
                :vers "1.0.1"}]
     (testing "success"
-      (crate-db/create-crate database {:metadata crate})
+      (crate-db/create-crate database crate)
       (doseq [user users]
         (user-db/create-user database user)
         (user-db/create-crate-user database (:name crate) (:name user)))

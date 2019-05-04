@@ -70,7 +70,7 @@
 
 (defn create-crate
   "Creates a crate in the database."
-  [database {:keys [metadata]}]
+  [database metadata]
   (jdbc/with-db-transaction [db-tx database]
     (if-let [crate (get-crate-version db-tx
                                       (:name metadata)

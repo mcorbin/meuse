@@ -8,7 +8,7 @@
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
 
-(deftest test-create-categories
+(deftest test-create-and-get-categories
   (create-category database "cat1" "category description")
   (is (thrown-with-msg? ExceptionInfo
                         #"already exists$"

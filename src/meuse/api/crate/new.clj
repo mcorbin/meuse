@@ -16,7 +16,7 @@
         (crate/request->crate request)]
     (info "publishing crate" (:name metadata)
           "version" (:vers metadata))
-    (crate-db/create-crate (:database request) crate)
+    (crate-db/create-crate (:database request) (:metadata crate))
     (metadata/write-metadata (get-in request [:config :metadata :path]) crate)
     ;; create the categories
     (crate-file/save-crate-file (get-in request [:config :crate :path]) crate)

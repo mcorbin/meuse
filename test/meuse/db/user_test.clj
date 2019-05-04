@@ -41,7 +41,7 @@
                :vers "1.0.1"}]
     (testing "success"
       (create-user database user)
-      (crate-db/create-crate database {:metadata crate})
+      (crate-db/create-crate database crate)
       (create-crate-user database (:name crate) (:name user))
       (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
                                     database
@@ -75,7 +75,7 @@
                :vers "1.0.1"}]
     (testing "success"
       (create-user database user)
-      (crate-db/create-crate database {:metadata crate})
+      (crate-db/create-crate database crate)
       (create-crate-user database (:name crate) (:name user))
       (delete-crate-user database (:name crate) (:name user))
       (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
@@ -111,7 +111,7 @@
     (testing "success"
       (doseq [user users]
         (create-user database user))
-      (crate-db/create-crate database {:metadata crate})
+      (crate-db/create-crate database crate)
       (create-crate-users database
                           (:name crate)
                           [(:name (first users))
@@ -160,7 +160,7 @@
         crate {:name "foo"
                :vers "1.0.1"}]
     (testing "success"
-      (crate-db/create-crate database {:metadata crate})
+      (crate-db/create-crate database crate)
       (doseq [user users]
         (create-user database user)
         (create-crate-user database (:name crate) (:name user)))
