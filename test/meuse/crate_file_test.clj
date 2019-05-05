@@ -12,10 +12,10 @@
   (is (= "/tmp/foo/foobaz/1.0.3/download"
          (crate-file-path "/tmp/foo" "foobaz" "1.0.3"))))
 
-(deftest save-crate-file-test
+(deftest write-crate-file-test
   (let [crate {:raw-metadata {:name "test1"
                               :vers "2.3.2"}
                :crate-file (.getBytes "this is the crate file content")}]
-    (save-crate-file tmp-dir crate)
+    (write-crate-file tmp-dir crate)
     (test-crate-file (str tmp-dir "/test1/2.3.2/download")
                      (:crate-file crate))))

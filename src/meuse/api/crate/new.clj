@@ -21,7 +21,7 @@
     ;; write the metadata file
     (metadata/write-metadata (get-in request [:config :metadata :path]) git-metadata)
     ;; write the crate binary file
-    (crate-file/save-crate-file (get-in request [:config :crate :path]) crate)
+    (crate-file/write-crate-file (get-in request [:config :crate :path]) crate)
     ;; git add
     (git/add (:git request))
     ;; git commit

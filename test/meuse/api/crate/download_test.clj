@@ -8,10 +8,10 @@
 (use-fixtures :each tmp-fixture)
 
 (deftest crate-api-download-test
-  (crate-file/save-crate-file tmp-dir
-                              {:raw-metadata {:name "foo"
-                                              :vers "1.0.0"}
-                               :crate-file (.getBytes "file content")})
+  (crate-file/write-crate-file tmp-dir
+                               {:raw-metadata {:name "foo"
+                                               :vers "1.0.0"}
+                                :crate-file (.getBytes "file content")})
   (is (= (slurp (:body (crates-api! {:action :download
                                      :config {:crate {:path tmp-dir}}
                                      :route-params {:crate-name "foo"

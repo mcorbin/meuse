@@ -7,8 +7,8 @@
   [base-path crate-name crate-version]
   (str base-path "/" crate-name "/" crate-version "/download"))
 
-(defn save-crate-file
-  "Takes a crate file and its metadata, saves the crate file on disk."
+(defn write-crate-file
+  "Takes a crate file and its metadata, writes the crate file on disk."
   [base-path {:keys [raw-metadata crate-file]}]
   (let [path (crate-file-path base-path
                               (:name raw-metadata)
