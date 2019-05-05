@@ -40,7 +40,7 @@
   [request]
   (let [crate-name (get-in request [:route-params
                                     :crate-name])
-        users (user-db/get-crate-users (:database request)
+        users (user-db/get-crate-join-crates-users (:database request)
                                        crate-name)]
     {:status 200
      :body {:users (map

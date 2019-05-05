@@ -24,10 +24,10 @@
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :category_id :category-id})))
 
-(defn get-crate-categories
+(defn get-crate-join-crates-categories
   "Get the crate/category relation for a crate and a category."
   [db-tx crate-id]
-  (->> (jdbc/query db-tx (category-queries/get-crate-categories crate-id))
+  (->> (jdbc/query db-tx (category-queries/get-crate-join-crates-categories crate-id))
        (map #(clojure.set/rename-keys % {:category_id :category-id
                                          :category_name :category-name
                                          :category_description :category-description}))))
@@ -52,10 +52,10 @@
   (doseq [category categories]
     (create-crate-category db-tx crate-id category)))
 
-(defn get-crate-version
+(defn get-crate-and-version
   "Takes a crate name and version and returns the crate version if it exists."
   [db-tx crate-name crate-version]
-  (-> (jdbc/query db-tx (crate-queries/get-crate-join-version crate-name crate-version))
+  (-> (jdbc/query db-tx (crate-queries/get-crate-and-version crate-name crate-version))
       first
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :crate_name :crate-name
@@ -72,9 +72,9 @@
   "Creates a crate in the database."
   [database metadata]
   (jdbc/with-db-transaction [db-tx database]
-    (if-let [crate (get-crate-version db-tx
-                                      (:name metadata)
-                                      (:vers metadata))]
+    (if-let [crate (get-crate-and-version db-tx
+                                          (:name metadata)
+                                          (:vers metadata))]
       ;; the crate exists, let's check the version
       (do
         (when (:version-version crate)
@@ -104,7 +104,7 @@
   [database crate-name crate-version yanked?]
   (info (yanked?->msg yanked?) "crate" crate-name crate-version)
   (jdbc/with-db-transaction [db-tx database]
-    (if-let [crate (get-crate-version db-tx crate-name crate-version)]
+    (if-let [crate (get-crate-and-version db-tx crate-name crate-version)]
       (do
         (when-not (:version-version crate)
           (throw

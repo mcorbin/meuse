@@ -106,7 +106,7 @@
       (is (= {:crate-id crate-db-id
               :user-id user2-db-id}
              crate-user2))
-      (let [crate-users (get-crate-users database "crate2")]
+      (let [crate-users (get-crate-join-crates-users database "crate2")]
         (is (int? (:user-cargo-id (first crate-users))))
         (is (int? (:user-cargo-id (second crate-users))))
         (is (= (set [{:user-id user1-db-id
@@ -130,7 +130,7 @@
       (is (nil? (get-crate-user database crate-db-id user1-db-id)))
       (is (nil? (get-crate-user database crate-db-id user2-db-id))))))
 
-(deftest ^:integration get-crate-users-error-test
+(deftest ^:integration get-crate-join-crates-users-error-test
   (is (thrown-with-msg? ExceptionInfo
                         #"the crate foobar does not exist"
-                        (get-crate-users database "foobar"))))
+                        (get-crate-join-crates-users database "foobar"))))

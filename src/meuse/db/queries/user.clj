@@ -65,7 +65,7 @@
                 [:= :c.user_id user-id]])
       sql/format))
 
-(defn get-crate-users
+(defn get-crate-join-crates-users
   [crate-id]
   (-> (h/select [:u.id "user_id"]
                 [:u.name "user_name"]

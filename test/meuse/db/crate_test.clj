@@ -38,8 +38,9 @@
                :yanked false}]
     (create-crate database crate)
     (let [crate-db (get-crate-by-name database "test-crate-category")
-          [c1 c2 :as categories] (->> (get-crate-categories database
-                                                            (:crate-id crate-db))
+          [c1 c2 :as categories] (->> (get-crate-join-crates-categories
+                                       database
+                                       (:crate-id crate-db))
                                       (sort-by :category-name))]
       (is (= 2 (count categories)))
       (is (uuid? (:category-id c1)))

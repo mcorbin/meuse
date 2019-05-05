@@ -20,7 +20,7 @@
       (h/where [:= :c.name crate-name])
       sql/format))
 
-(defn get-crate-join-version
+(defn get-crate-and-version
   [crate-name crate-version]
   (-> (h/select [:c.id "crate_id"]
                 [:c.name "crate_name"]

@@ -22,7 +22,7 @@
                 [:= :c.category_id category-id]])
       sql/format))
 
-(defn get-crate-categories
+(defn get-crate-join-crates-categories
   [crate-id]
   (-> (h/select [:c.id "category_id"]
                 [:c.name "category_name"]

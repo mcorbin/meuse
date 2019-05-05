@@ -30,9 +30,9 @@
     (test-metadata-file (str tmp-dir "/fo/ob/foobar")
                         [crate1])
     (write-metadata tmp-dir crate2)
-        (test-metadata-file (str tmp-dir "/fo/ob/foobar")
-                            [crate1
-                             crate2])))
+    (test-metadata-file (str tmp-dir "/fo/ob/foobar")
+                        [crate1
+                         crate2])))
 
 (deftest replace-yank-test
   (is (= "{\"name\":\"test1\",\"vers\":\"2.3.2\",\"yanked\":false}\n"

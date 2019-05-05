@@ -100,12 +100,13 @@
     (doseq [user users]
       (delete-crate-user db-tx crate-name user))))
 
-(defn get-crate-users
+(defn get-crate-join-crates-users
   "Get the crate users"
   [database crate-name]
   (jdbc/with-db-transaction [db-tx database]
     (if-let [crate (crate/get-crate-by-name db-tx crate-name)]
-      (->> (jdbc/query db-tx (user-queries/get-crate-users (:crate-id crate)))
+      (->> (jdbc/query db-tx (user-queries/get-crate-join-crates-users
+                              (:crate-id crate)))
            (map #(set/rename-keys % {:crate_id :crate-id
                                      :user_id :user-id
                                      :user_cargo_id :user-cargo-id

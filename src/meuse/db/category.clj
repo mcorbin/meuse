@@ -6,7 +6,7 @@
 
 (defn get-category-by-name
   "Takes a db transaction and a category name, and get this category
-  in the database"
+  from the database"
   [db-tx category-name]
   (-> (jdbc/query db-tx (queries/get-category-by-name category-name))
       first
