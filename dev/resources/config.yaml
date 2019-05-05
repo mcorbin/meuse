@@ -11,5 +11,6 @@ logging:
 metadata:
   path: "/home/mathieu/prog/rust/testregistry"
   target: "origin/master"
+  url: "https://github.com/mcorbin/testregistry"
 crate:
   path: "/home/mathieu/prog/rust/crates"

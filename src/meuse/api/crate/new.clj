@@ -6,6 +6,7 @@
             [meuse.git :as git]
             [meuse.metadata :as metadata]
             [meuse.message :as msg]
+            [meuse.registry :as registry]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]))
 
@@ -16,6 +17,11 @@
         (crate/request->crate request)]
     (info "publishing crate" (:name raw-metadata)
           "version" (:vers raw-metadata))
+    ;; check if the dependencies registry is allowed
+    (registry/allowed-registry? raw-metadata
+                                (get-in request
+                                        [:registry-config
+                                         :allowed-registries]))
     ;; create the crate in the db
     (crate-db/create-crate (:database request) raw-metadata)
     ;; write the metadata file

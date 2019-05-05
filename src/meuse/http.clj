@@ -23,6 +23,7 @@
             [meuse.db :refer [database]]
             [meuse.git :refer [git]]
             [meuse.middleware :refer [wrap-json]]
+            [meuse.registry :as registry]
             [meuse.request :refer [convert-body-edn]])
   (:import java.io.Closeable
            java.util.UUID))
@@ -76,7 +77,7 @@
     [request]
     (let [uri (:uri request)
           ;; add a request id
-          request (->> (assoc request :request-id (str (UUID/randomUUID)))
+           request (->> (assoc request :request-id (str (UUID/randomUUID)))
                        (match-route* routes uri))
           ;; todo: clean this mess
           request (assoc request
@@ -85,7 +86,10 @@
                          :config {:crate crate-config
                                   :metadata metadata-config}
                          :subsystem (-> request :handler namespace keyword)
-                         :action (-> request :handler name keyword))]
+                         :action (-> request :handler name keyword)
+                         :registry-config (registry/read-registry-config
+                                           (:path metadata-config)
+                                           (:url metadata-config)))]
       (try
         (debug "request " (:request-id request)
                "with subsystem" (:subsystem request)

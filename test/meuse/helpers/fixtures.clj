@@ -12,6 +12,7 @@
 (defn tmp-fixture
   [f]
   (FileUtils/deleteDirectory (io/file tmp-dir))
+  (FileUtils/forceMkdir (io/file tmp-dir))
   (f))
 
 (defn db-fixture
