@@ -27,17 +27,17 @@ Meuse needs a `yaml` configuration file. An example file exists in `dev/resource
 * http:
   - address: the IP address on which Meuse will listen.
   - port: the Meuse HTTP port.
-* logging: logging configuration, cf the [https://github.com/pyr/unilog/](unilog) library doc.
+* logging: logging configuration, cf the [unilog](https://github.com/pyr/unilog/) library doc.
 * metadata:
   - path: the directory path to your Git repository. The Meuse process should be able to access and write in it.
   - target: the target branch, the format should be `<remote>/<branch>`
-  - url: url of the Git repository. The URL will be used by Meuse to allow dependencies from Meuse if the `allowed-registries` option is not set in the repository config (cf the [https://github.com/rust-lang/rfcs/blob/master/text/2141-alternative-registries.md#registry-index-format-specification](Registry index format specification)).
+  - url: url of the Git repository. The URL will be used by Meuse to allow dependencies from Meuse if the `allowed-registries` option is not set in the repository config (cf the [Registry index format specification](https://github.com/rust-lang/rfcs/blob/master/text/2141-alternative-registries.md#registry-index-format-specification)).
 * crate:
   - path: The directory where Meuse will save crates files. Meuse will also expose this directory for Cargo.
 
 ### Run Meuse
 
-You currently need [https://leiningen.org/](Leiningen), a Clojure build tool, to run the project. In the future, I will release `Meuse` jars for Meuse versions.
+You currently need [Leiningen](https://leiningen.org/), a Clojure build tool, to run the project. In the future, I will release `Meuse` jars for Meuse versions.
 
 The `MEUSE_CONFIGURATION` variable should be the path of your yaml configuration file. You can then run the project with `lein run` in the project directory:
 
@@ -54,7 +54,7 @@ Add an entry for your custom registry in your `.cargo/config` file:
 index = "https://github.com/mcorbin/testregistry.git"
 ```
 
-Your Git repository should contain a `config.json` file which will contain the URL of the Meuse API (as described in the Cargo (https://doc.rust-lang.org/nightly/cargo/reference/registries.html)[registries] documentation), for example:
+Your Git repository should contain a `config.json` file which will contain the URL of the Meuse API (as described in the Cargo [registries](https://doc.rust-lang.org/nightly/cargo/reference/registries.html) documentation), for example:
 
 ```
 {
