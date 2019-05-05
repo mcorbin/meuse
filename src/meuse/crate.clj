@@ -44,10 +44,21 @@
         _ (check-size byte-array (+ 4 metadata-size))
         metadata (-> (String. (Arrays/copyOfRange byte-array 4 (+ 4 metadata-size)))
                      (json/parse-string true))
-        crate-size (+ (bit-shift-left (bit-and (aget byte-array (+ metadata-size 4 3)) 0xFF) 24)
-                      (bit-shift-left (bit-and (aget byte-array (+ metadata-size 4 2)) 0xFF) 16)
-                      (bit-shift-left (bit-and (aget byte-array (+ metadata-size 4 1)) 0xFF) 8)
-                      (bit-and (aget byte-array (+ metadata-size 4)) 0xFF))
+        crate-size (+ (bit-shift-left (bit-and (aget byte-array
+                                                     (+ metadata-size 4 3))
+                                               0xFF)
+                                      24)
+                      (bit-shift-left (bit-and (aget byte-array
+                                                     (+ metadata-size 4 2))
+                                               0xFF)
+                                      16)
+                      (bit-shift-left (bit-and (aget byte-array
+                                                     (+ metadata-size 4 1))
+                                               0xFF)
+                                      8)
+                      (bit-and (aget byte-array
+                                     (+ metadata-size 4))
+                               0xFF))
         _ (check-size byte-array (+ metadata-size 4 crate-size))
         crate-file (Arrays/copyOfRange byte-array
                                        (+ 4 metadata-size 4)
