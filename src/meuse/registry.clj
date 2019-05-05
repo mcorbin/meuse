@@ -8,7 +8,7 @@
   If the `allowed-registry` key is empty, the current registry url
   will be used."
   [base-path registry-url]
-  (let [config-path (str base-path "/config.json")]
+  (let [config-path (.getPath (io/file base-path "config.json"))]
     (when-not (.exists (io/file config-path))
       (throw (ex-info (str "the file " config-path " does not exist") {})))
     (-> (slurp config-path)

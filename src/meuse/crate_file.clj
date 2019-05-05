@@ -5,7 +5,7 @@
 (defn crate-file-path
   "Get the path to the crate file on disk."
   [base-path crate-name crate-version]
-  (str base-path "/" crate-name "/" crate-version "/download"))
+  (.getPath (io/file base-path crate-name crate-version "download")))
 
 (defn write-crate-file
   "Takes a crate file and its metadata, writes the crate file on disk."

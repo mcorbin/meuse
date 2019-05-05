@@ -15,12 +15,11 @@
     3 (str "3/" (first crate-name))
     (str (subs crate-name 0 2) "/" (subs crate-name 2 4))))
 
-;; todo: creating path with str is not nice
 (defn metadata-file-path
   "Takes a path and a crate name, returns the path to the metadata file."
   [base-path crate-name]
-  (let [dir (str base-path "/" (metadata-dir crate-name))]
-    [dir (str dir "/" crate-name)]))
+  (let [dir (.getPath (io/file base-path (metadata-dir crate-name)))]
+    [dir (.getPath (io/file dir crate-name))]))
 
 (defn write-metadata
   "Takes a crate and add the metadata into the git directory."

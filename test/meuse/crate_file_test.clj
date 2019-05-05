@@ -9,6 +9,8 @@
 (deftest crate-file-path-test
   (is (= "/tmp/foo/foobar/1.0.0/download"
          (crate-file-path "/tmp/foo" "foobar" "1.0.0")))
+    (is (= "/tmp/foo/foobar/1.0.0/download"
+         (crate-file-path "/tmp/foo/" "foobar" "1.0.0")))
   (is (= "/tmp/foo/foobaz/1.0.3/download"
          (crate-file-path "/tmp/foo" "foobaz" "1.0.3"))))
 

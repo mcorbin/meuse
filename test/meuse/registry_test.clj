@@ -2,6 +2,7 @@
   (:require [cheshire.core :as json]
             [meuse.registry :refer :all]
             [meuse.helpers.fixtures :refer :all]
+            [clojure.java.io :as io]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 
@@ -14,7 +15,7 @@
                         "https://my-intranet:8080/index"]})
 
 (deftest read-registry-config-test
-  (let [config-path (str tmp-dir "/config.json")]
+  (let [config-path (.getPath (io/file tmp-dir "config.json"))]
     (is (thrown-with-msg?
          ExceptionInfo
          (re-pattern (format "the file %s does not exist" config-path))
