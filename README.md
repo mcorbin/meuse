@@ -31,6 +31,7 @@ Meuse needs a `yaml` configuration file. An example file exists in `dev/resource
 * metadata:
   - path: the directory path to your Git repository. The Meuse process should be able to access and write in it.
   - target: the target branch, the format should be `<remote>/<branch>`
+  - url: url of the Git repository. The URL will be used by Meuse to allow dependencies from Meuse if the `allowed-registries` option is not set in the repository config (cf the [https://github.com/rust-lang/rfcs/blob/master/text/2141-alternative-registries.md#registry-index-format-specification](Registry index format specification)).
 * crate:
   - path: The directory where Meuse will save crates files. Meuse will also expose this directory for Cargo.
 

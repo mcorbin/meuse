@@ -73,30 +73,31 @@
 (defn get-handler
   "Returns the main handler for the HTTP server."
   [crate-config metadata-config database git]
-  (fn handler
-    [request]
-    (let [uri (:uri request)
-          ;; add a request id
-           request (->> (assoc request :request-id (str (UUID/randomUUID)))
-                       (match-route* routes uri))
-          ;; todo: clean this mess
-          request (assoc request
-                         :database database
-                         :git git
-                         :config {:crate crate-config
-                                  :metadata metadata-config}
-                         :subsystem (-> request :handler namespace keyword)
-                         :action (-> request :handler name keyword)
-                         :registry-config (registry/read-registry-config
-                                           (:path metadata-config)
-                                           (:url metadata-config)))]
-      (try
-        (debug "request " (:request-id request)
-               "with subsystem" (:subsystem request)
-               "with action" (:action request))
-        (route! request)
-        (catch Exception e
-          (handle-req-errors request e))))))
+  (let [registry-config (registry/read-registry-config
+                         (:path metadata-config)
+                         (:url metadata-config))]
+    (fn handler
+      [request]
+      (let [uri (:uri request)
+            ;; add a request id
+            request (->> (assoc request :request-id (str (UUID/randomUUID)))
+                         (match-route* routes uri))
+            ;; todo: clean this mess
+            request (assoc request
+                           :database database
+                           :git git
+                           :config {:crate crate-config
+                                    :metadata metadata-config}
+                           :subsystem (-> request :handler namespace keyword)
+                           :action (-> request :handler name keyword)
+                           :registry-config registry-config)]
+        (try
+          (debug "request " (:request-id request)
+                 "with subsystem" (:subsystem request)
+                 "with action" (:action request))
+          (route! request)
+          (catch Exception e
+            (handle-req-errors request e)))))))
 
 (defn start-server
   [http-config crate-config metadata-config database git]

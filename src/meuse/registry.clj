@@ -1,7 +1,8 @@
 (ns meuse.registry
   "Manage the registry configuration file."
   (:require [cheshire.core :as json]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [clojure.tools.logging :refer [debug info error]]))
 
 (defn read-registry-config
   "Read the `config.json` file in the crate git registry.
