@@ -9,8 +9,10 @@
 
 (defn save-crate-file
   "Takes a crate file and its metadata, saves the crate file on disk."
-  [base-path {:keys [metadata crate-file]}]
-  (let [path (crate-file-path base-path (:name metadata) (:vers metadata))]
+  [base-path {:keys [raw-metadata crate-file]}]
+  (let [path (crate-file-path base-path
+                              (:name raw-metadata)
+                              (:vers raw-metadata))]
     (io/make-parents path)
     (with-open [w (io/output-stream path)]
       (.write w crate-file))))

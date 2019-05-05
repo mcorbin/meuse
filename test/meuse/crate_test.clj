@@ -11,10 +11,11 @@
 
 (defn create-publish-request
   [metadata crate-file]
-  (let [;; size is 13
-        metadata (-> metadata json/generate-string .getBytes)
-        metadata-length [(byte (count metadata)) (byte 0) (byte 0) (byte 0)]
-        ;; size is 14
+  (let [metadata (-> metadata json/generate-string .getBytes)
+        metadata-length [(bit-and (unchecked-byte (count metadata)) 0xFF)
+                         (byte 0)
+                         (byte 0)
+                         (byte 0)]
         crate-file (.getBytes crate-file)
         crate-file-length [(byte (count crate-file)) (byte 0) (byte 0) (byte 0)]
         request {:body (byte-array (concat metadata-length
@@ -40,9 +41,19 @@
           metadata {:name "bar"
                     :vers "1.0.1"
                     :yanked false
+                    :foo "bar"
+                    :deps [{:version_req "0.1.0"
+                             :foo "bar"
+                             :explicit_name_in_toml "toto"}]
                     :cksum (digest/sha-256 crate-file)}
           request (create-publish-request metadata crate-file)]
-      (is (= {:metadata metadata
+      (is (= {:raw-metadata metadata
+              :git-metadata {:name "bar"
+                             :vers "1.0.1"
+                             :yanked false
+                             :deps [{:req "0.1.0"
+                                     :package "toto"}]
+                    :cksum (digest/sha-256 crate-file)}
               :crate-file (String. (.getBytes crate-file))}
              (-> (request->crate request)
                  (update :crate-file #(String. %)))))))

@@ -9,8 +9,8 @@
 (deftest publish-commit-msg-test
   (is (= ["foo 1.1.2"
           "meuse published foo 1.1.2"]
-         (publish-commit-msg {:metadata {:name "foo"
-                                         :vers "1.1.2"}}))))
+         (publish-commit-msg {:name "foo"
+                              :vers "1.1.2"}))))
 
 (deftest yank-commit-msg-test
   (is (= ["foo 1.1.2"

@@ -9,7 +9,7 @@
 
 (defn publish-commit-msg
   "Creates a commit message from a crate."
-  [{:keys [metadata]}]
+  [metadata]
   [(format "%s %s" (:name metadata) (:vers metadata))
    (format "meuse published %s %s" (:name metadata) (:vers metadata))])
 

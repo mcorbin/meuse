@@ -4,6 +4,7 @@
             [cheshire.core :as json]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]
+            [clojure.set :as set]
             [clojure.string :as string]
             [digest :as digest])
   (:import java.util.Arrays))
@@ -16,29 +17,45 @@
     (throw (ex-info (format "invalid request size %d" (alength byte-array))
                     {}))))
 
+
+(def git-metadata-keys [:name :vers :deps :cksum :features :yanked :links])
+(def deps-metadata-keys [:name :version_req :features :optional :default_features :target :kind :registry :explicit_name_in_toml])
+(def deps-keys-renamed {:version_req :req
+                        :explicit_name_in_toml :package})
+
+(defn raw-metadata->metadata
+  "Converts the raw metadata from `cargo publish` into metadata which will be
+  stored in the Git repository."
+  [raw-metadata]
+  (-> (select-keys raw-metadata git-metadata-keys)
+      (update :deps (fn [deps] (map #(select-keys % deps-metadata-keys) deps)))
+      (update :deps (fn [deps] (map #(set/rename-keys % deps-keys-renamed) deps)))))
+
 (defn request->crate
   "Takes an HTTP publish request. Converts the payload to a map containing
-  the metadata and the crate file."
+  the raw metadata from the request, the git metadata and the crate file."
   [request]
   (let [byte-array (bs/to-byte-array (:body request))
         _ (check-size byte-array 8)
-        metadata-size (+ (bit-shift-left (aget byte-array 3) 24)
-                         (bit-shift-left (aget byte-array 2) 16)
-                         (bit-shift-left (aget byte-array 1) 8)
-                         (aget byte-array 0))
+        metadata-size (+ (bit-shift-left (bit-and (aget byte-array 3) 0xFF) 24)
+                         (bit-shift-left (bit-and (aget byte-array 2) 0xFF) 16)
+                         (bit-shift-left (bit-and (aget byte-array 1) 0xFF) 8)
+                         (bit-and (aget byte-array 0) 0xFF))
         _ (check-size byte-array (+ 4 metadata-size))
-        metadata (Arrays/copyOfRange byte-array 4 (+ 4 metadata-size))
-        crate-size (+ (bit-shift-left (aget byte-array (+ metadata-size 4 3)) 24)
-                      (bit-shift-left (aget byte-array (+ metadata-size 4 2)) 16)
-                      (bit-shift-left (aget byte-array (+ metadata-size 4 1)) 8)
-                      (aget byte-array (+ metadata-size 4)))
+        metadata (-> (String. (Arrays/copyOfRange byte-array 4 (+ 4 metadata-size)))
+                     (json/parse-string true))
+        crate-size (+ (bit-shift-left (bit-and (aget byte-array (+ metadata-size 4 3)) 0xFF) 24)
+                      (bit-shift-left (bit-and (aget byte-array (+ metadata-size 4 2)) 0xFF) 16)
+                      (bit-shift-left (bit-and (aget byte-array (+ metadata-size 4 1)) 0xFF) 8)
+                      (bit-and (aget byte-array (+ metadata-size 4)) 0xFF))
         _ (check-size byte-array (+ metadata-size 4 crate-size))
         crate-file (Arrays/copyOfRange byte-array
                                        (+ 4 metadata-size 4)
                                        (+ 4 metadata-size 4 crate-size))
         sha256sum (digest/sha-256 crate-file)]
-    {:metadata (-> (String. metadata)
-                   (json/parse-string true)
-                   (assoc :yanked false)
-                   (assoc :cksum sha256sum))
+    {:raw-metadata metadata
+     :git-metadata (-> metadata
+                       (assoc :yanked false)
+                       (assoc :cksum sha256sum)
+                       raw-metadata->metadata)
      :crate-file crate-file}))

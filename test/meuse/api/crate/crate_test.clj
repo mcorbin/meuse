@@ -57,7 +57,7 @@
                          :other []}}})
     (is (= @git-actions [{:cmd "add"}
                          {:cmd "commit"
-                          :args (publish-commit-msg {:metadata metadata})}
+                          :args (publish-commit-msg metadata)}
                          {:cmd "push"}]))
     (is (= (slurp (str tmp-dir "/toto/1.0.1/download"))
            crate-file))

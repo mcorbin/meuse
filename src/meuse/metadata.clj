@@ -24,8 +24,8 @@
 
 (defn write-metadata
   "Takes a crate and add the metadata into the git directory."
-  [base-path crate]
-  (let [crate-name (get-in crate [:metadata :name])
+  [base-path metadata]
+  (let [crate-name (:name metadata)
         [dir metadata-path] (metadata-file-path base-path crate-name)]
     (when-not (.exists (io/file dir))
       (when-not (io/make-parents metadata-path)
@@ -33,7 +33,7 @@
                         {:crate {:name crate-name
                                  :directory dir}}))))
     (spit metadata-path
-          (str (->> (:metadata crate)
+          (str (->> metadata
                     (remove #(nil? (second %)))
                     (into {})
                     json/generate-string)

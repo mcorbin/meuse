@@ -22,17 +22,17 @@
   (is (= ["/foo/repo/to/to" "/foo/repo/to/to/toto"] (metadata-file-path "/foo/repo" "toto"))))
 
 (deftest write-metadata-test
-  (let [crate1 {:metadata {:name "foobar"
-                           :version "1.0.0"}}
-        crate2 {:metadata {:name "foobar"
-                           :version "1.0.1"}}]
+  (let [crate1 {:name "foobar"
+                :version "1.0.0"}
+        crate2 {:name "foobar"
+                :version "1.0.1"}]
     (write-metadata tmp-dir crate1)
     (test-metadata-file (str tmp-dir "/fo/ob/foobar")
-                        [(:metadata crate1)])
+                        [crate1])
     (write-metadata tmp-dir crate2)
         (test-metadata-file (str tmp-dir "/fo/ob/foobar")
-                            [(:metadata crate1)
-                             (:metadata crate2)])))
+                            [crate1
+                             crate2])))
 
 (deftest replace-yank-test
   (is (= "{\"name\":\"test1\",\"vers\":\"2.3.2\",\"yanked\":false}\n"
@@ -53,14 +53,14 @@
                             "{\"name\":\"test1\",\"vers\":\"2.3.3\",\"yanked\":true}\n")))))
 
 (deftest update-yank-test
-  (let [crate {:metadata {:name "test1"
-                          :vers "2.3.2"
-                          :yanked false}}
+  (let [crate {:name "test1"
+               :vers "2.3.2"
+               :yanked false}
         path (str tmp-dir "/te/st/test1")]
     (write-metadata tmp-dir crate)
-    (test-metadata-file path [(:metadata crate)])
+    (test-metadata-file path [crate])
     (update-yank tmp-dir "test1" "2.3.2" true)
-    (test-metadata-file path [(assoc (:metadata crate) :yanked true)])
+    (test-metadata-file path [(assoc crate :yanked true)])
     (update-yank tmp-dir "test1" "2.3.2" false)
-    (test-metadata-file path [(:metadata crate)])))
+    (test-metadata-file path [crate])))
 

@@ -12,16 +12,21 @@
 (defmethod crates-api! :new
   [request]
   (info "received new crate request" (:request-id request))
-  (let [{:keys [metadata crate-file] :as crate}
+  (let [{:keys [git-metadata raw-metadata crate-file] :as crate}
         (crate/request->crate request)]
-    (info "publishing crate" (:name metadata)
-          "version" (:vers metadata))
-    (crate-db/create-crate (:database request) (:metadata crate))
-    (metadata/write-metadata (get-in request [:config :metadata :path]) crate)
-    ;; create the categories
+    (info "publishing crate" (:name raw-metadata)
+          "version" (:vers raw-metadata))
+    ;; create the crate in the db
+    (crate-db/create-crate (:database request) raw-metadata)
+    ;; write the metadata file
+    (metadata/write-metadata (get-in request [:config :metadata :path]) git-metadata)
+    ;; write the crate binary file
     (crate-file/save-crate-file (get-in request [:config :crate :path]) crate)
+    ;; git add
     (git/add (:git request))
-    (apply git/commit (:git request) (msg/publish-commit-msg crate))
+    ;; git commit
+    (apply git/commit (:git request) (msg/publish-commit-msg raw-metadata))
+    ;; git push
     (git/push (:git request))
     {:status 200
      :body {:warning {:invalid_categories []
