@@ -1,6 +1,6 @@
 CREATE TABLE roles(
 id UUID PRIMARY KEY,
-name TEXT UNIQUE
+name TEXT NOT NULL UNIQUE
 );
 
 INSERT INTO roles(id, name)
@@ -12,9 +12,9 @@ VALUES ('a5435b66-69ba-11e9-8385-8b7c3810e186', 'tech');
 CREATE TABLE users(
 id UUID PRIMARY KEY,
 cargo_id SERIAL,
-name TEXT UNIQUE,
-password TEXT,
-description TEXT,
+name TEXT NOT NULL UNIQUE,
+password TEXT NOT NULL,
+description TEXT NOT NULL,
 role_id UUID,
 FOREIGN KEY (role_id) REFERENCES roles(id)
 );
@@ -27,8 +27,8 @@ VALUES ('1dbdeb3a-6ac7-11e9-b2dc-dbb2118a325d', 'user2', '$2a$11$YEHP9DkYTPlMVZK
 
 CREATE TABLE tokens(
 id UUID PRIMARY KEY,
-token TEXT,
-expired_at timestamp,
+token TEXT NOT NULL UNIQUE,
+expired_at timestamp NOT NULL,
 user_id uuid,
 FOREIGN KEY (user_id) REFERENCES users(id)
 );
