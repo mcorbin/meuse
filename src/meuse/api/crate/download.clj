@@ -1,12 +1,14 @@
 (ns meuse.api.crate.download
   (:require [meuse.crate-file :as crate-file]
             [meuse.api.crate.http :refer (crates-api!)]
+            [meuse.api.params :as params]
             [clojure.tools.logging :refer [debug info error]]
             [clojure.java.io :as io])
   (:import java.io.File))
 
 (defmethod crates-api! :download
   [request]
+  (params/validate-params request ::api)
   (let [{:keys [crate-name crate-version]} (:route-params request)
         path (crate-file/crate-file-path
               (get-in request [:config :crate :path])

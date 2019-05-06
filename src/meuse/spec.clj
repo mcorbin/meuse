@@ -1,8 +1,11 @@
 (ns meuse.spec
   "Specs of the project"
-  (:require [clojure.spec.alpha :as s]))
+  (:require [meuse.semver :as semver]
+            [clojure.spec.alpha :as s]))
 
 (s/def ::non-empty-string (s/and string? not-empty))
+(s/def :crate/name ::non-empty-string)
+(s/def :crate/version semver/valid?)
 
 ;; config
 
@@ -40,3 +43,16 @@
                                  :metadata/metadata
                                  :crate/crate
                                  ::logging]))
+
+;; api
+
+;; download
+
+(s/def :meuse.api.crate.download/crate-name :crate/name)
+(s/def :meuse.api.crate.download/crate-version :crate/version)
+(s/def :meuse.api.crate.download/route-params
+  (s/keys :req-un [:meuse.api.crate.download/crate-name
+                   :meuse.api.crate.download/crate-version]))
+
+(s/def :meuse.api.crate.download/api
+  (s/keys :req-un [:meuse.api.crate.download/route-params]))
