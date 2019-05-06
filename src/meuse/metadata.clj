@@ -1,6 +1,7 @@
 (ns meuse.metadata
   "Functions to interacts with the crate metadata file."
-  (:require [cheshire.core :as json]
+  (:require [meuse.path :as path]
+            [cheshire.core :as json]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]
             [clojure.string :as string]))
@@ -18,8 +19,8 @@
 (defn metadata-file-path
   "Takes a path and a crate name, returns the path to the metadata file."
   [base-path crate-name]
-  (let [dir (.getPath (io/file base-path (metadata-dir crate-name)))]
-    [dir (.getPath (io/file dir crate-name))]))
+  (let [dir (path/new-path base-path (metadata-dir crate-name))]
+    [dir (path/new-path dir crate-name)]))
 
 (defn write-metadata
   "Takes a crate and add the metadata into the git directory."

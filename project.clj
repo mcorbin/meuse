@@ -31,6 +31,8 @@
                                   [tortue/spy "1.6.0"]
                                   [ring/ring-mock "0.3.0"]
                                   [commons-io/commons-io 2.6]]
+                   :global-vars    {*warn-on-reflection* true
+                                    *assert* true}
                    :cloverage {:ns-exclude-regex [#"meuse.core"
                                                   #"user"]}
                    :env {:meuse-configuration "dev/resources/config.yaml"}

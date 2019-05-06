@@ -1,6 +1,7 @@
 (ns meuse.registry
   "Manage the registry configuration file."
-  (:require [cheshire.core :as json]
+  (:require [meuse.path :as path]
+            [cheshire.core :as json]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]))
 
@@ -9,7 +10,7 @@
   If the `allowed-registry` key is empty, the current registry url
   will be used."
   [base-path registry-url]
-  (let [config-path (.getPath (io/file base-path "config.json"))]
+  (let [config-path (path/new-path base-path "config.json")]
     (when-not (.exists (io/file config-path))
       (throw (ex-info (str "the file " config-path " does not exist") {})))
     (-> (slurp config-path)
