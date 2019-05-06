@@ -13,7 +13,6 @@
                                      :db/user
                                      :db/password]))
 
-
 (s/def :http/port pos-int?)
 (s/def :http/address ::non-empty-string)
 (s/def :http/http (s/keys :req-un [:http/port
@@ -21,12 +20,13 @@
 
 (s/def :metadata/path ::non-empty-string)
 (s/def :metadata/target ::non-empty-string)
+(s/def :metadata/url ::non-empty-string)
+(s/def :metadata/metadata (s/keys :req-un [:metadata/path
+                                           :metadata/target
+                                           :metadata/url]))
 
 (s/def :crate/path ::non-empty-string)
-
-(s/def ::crate (s/keys :req-un [:crate/path]))
-
-(s/def ::metadata (s/keys :req-un [:git/path :git/target]))
+(s/def :crate/crate (s/keys :req-un [:crate/path]))
 
 (s/def ::level #{"debug" "info"})
 (s/def ::encoder #{"json"})
@@ -37,6 +37,6 @@
 
 (s/def ::config (s/keys :req-un [:http/http
                                  :db/database
-                                 ::metadata
-                                 ::crate
+                                 :metadata/metadata
+                                 :crate/crate
                                  ::logging]))
