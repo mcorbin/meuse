@@ -20,6 +20,5 @@
       (throw (ex-info (format "the file %s is a directory" path)
                       {})))
     (debug "serving crate file" path)
-    ;; todo: check if file exists
     {:status 200
-     :body (io/file path)}))
+     :body file}))
