@@ -67,13 +67,13 @@
   (s/keys :req-un [:meuse.api.crate.download/crate-name
                    :meuse.api.crate.download/crate-version]))
 
-(s/def :meuse.api.crate.download/api
+(s/def :meuse.api.crate.download/download
   (s/keys :req-un [:meuse.api.crate.download/route-params]))
 
 ;; new
 
 (s/def :meuse.api.crate.new/body #(instance? Object %))
-(s/def :meuse.api.crate.new/api
+(s/def :meuse.api.crate.new/new
   (s/keys :req-un [:meuse.api.crate.new/body]))
 
 (s/def :deps/name :crate/name)

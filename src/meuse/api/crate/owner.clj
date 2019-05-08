@@ -14,6 +14,7 @@
         crate-name (get-in request [:route-params
                                     :crate-name])
         users (get-in request [:body :users])]
+    (info "add owners" (string/join ", " users) "to crate" crate-name)
     (user-db/create-crate-users (:database request)
                                 crate-name
                                 users)
@@ -30,6 +31,7 @@
         crate-name (get-in request [:route-params
                                     :crate-name])
         users (get-in request [:body :users])]
+    (info "remove owners" (string/join ", " users) "to crate" crate-name)
     (user-db/delete-crate-users (:database request)
                                 crate-name
                                 users)
@@ -47,6 +49,7 @@
         users (user-db/get-crate-join-crates-users
                (:database request)
                crate-name)]
+    (info "list owners for crate" crate-name)
     {:status 200
      :body {:users (map
                     (fn [u]

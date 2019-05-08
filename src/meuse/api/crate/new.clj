@@ -14,7 +14,7 @@
 (defmethod crates-api! :new
   [request]
   (info "received new crate request" (:request-id request))
-  (params/validate-params request ::api)
+  (params/validate-params request ::new)
   (let [{:keys [git-metadata raw-metadata crate-file] :as crate}
         (crate/request->crate request)]
     (params/validate-params crate ::crate)

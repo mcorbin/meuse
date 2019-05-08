@@ -8,7 +8,7 @@
 
 (defmethod crates-api! :download
   [request]
-  (params/validate-params request ::api)
+  (params/validate-params request ::download)
   (let [{:keys [crate-name crate-version]} (:route-params request)
         path (crate-file/crate-file-path
               (get-in request [:config :crate :path])
@@ -21,6 +21,6 @@
     (when (.isDirectory file)
       (throw (ex-info (format "the file %s is a directory" path)
                       {})))
-    (debug "serving crate file" path)
+    (info "serving crate file" path)
     {:status 200
      :body file}))

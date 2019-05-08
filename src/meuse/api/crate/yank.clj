@@ -11,6 +11,7 @@
   [request yanked?]
   (params/validate-params request ::yank)
   (let [{:keys [crate-name crate-version]} (:route-params request)]
+    (info (msg/yanked?->msg yanked?) "crate" crate-name "version" crate-version)
     (crate-db/update-yank (:database request) crate-name crate-version yanked?)
     (metadata/update-yank (get-in request [:config :metadata :path])
                           crate-name
