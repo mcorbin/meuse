@@ -77,7 +77,9 @@
           metadata {:name name
                     :vers version
                     :yanked false
-                    :deps [{:registry "default"}]}
+                    :deps [{:name "bar"
+                            :version_req "^1.0.3"
+                            :registry "default"}]}
           crate-file "random content"
           git-actions (atom [])
           request (merge
@@ -99,7 +101,9 @@
           metadata {:name name
                     :vers version
                     :yanked false
-                    :deps [{:registry "default"}]}
+                    :deps [{:name "bar"
+                            :version_req "^1.0.3"
+                            :registry "default"}]}
           crate-file "random content"
           git-actions (atom [])
           request (merge
@@ -113,6 +117,47 @@
       (is (thrown-with-msg?
            ExceptionInfo
            #"the registry default is not allowed"
+           (crates-api! request)))))
+  (testing "invalid parameters"
+    (let [name "toto"
+          version "1.0.3"
+          metadata {:name name
+                    :vers version
+                    :yanked false
+                    :deps [{:name "foo"}]}
+          crate-file "random content"
+          request (merge
+                   (create-publish-request metadata crate-file)
+                   {:action :new})]
+      (is (thrown-with-msg?
+           ExceptionInfo
+           #"invalid parameters"
+           (crates-api! request))))
+    (let [name "toto"
+          version "1.0.3"
+          metadata {:name ""
+                    :vers version
+                    :yanked false}
+          crate-file "random content"
+          request (merge
+                   (create-publish-request metadata crate-file)
+                   {:action :new})]
+      (is (thrown-with-msg?
+           ExceptionInfo
+           #"invalid parameters"
+           (crates-api! request))))
+    (let [name "toto"
+          version "aaa"
+          metadata {:name ""
+                    :vers version
+                    :yanked false}
+          crate-file "random content"
+          request (merge
+                   (create-publish-request metadata crate-file)
+                   {:action :new})]
+      (is (thrown-with-msg?
+           ExceptionInfo
+           #"invalid parameters"
            (crates-api! request))))))
 
 (deftest ^:integration crates-api-yank-unyank-test

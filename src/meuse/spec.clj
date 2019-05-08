@@ -4,6 +4,9 @@
             [clojure.spec.alpha :as s]))
 
 (s/def ::non-empty-string (s/and string? not-empty))
+(s/def ::null-or-non-empty-string (s/or :nil nil?
+                                        :string (s/and string? not-empty)))
+
 (s/def :crate/name ::non-empty-string)
 (s/def :crate/version semver/valid?)
 
@@ -56,3 +59,73 @@
 
 (s/def :meuse.api.crate.download/api
   (s/keys :req-un [:meuse.api.crate.download/route-params]))
+
+;; new
+
+(s/def :meuse.api.crate.new/body #(instance? java.io.ByteArrayInputStream %))
+(s/def :meuse.api.crate.new/api
+  (s/keys :req-un [:meuse.api.crate.new/body]))
+
+
+(s/def :deps/name :crate/name)
+(s/def :deps/version_req ::non-empty-string)
+(s/def :deps/features (s/coll-of ::non-empty-string))
+(s/def :deps/optional boolean?)
+(s/def :deps/default_features boolean?)
+(s/def :deps/target ::null-or-non-empty-string)
+(s/def :deps/kind ::non-empty-string)
+(s/def :deps/registry ::null-or-non-empty-string)
+(s/def :deps/explicit_name_in_toml ::null-or-non-empty-string)
+
+(s/def :deps/deps (s/keys :req-un [:deps/name
+                                   :deps/version_req]
+                          :opt-un [:deps/features
+                                   :deps/optional
+                                   :deps/default_features
+                                   :deps/target
+                                   :deps/kind
+                                   :deps/registry
+                                   :deps/explicit_name_in_toml]))
+
+(s/def :features/extras (s/coll-of ::non-empty-string))
+
+(s/def :meuse.api.crate.new/name :crate/name)
+(s/def :meuse.api.crate.new/vers :crate/version)
+(s/def :meuse.api.crate.new/deps (s/coll-of :deps/deps))
+(s/def :meuse.api.crate.new/features (s/keys :opt-un [:features/extras]))
+(s/def :meuse.api.crate.new/authors (s/coll-of ::non-empty-string))
+(s/def :meuse.api.crate.new/description ::null-or-non-empty-string)
+(s/def :meuse.api.crate.new/documentation ::null-or-non-empty-string)
+(s/def :meuse.api.crate.new/homepage ::null-or-non-empty-string)
+(s/def :meuse.api.crate.new/readme ::null-or-non-empty-string)
+(s/def :meuse.api.crate.new/readme_file ::null-or-non-empty-string)
+(s/def :meuse.api.crate.new/keywords (s/coll-of ::non-empty-string))
+(s/def :meuse.api.crate.new/categories (s/coll-of ::non-empty-string))
+(s/def :meuse.api.crate.new/license ::null-or-non-empty-string)
+(s/def :meuse.api.crate.new/license_file ::null-or-non-empty-string)
+(s/def :meuse.api.crate.new/repository ::null-or-non-empty-string)
+(s/def :meuse.api.crate.new/links ::null-or-non-empty-string)
+
+(s/def :meuse.api.crate.new/raw-metadata
+  (s/keys :req-un [:meuse.api.crate.new/name
+                   :meuse.api.crate.new/vers]
+          :opt-un [:meuse.api.crate.new/deps
+                   :meuse.api.crate.new/features
+                   :meuse.api.crate.new/authors
+                   :meuse.api.crate.new/description
+                   :meuse.api.crate.new/documentation
+                   :meuse.api.crate.new/homepage
+                   :meuse.api.crate.new/readme
+                   :meuse.api.crate.new/readme_file
+                   :meuse.api.crate.new/keywords
+                   :meuse.api.crate.new/categories
+                   :meuse.api.crate.new/license
+                   :meuse.api.crate.new/license_file
+                   :meuse.api.crate.new/repository
+                   :meuse.api.crate.new/links]))
+
+(s/def :meuse.api.crate.new/crate-file bytes?)
+
+(s/def :meuse.api.crate.new/crate
+  (s/keys :req-un [:meuse.api.crate.new/raw-metadata
+                   :meuse.api.crate.new/crate-file]))
