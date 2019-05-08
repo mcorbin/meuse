@@ -1,6 +1,7 @@
 (ns meuse.api.crate.owner
   "Owner Cargo API"
   (:require [meuse.api.crate.http :refer (crates-api!)]
+            [meuse.api.params :as params]
             [meuse.db.user :as user-db]
             [meuse.request :refer [convert-body-edn]]
             [clojure.string :as string]
@@ -8,10 +9,11 @@
 
 (defmethod crates-api! :add-owner
   [request]
-  (let [crate-name (get-in request [:route-params
+  (let [request (convert-body-edn request)
+        _ (params/validate-params request ::add)
+        crate-name (get-in request [:route-params
                                     :crate-name])
-        users (-> (convert-body-edn request)
-                  (get-in [:body :users]))]
+        users (get-in request [:body :users])]
     (user-db/create-crate-users (:database request)
                                 crate-name
                                 users)
@@ -23,10 +25,11 @@
 
 (defmethod crates-api! :remove-owner
   [request]
-  (let [crate-name (get-in request [:route-params
+  (let [request (convert-body-edn request)
+        _ (params/validate-params request ::remove)
+        crate-name (get-in request [:route-params
                                     :crate-name])
-        users (-> (convert-body-edn request)
-                  (get-in [:body :users]))]
+        users (get-in request [:body :users])]
     (user-db/delete-crate-users (:database request)
                                 crate-name
                                 users)
@@ -38,10 +41,12 @@
 
 (defmethod crates-api! :list-owners
   [request]
+  (params/validate-params request ::list)
   (let [crate-name (get-in request [:route-params
                                     :crate-name])
-        users (user-db/get-crate-join-crates-users (:database request)
-                                       crate-name)]
+        users (user-db/get-crate-join-crates-users
+               (:database request)
+               crate-name)]
     {:status 200
      :body {:users (map
                     (fn [u]

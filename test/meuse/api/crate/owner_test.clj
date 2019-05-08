@@ -7,7 +7,8 @@
             [meuse.helpers.fixtures :refer :all]
             [cheshire.core :as json]
             [clojure.string :as string]
-            [clojure.test :refer :all]))
+            [clojure.test :refer :all])
+  (:import clojure.lang.ExceptionInfo))
 
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
@@ -47,18 +48,25 @@
              crate-user1))
       (is (= {:crate-id crate-db-id
               :user-id user2-db-id}
-             crate-user2))
-      (let [crate-users (crates-api! {:action :list-owners
-                                      :database database
-                                      :route-params {:crate-name "crate2"}})]
-        (is (= (update-in crate-users
-                          [:body :users]
-                          (fn [u] (set (map #(dissoc % :id) u))))
-               {:status 200
-                :body {:users (set [{:login "user2"
-                                     :name "user2"}
-                                    {:login "user3"
-                                     :name "user3"}])}}))))))
+             crate-user2))))
+  (testing "invalid parameters"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid parameters"
+         (crates-api! {:action :add-owner
+                       :database database
+                       :route-params {:crate-name "crate2"}
+                       :body (json/generate-string
+                              {:users []})}))))
+  (testing "invalid parameters"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid parameters"
+         (crates-api! {:action :add-owner
+                       :database database
+                       :route-params {}
+                       :body (json/generate-string
+                              {:users ["foo"]})})))))
 
 (deftest ^:integration remove-owner-test
   (testing "success"
@@ -89,4 +97,43 @@
       (is (nil? (user-db/get-crate-user
                  database
                  crate-db-id
-                 user2-db-id))))))
+                 user2-db-id)))))
+  (testing "invalid parameters"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid parameters"
+         (crates-api! {:action :remove-owner
+                       :database database
+                       :route-params {:crate-name "crate2"}
+                       :body (json/generate-string
+                              {:users []})}))))
+  (testing "invalid parameters"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid parameters"
+         (crates-api! {:action :remove-owner
+                       :database database
+                       :route-params {}
+                       :body (json/generate-string
+                              {:users ["foo"]})})))))
+
+(deftest list-owner-test
+  (testing "success"
+    (let [crate-users (crates-api! {:action :list-owners
+                                    :database database
+                                    :route-params {:crate-name "crate1"}})]
+      (is (= (update-in crate-users
+                        [:body :users]
+                        (fn [u] (set (map #(dissoc % :id) u))))
+             {:status 200
+              :body {:users (set [{:login "user2"
+                                   :name "user2"}
+                                  {:login "user3"
+                                   :name "user3"}])}}))))
+  (testing "invalid parameters"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid parameters"
+         (crates-api! {:action :list-owners
+                       :database database
+                       :route-params {}})))))

@@ -6,9 +6,14 @@
 (s/def ::non-empty-string (s/and string? not-empty))
 (s/def ::null-or-non-empty-string (s/or :nil nil?
                                         :string (s/and string? not-empty)))
+;; crate
 
 (s/def :crate/name ::non-empty-string)
 (s/def :crate/version semver/valid?)
+
+;; user
+
+(s/def :user/name ::non-empty-string)
 
 ;; config
 
@@ -62,10 +67,9 @@
 
 ;; new
 
-(s/def :meuse.api.crate.new/body #(instance? java.io.ByteArrayInputStream %))
+(s/def :meuse.api.crate.new/body #(instance? Object %))
 (s/def :meuse.api.crate.new/api
   (s/keys :req-un [:meuse.api.crate.new/body]))
-
 
 (s/def :deps/name :crate/name)
 (s/def :deps/version_req ::non-empty-string)
@@ -129,3 +133,29 @@
 (s/def :meuse.api.crate.new/crate
   (s/keys :req-un [:meuse.api.crate.new/raw-metadata
                    :meuse.api.crate.new/crate-file]))
+
+;; owner
+
+(s/def :meuse.api.crate.owner/crate-name :crate/name)
+(s/def :meuse.api.crate.owner/users (s/coll-of :user/name
+                                               :min-count 1))
+
+(s/def :meuse.api.crate.owner/route-params
+  (s/keys :req-un [:meuse.api.crate.owner/crate-name]))
+(s/def :meuse.api.crate.owner/body
+  (s/keys :req-un [:meuse.api.crate.owner/users]))
+
+(s/def :meuse.api.crate.owner/add
+  (s/keys :req-un [:meuse.api.crate.owner/route-params
+                   :meuse.api.crate.owner/body]))
+
+(s/def :meuse.api.crate.owner/remove
+  (s/keys :req-un [:meuse.api.crate.owner/route-params
+                   :meuse.api.crate.owner/body]))
+
+(s/def :meuse.api.crate.owner/list
+  (s/keys :req-un [:meuse.api.crate.owner/route-params]))
+
+
+
+
