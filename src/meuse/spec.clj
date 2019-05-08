@@ -13,7 +13,14 @@
 
 ;; user
 
+(def min-password-size 8)
+(def user-roles #{"admin" "tech"})
+
 (s/def :user/name ::non-empty-string)
+(s/def :user/password (s/and ::non-empty-string
+                             #(>= (count %) min-password-size)))
+(s/def :user/description ::non-empty-string)
+(s/def :user/role user-roles)
 
 ;; category
 
@@ -196,3 +203,15 @@
 
 (s/def :meuse.api.meuse.category/new
   (s/keys :req-un [:meuse.api.meuse.category/body]))
+
+;; user
+
+(s/def :meuse.api.meuse.user/body
+  (s/keys :req-un [:user/description
+                   :user/password
+                   :user/name
+                   :user/role]))
+
+(s/def :meuse.api.meuse.user/new
+  (s/keys :req-un [:meuse.api.meuse.user/body]))
+
