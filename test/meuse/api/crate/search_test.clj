@@ -4,7 +4,8 @@
             [meuse.db :refer [database]]
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all])
-  (:import java.util.UUID))
+  (:import java.util.UUID
+           clojure.lang.ExceptionInfo))
 
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
@@ -103,36 +104,55 @@
             :crate-name "bar"}]))))
 
 (deftest crate-api-search-test
-  (let [request {:action :search
-                 :database database
-                 :params {:q "foobar"}}
-        result (crates-api! request)]
-    (is (= {:status 200
-            :body {:meta {:total 1}
-                   :crates [{:name "crate1"
-                             :max_version "1.1.5"
-                             :description "the crate1 description, this crate is for foobar"}]}}
-           result)))
-  (let [request {:action :search
-                 :database database
-                 :params {:q "description"}}
-        result (crates-api! request)]
-    (is (= {:status 200
-            :body {:meta {:total 2}
-                   :crates [{:name "crate1"
-                             :max_version "1.1.5"
-                             :description "the crate1 description, this crate is for foobar"}
-                            {:name "crate2"
-                             :max_version "1.3.0"
-                             :description "the crate2 description, this crate is for barbaz"}]}}
-           result)))
-  (let [request {:action :search
-                 :database database
-                 :params {:q "description" :per_page "1"}}
-        result (crates-api! request)]
-    (is (= {:status 200
-            :body {:meta {:total 1}
-                   :crates [{:name "crate1"
-                             :max_version "1.1.5"
-                             :description "the crate1 description, this crate is for foobar"}]}}
-           result))))
+  (testing "success"
+    (let [request {:action :search
+                   :database database
+                   :params {:q "foobar"}}
+          result (crates-api! request)]
+      (is (= {:status 200
+              :body {:meta {:total 1}
+                     :crates [{:name "crate1"
+                               :max_version "1.1.5"
+                               :description "the crate1 description, this crate is for foobar"}]}}
+             result)))
+    (let [request {:action :search
+                   :database database
+                   :params {:q "description"}}
+          result (crates-api! request)]
+      (is (= {:status 200
+              :body {:meta {:total 2}
+                     :crates [{:name "crate1"
+                               :max_version "1.1.5"
+                               :description "the crate1 description, this crate is for foobar"}
+                              {:name "crate2"
+                               :max_version "1.3.0"
+                               :description "the crate2 description, this crate is for barbaz"}]}}
+             result)))
+    (let [request {:action :search
+                   :database database
+                   :params {:q "description" :per_page "1"}}
+          result (crates-api! request)]
+      (is (= {:status 200
+              :body {:meta {:total 1}
+                     :crates [{:name "crate1"
+                               :max_version "1.1.5"
+                               :description "the crate1 description, this crate is for foobar"}]}}
+             result))))
+  (testing "invalid params"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid parameters"
+         (crates-api! {:action :search
+                       :params {:q ""}}))))
+  (testing "invalid params"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid parameters"
+         (crates-api! {:action :search
+                       :params {}}))))
+  (testing "invalid params"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid parameters"
+         (crates-api! {:action :search
+                       :params {:q "foo" :per_page "aaa"}})))))

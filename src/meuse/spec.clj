@@ -156,6 +156,29 @@
 (s/def :meuse.api.crate.owner/list
   (s/keys :req-un [:meuse.api.crate.owner/route-params]))
 
+;; search
 
+(s/def :meuse.api.crate.search/q ::non-empty-string)
+(s/def :meuse.api.crate.search/per_page (s/and ::non-empty-string
+                                               #(try (Integer/parseInt %)
+                                                     (catch Exception _
+                                                       false))))
 
+(s/def :meuse.api.crate.search/params
+  (s/keys :req-un [:meuse.api.crate.search/q]
+          :opt-un [:meuse.api.crate.search/per_page]))
 
+(s/def :meuse.api.crate.search/search
+  (s/keys :req-un [:meuse.api.crate.search/params]))
+
+;; yank
+
+(s/def :meuse.api.crate.yank/crate-name :crate/name)
+(s/def :meuse.api.crate.yank/crate-version :crate/version)
+
+(s/def :meuse.api.crate.yank/route-params
+  (s/keys :req-un [:meuse.api.crate.yank/crate-name
+                   :meuse.api.crate.yank/crate-version]))
+
+(s/def :meuse.api.crate.yank/yank
+  (s/keys :req-un [:meuse.api.crate.yank/route-params]))

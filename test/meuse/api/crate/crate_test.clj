@@ -185,7 +185,20 @@
     (test-crate-version database {:crate-name "crate1"
                                   :version-version "1.1.0"
                                   :version-yanked false
-                                  :version-description "the crate1 description, this crate is for foobar"})))
+                                  :version-description "the crate1 description, this crate is for foobar"}))
+  (testing "invalid parameters"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid parameters"
+         (crates-api! {:route-params {:crate-name "crate1"}
+                       :action :yank}))))
+  (testing "invalid parameters"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid parameters"
+         (crates-api! {:route-params {:crate-name "crate1"
+                                      :crate-version "1.1"}
+                       :action :yank})))))
 
 (deftest default-not-found-test
   (is (= meuse.api.default/not-found

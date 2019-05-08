@@ -2,6 +2,7 @@
   "Search API"
   (:require [meuse.api.crate.http :refer (crates-api!)]
             [meuse.db.search :as search-db]
+            [meuse.api.params :as params]
             [meuse.semver :as semver]
             [clojure.tools.logging :refer [debug info error]]))
 
@@ -32,6 +33,7 @@
 
 (defmethod crates-api! :search
   [request]
+  (params/validate-params request ::search)
   (let [{query :q nb-results :per_page} (:params request)
         search-result (->> (search-db/search (:database request) query)
                            format-search-result

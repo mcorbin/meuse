@@ -1,6 +1,7 @@
 (ns meuse.api.crate.yank
   (:require [meuse.api.crate.http :refer (crates-api!)]
             [meuse.db.crate :as crate-db]
+            [meuse.api.params :as params]
             [meuse.git :as git]
             [meuse.metadata :as metadata]
             [meuse.message :as msg]
@@ -8,6 +9,7 @@
 
 (defn update-yank
   [request yanked?]
+  (params/validate-params request ::yank)
   (let [{:keys [crate-name crate-version]} (:route-params request)]
     (crate-db/update-yank (:database request) crate-name crate-version yanked?)
     (metadata/update-yank (get-in request [:config :metadata :path])
