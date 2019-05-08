@@ -15,6 +15,11 @@
 
 (s/def :user/name ::non-empty-string)
 
+;; category
+
+(s/def :category/name ::non-empty-string)
+(s/def :category/description ::non-empty-string)
+
 ;; config
 
 (s/def :db/subname ::non-empty-string)
@@ -182,3 +187,12 @@
 
 (s/def :meuse.api.crate.yank/yank
   (s/keys :req-un [:meuse.api.crate.yank/route-params]))
+
+;; category
+
+(s/def :meuse.api.meuse.category/body
+  (s/keys :req-un [:category/description
+                   :category/name]))
+
+(s/def :meuse.api.meuse.category/new
+  (s/keys :req-un [:meuse.api.meuse.category/body]))

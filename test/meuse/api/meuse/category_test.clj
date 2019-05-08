@@ -23,4 +23,10 @@
       (is (= "the description" (:category-description category))))
     (is (thrown-with-msg? ExceptionInfo
                           #"already exists$"
-                          (meuse-api! request)))))
+                          (meuse-api! request))))
+  (testing "invalid parameters"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid parameters"
+         (meuse-api! {:action :new-category
+                      :body {:description "the description"}})))))
