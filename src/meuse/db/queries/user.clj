@@ -38,6 +38,12 @@
                   role-id]])
       sql/format))
 
+(defn delete-user
+  [user-id]
+  (-> (h/delete-from :users)
+      (h/where [:= :id user-id])
+      sql/format))
+
 (defn create-crate-user
   [crate-id user-id]
   (-> (h/insert-into :crates_users)
@@ -53,6 +59,12 @@
       (h/where [:and
                 [:= :crate_id crate-id]
                 [:= :user_id user-id]])
+      sql/format))
+
+(defn delete-crates-user
+  [user-id]
+  (-> (h/delete-from :crates_users)
+      (h/where [:= :user_id user-id])
       sql/format))
 
 (defn get-crate-user

@@ -34,6 +34,18 @@
                               (:role user))
                       {:status 400})))))
 
+(defn delete-user
+  "Deletes an user."
+  [database user-name]
+  (jdbc/with-db-transaction [db-tx database]
+    (if-let [user (get-user-by-name db-tx user-name)]
+      (do
+        (jdbc/execute! db-tx (user-queries/delete-crates-user (:user-id user)))
+        (jdbc/execute! db-tx (user-queries/delete-user (:user-id user))))
+      (throw (ex-info (format "the user %s does not exist"
+                              user-name)
+                      {:status 400})))))
+
 (defn get-crate-user
   "Get the crate/user relation for a crate and an user."
   [db-tx crate-id user-id]

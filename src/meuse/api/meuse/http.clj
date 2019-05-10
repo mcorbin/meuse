@@ -3,8 +3,8 @@
 
 (def meuse-routes
   {#"/category/?" {:post ::new-category}
-   [#"/category/?" :crate-name] {:delete ::delete-category}}
-  #"/user/?" {:post ::new-user}
+   [#"/category/?" :crate-name] {:delete ::delete-category}
+   #"/user/?" {:post ::new-user}
    [#"/user/?" :user-name] {:delete ::delete-user}})
 
 (defmulti meuse-api!

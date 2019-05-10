@@ -4,6 +4,7 @@
             [meuse.db.user :refer :all]
             [meuse.db.crate :as crate-db]
             [meuse.db.role :as role-db]
+            [meuse.db.token :as token-db]
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all]
             [meuse.db.role :as role])
@@ -134,3 +135,9 @@
   (is (thrown-with-msg? ExceptionInfo
                         #"the crate foobar does not exist"
                         (get-crate-join-crates-users database "foobar"))))
+
+(deftest delete-user-test
+  (token-db/create-token database "user2" 10)
+  (token-db/create-token database "user2" 20)
+  (delete-user database "user2")
+  (is (= nil (get-user-by-name database "user2"))))

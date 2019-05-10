@@ -25,6 +25,7 @@
   [f]
   (jdbc/execute! database ["TRUNCATE TABLE CRATES CASCADE;"])
   (jdbc/execute! database ["TRUNCATE TABLE CATEGORIES CASCADE;"])
+  (jdbc/execute! database ["TRUNCATE TABLE TOKENS CASCADE;"])
   (jdbc/execute! database ["TRUNCATE TABLE USERS CASCADE;"])
   (helpers/create-test-db! database)
   (f))
