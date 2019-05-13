@@ -18,6 +18,7 @@
                 [:u.name "user_name"]
                 [:u.password "user_password"]
                 [:u.description "user_description"]
+                [:u.active "user_active"]
                 [:u.role_id "user_role_id"])
       (h/from [:users :u])
       (h/where [:= :u.name user-name])
@@ -30,11 +31,13 @@
                  :name
                  :password
                  :description
+                 :active
                  :role_id)
       (h/values [[(UUID/randomUUID)
                   (:name user)
                   (password/encrypt (:password user))
                   (:description user)
+                  (:active user false)
                   role-id]])
       sql/format))
 

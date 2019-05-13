@@ -9,6 +9,14 @@
             [clojure.set :as set])
   (:import java.util.UUID))
 
+(defn check-active!
+  "Takes an user from the database. Throws if the user is inactive."
+  [user]
+  (when-not (:active user)
+    (throw (ex-info (format "the user %s is inactive" (:name user))
+                    {:status 400})))
+  true)
+
 (defn get-user-by-name
   "Get an user by username."
   [db-tx user-name]
@@ -18,6 +26,7 @@
                                 :user_name :user-name
                                 :user_password :user-password
                                 :user_description :user-description
+                                :user_active :user-active
                                 :user_role_id :user-role-id})))
 
 (defn create-user

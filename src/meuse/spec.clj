@@ -20,6 +20,7 @@
 (s/def :user/password (s/and ::non-empty-string
                              #(>= (count %) min-password-size)))
 (s/def :user/description ::non-empty-string)
+(s/def :user/active boolean?)
 (s/def :user/role user-roles)
 
 ;; category
@@ -211,6 +212,7 @@
   (s/keys :req-un [:user/description
                    :user/password
                    :user/name
+                   :user/active
                    :user/role]))
 
 (s/def :meuse.api.meuse.user/new

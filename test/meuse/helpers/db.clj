@@ -38,7 +38,7 @@
   "Create entities in the test database."
   [database]
   (doseq [user (:users db-state)]
-    (user-db/create-user database user))
+    (user-db/create-user database (assoc user :active true)))
   (doseq [category (:categories db-state)]
     (category-db/create-category database
                                  (:name category)

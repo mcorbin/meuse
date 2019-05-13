@@ -13,10 +13,17 @@
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
 
+(deftest check-active!-test
+  (is (thrown-with-msg? ExceptionInfo
+                        #"the user foo is inactive"
+                        (check-active! {:name "foo" :active false})))
+  (is (check-active! {:name "foo" :active true})))
+
 (deftest ^:integration create-user-get-test
   (let [user {:name "mathieu"
               :password "foobar"
               :description "it's me mathieu"
+              :active true
               :role "admin"}]
     (create-user database user)
     (let [user-db (get-user-by-name database "mathieu")
@@ -25,6 +32,7 @@
       (is (= (:name user) (:user-name user-db)))
       (is (password/check (:password user) (:user-password user-db)))
       (is (= (:description user) (:user-description user-db)))
+      (is (= (:active user) (:user-active user-db)))
       (is (= (:role-id admin-role) (:user-role-id user-db))))
     (is (thrown-with-msg? ExceptionInfo
                           #"already exists$"
@@ -37,6 +45,7 @@
   (let [user {:name "mathieu"
               :password "foobar"
               :description "it's me mathieu"
+              :active true
               :role "admin"}]
     (testing "success"
       (create-user database user)
@@ -141,3 +150,4 @@
   (token-db/create-token database "user2" 20)
   (delete-user database "user2")
   (is (= nil (get-user-by-name database "user2"))))
+>

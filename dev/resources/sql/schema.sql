@@ -15,6 +15,7 @@ cargo_id SERIAL,
 name TEXT NOT NULL UNIQUE,
 password TEXT NOT NULL,
 description TEXT NOT NULL,
+active BOOLEAN NOT NULL,
 role_id UUID,
 FOREIGN KEY (role_id) REFERENCES roles(id)
 );

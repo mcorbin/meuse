@@ -15,6 +15,7 @@
 (deftest ^:integration new-user-test
   (let [user {:name "mathieu"
               :password "foobarbaz"
+              :active true
               :description "it's me mathieu"
               :role "admin"}
         request {:database database
@@ -27,6 +28,7 @@
       (is (= (:name user) (:user-name user-db)))
       (is (password/check (:password user) (:user-password user-db)))
       (is (= (:description user) (:user-description user-db)))
+      (is (= (:active user) (:user-active user-db)))
       (is (= (:role-id admin-role) (:user-role-id user-db))))
     (is (thrown-with-msg? ExceptionInfo
                           #"already exists$"
