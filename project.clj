@@ -5,7 +5,7 @@
             :url "http://www.cecill.info/licences.fr.html"}
   :maintainer {:name "Mathieu Corbin"
                :website "https://mcorbin.fr"}
-  :dependencies [[org.clojure/clojure "1.10.0"]
+  :dependencies [[org.clojure/clojure "1.10.1-beta2"]
                  [org.clojure/java.jdbc "0.7.9"]
                  [org.clojure/tools.logging "0.4.1"]
                  [aleph "0.4.6"]

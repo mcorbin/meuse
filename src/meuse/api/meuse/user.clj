@@ -12,3 +12,12 @@
                        (:body request))
   {:status 200})
 
+(defmethod meuse-api! :delete-user
+  [request]
+  (params/validate-params request ::delete)
+  (info "delete user" (get-in request [:body :name]))
+  (db-user/delete-user (:database request)
+                       (get-in request [:body :name]))
+  {:status 200})
+
+

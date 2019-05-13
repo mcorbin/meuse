@@ -55,3 +55,21 @@
                              :description "it's me mathieu"
                              :role "lol"}})))))
 
+(deftest ^:integration delete-user-test
+  (let [username "user2"
+        request {:database database
+                 :action :delete-user
+                 :body {:name username}}]
+    (is (= {:status 200} (meuse-api! request)))
+    (is (nil? (user-db/get-user-by-name database "user2"))))
+  (testing "invalid parameters"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid parameters"
+         (meuse-api! {:action :delete-user
+                      :body {}})))
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid parameters"
+         (meuse-api! {:action :delete-user
+                      :body {:name ""}})))))

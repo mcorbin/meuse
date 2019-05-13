@@ -206,12 +206,18 @@
 
 ;; user
 
-(s/def :meuse.api.meuse.user/body
+
+(s/def :meuse.api.meuse.user-new/body
   (s/keys :req-un [:user/description
                    :user/password
                    :user/name
                    :user/role]))
 
 (s/def :meuse.api.meuse.user/new
-  (s/keys :req-un [:meuse.api.meuse.user/body]))
+  (s/keys :req-un [:meuse.api.meuse.user-new/body]))
 
+(s/def :meuse.api.meuse.user-delete/body
+  (s/keys :req-un [:user/name]))
+
+(s/def :meuse.api.meuse.user/delete
+  (s/keys :req-un [:meuse.api.meuse.user-delete/body]))
