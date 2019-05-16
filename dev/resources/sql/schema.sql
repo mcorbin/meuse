@@ -22,6 +22,7 @@ FOREIGN KEY (role_id) REFERENCES roles(id)
 
 CREATE TABLE tokens(
 id UUID PRIMARY KEY,
+name TEXT NOT NULL,
 token TEXT NOT NULL UNIQUE,
 created_at timestamp NOT NULL,
 expired_at timestamp NOT NULL,

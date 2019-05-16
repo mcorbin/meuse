@@ -146,8 +146,12 @@
                         (get-crate-join-crates-users database "foobar"))))
 
 (deftest delete-user-test
-  (token-db/create-token database "user2" 10)
-  (token-db/create-token database "user2" 20)
+  (token-db/create-token database {:user "user2"
+                                   :validity 10
+                                   :name "foo"})
+  (token-db/create-token database {:user "user2"
+                                   :validity 20
+                                   :name "bar"})
   (delete-user database "user2")
   (is (= nil (get-user-by-name database "user2"))))
 >

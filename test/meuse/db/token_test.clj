@@ -15,10 +15,14 @@
   (testing "success"
     (let [user-name "user2"
           validity 10
-          token (token-db/create-token database user-name validity)]
+          token-name "mytoken"
+          token (token-db/create-token database {:user user-name
+                                                 :validity validity
+                                                 :name token-name})]
       (let [[db-token :as tokens] (token-db/get-user-tokens database "user2")]
         (is (= 1 (count tokens)))
         (is (uuid? (:token-id db-token)))
+        (is (= token-name (:token-name db-token)))
         (is (t/within? (t/minus (t/now) (t/minutes 1))
                        (t/now)
                        (DateTime. (:token-created-at db-token))))
@@ -30,9 +34,26 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"the user toto does not exist"
-         (token-db/create-token database "toto" 10))))
+         (token-db/create-token database {:user "toto"
+                                          :validity 10
+                                          :name "foo"})))))
+
+(deftest delete-token-test
+  (testing "success"
+    (let [user-name "user2"
+          validity 10
+          token-name "mytoken"
+          token (token-db/create-token database {:user user-name
+                                                 :validity validity
+                                                 :name token-name})]
+      (token-db/delete-token database user-name token-name)
+      (is (= 0 (count (token-db/get-user-tokens database "user2"))))))
   (testing "errors"
     (is (thrown-with-msg?
          ExceptionInfo
          #"the user toto does not exist"
-         (token-db/get-user-tokens database "toto")))))
+         (token-db/delete-token database "toto" "foo")))
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"the token foo does not exist for the user user2"
+         (token-db/delete-token database "user2" "foo")))))
