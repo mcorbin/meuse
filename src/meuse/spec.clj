@@ -23,6 +23,16 @@
 (s/def :user/active boolean?)
 (s/def :user/role user-roles)
 
+;; token
+
+(s/def :token/id uuid?)
+(s/def :token/name ::non-empty-string)
+(s/def :token/user-name :user/name)
+(s/def :token/token ::non-empty-string)
+(s/def :token/created-at inst?)
+(s/def :token/expired-at inst?)
+(s/def :token/user-id uuid?)
+
 ;; category
 
 (s/def :category/name ::non-empty-string)
@@ -207,7 +217,6 @@
 
 ;; user
 
-
 (s/def :meuse.api.meuse.user-new/body
   (s/keys :req-un [:user/description
                    :user/password
@@ -223,3 +232,14 @@
 
 (s/def :meuse.api.meuse.user/delete
   (s/keys :req-un [:meuse.api.meuse.user-delete/body]))
+
+;; token
+
+(s/def :meuse.api.meuse.token-delete/body
+  (s/keys :req-un [:token/name
+                   :token/user-name]))
+
+(s/def :meuse.api.meuse.token/delete
+  (s/keys :req-un [:meuse.api.meuse.token-delete/body]))
+
+

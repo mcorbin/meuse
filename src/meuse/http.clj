@@ -18,6 +18,7 @@
             meuse.api.crate.search
             [meuse.api.meuse.http :refer [meuse-routes meuse-api!]]
             meuse.api.meuse.category
+            meuse.api.meuse.token
             [meuse.api.default :refer [default-api!]]
             [meuse.config :refer [config]]
             [meuse.db :refer [database]]
