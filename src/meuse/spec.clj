@@ -27,7 +27,8 @@
 
 (s/def :token/id uuid?)
 (s/def :token/name ::non-empty-string)
-(s/def :token/user-name :user/name)
+(s/def :token/validity pos-int?)
+(s/def :token/user :user/name)
 (s/def :token/token ::non-empty-string)
 (s/def :token/created-at inst?)
 (s/def :token/expired-at inst?)
@@ -237,9 +238,17 @@
 
 (s/def :meuse.api.meuse.token-delete/body
   (s/keys :req-un [:token/name
-                   :token/user-name]))
+                   :token/user]))
 
 (s/def :meuse.api.meuse.token/delete
   (s/keys :req-un [:meuse.api.meuse.token-delete/body]))
+
+(s/def :meuse.api.meuse.token-create/body
+  (s/keys :req-un [:token/name
+                   :token/validity
+                   :token/user]))
+
+(s/def :meuse.api.meuse.token/create
+  (s/keys :req-un [:meuse.api.meuse.token-create/body]))
 
 
