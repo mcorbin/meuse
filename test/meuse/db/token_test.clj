@@ -1,5 +1,6 @@
 (ns meuse.db.token-test
-  (:require [meuse.db :refer [database]]
+  (:require [meuse.auth.token :as auth-token]
+            [meuse.db :refer [database]]
             [meuse.db.token :as token-db]
             [meuse.helpers.fixtures :refer :all]
             [clj-time.core :as t]
@@ -21,6 +22,8 @@
                                                  :name token-name})]
       (let [[db-token :as tokens] (token-db/get-user-tokens database "user2")]
         (is (= 1 (count tokens)))
+        (is (= (auth-token/extract-identifier token)
+               (:token-identifier db-token)))
         (is (uuid? (:token-id db-token)))
         (is (= token-name (:token-name db-token)))
         (is (t/within? (t/minus (t/now) (t/minutes 1))
@@ -29,7 +32,7 @@
         (is (t/within? (t/plus (t/minus (t/now) (t/minutes 1)) (t/days validity))
                        (t/plus (t/now) (t/days validity))
                        (DateTime. (:token-expired-at db-token))))
-        (is (bcrypt/check token (:token-token db-token))))))
+        (is (auth-token/valid? token db-token)))))
   (testing "errors"
     (is (thrown-with-msg?
          ExceptionInfo
@@ -57,3 +60,19 @@
          ExceptionInfo
          #"the token foo does not exist for the user user2"
          (token-db/delete-token database "user2" "foo")))))
+
+(deftest get-token-user-role-test
+  (testing "success"
+    (let [user-name "user2"
+          validity 10
+          token-name "mytoken"
+          token (token-db/create-token database {:user user-name
+                                                 :validity validity
+                                                 :name token-name})
+          db-token (token-db/get-token-user-role database token)]
+      (is (= token-name (:token-name db-token)))
+      (is (= (auth-token/extract-identifier token)
+             (:token-identifier db-token)))
+      (is (auth-token/valid? token db-token))
+      (is (= user-name (:user-name db-token)))
+      (is (= "tech" (:role-name db-token))))))

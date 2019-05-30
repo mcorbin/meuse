@@ -15,3 +15,7 @@
   []
   (stop!)
   (tn/refresh :after 'meuse.core/start!))
+
+(defn go
+  []
+  (start!))

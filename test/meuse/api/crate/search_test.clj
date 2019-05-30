@@ -141,18 +141,18 @@
   (testing "invalid params"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field q: the value should be a non empty string\n"
          (crates-api! {:action :search
                        :params {:q ""}}))))
   (testing "invalid params"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field q missing in params\n"
          (crates-api! {:action :search
                        :params {}}))))
   (testing "invalid params"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field per_page is incorrect\n"
          (crates-api! {:action :search
                        :params {:q "foo" :per_page "aaa"}})))))

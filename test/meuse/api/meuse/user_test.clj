@@ -36,7 +36,7 @@
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field active missing in body\n - field password: the password should have at least 8 characters\n"
          (meuse-api! {:action :new-user
                       :body {:name "mathieu"
                              :password "foobar"
@@ -44,16 +44,18 @@
                              :role "admin"}})))
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field password missing in body\n"
          (meuse-api! {:action :new-user
                       :body {:name "mathieu"
+                             :active true
                              :description "it's me mathieu"
                              :role "admin"}})))
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field password missing in body\n - field role: the role should be 'admin' or 'tech'\n"
          (meuse-api! {:action :new-user
                       :body {:name "mathieu"
+                             :active true
                              :description "it's me mathieu"
                              :role "lol"}})))))
 
@@ -67,11 +69,11 @@
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field name missing in body\n"
          (meuse-api! {:action :delete-user
                       :body {}})))
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field name: the value should be a non empty string\n"
          (meuse-api! {:action :delete-user
                       :body {:name ""}})))))

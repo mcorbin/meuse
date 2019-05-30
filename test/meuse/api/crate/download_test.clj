@@ -27,17 +27,15 @@
                                           :route-params {:crate-name "bar"
                                                          :crate-version "1.0.0"}}))))
   (testing "invalid parameters"
-    (doseq [params [{:crate-name ""
-                     :crate-version "1.0.0"}
-                    {:crate-name "aaaa"
-                     :crate-version "1.1"}]]
-      (is (thrown-with-msg? ExceptionInfo
-                            #"invalid parameters"
-                            (crates-api! {:action :download
-                                          :config {:crate {:path tmp-dir}}
-                                          :route-params params})))
-      (is (thrown-with-msg? ExceptionInfo
-                            #"invalid parameters"
-                            (crates-api! {:action :download
-                                          :config {:crate {:path tmp-dir}}
-                                          :route-params params}))))))
+    (is (thrown-with-msg? ExceptionInfo
+                          #"Wrong input parameters:\n - field crate-name: the value should be a non empty string\n"
+                          (crates-api! {:action :download
+                                        :config {:crate {:path tmp-dir}}
+                                        :route-params {:crate-name ""
+                                                       :crate-version "1.0.0"}})))
+    (is (thrown-with-msg? ExceptionInfo
+                          #"Wrong input parameters:\n - field crate-version: the value should be a valid semver string\n"
+                          (crates-api! {:action :download
+                                        :config {:crate {:path tmp-dir}}
+                                        :route-params {:crate-name "aaaa"
+                                                       :crate-version "1.1"}})))))

@@ -31,19 +31,18 @@
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field name missing in body\n"
          (meuse-api! {:action :delete-token
-                      :name ""
                       :body {:user "user2"}})))
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field name: the value should be a non empty string\n"
          (meuse-api! {:action :delete-token
                       :body {:name ""
                              :user "user2"}})))
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field name missing in body\n - field user missing in body\n"
          (meuse-api! {:action :delete-token
                       :body {}})))))
 
@@ -67,24 +66,24 @@
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field name: the value should be a non empty string\n"
          (meuse-api! {:action :create-token
                       :name ""
                       :body {:name ""
-                             :user-name "foo"
+                             :user "foo"
                              :validity 10}})))
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field user missing in body\n"
          (meuse-api! {:action :create-token
                       :body {:name "mytoken"
                              :validity 10}})))
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field validity: the value should be a positive integer\n"
          (meuse-api! {:action :create-token
                       :body {:name "mytoken"
-                             :user-name "foo"
+                             :user "foo"
                              :validity "foo"}})))))
 
 

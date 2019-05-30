@@ -52,7 +52,7 @@
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field users is incorrect\n"
          (crates-api! {:action :add-owner
                        :database database
                        :route-params {:crate-name "crate2"}
@@ -61,7 +61,7 @@
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field crate-name missing in route-params\n"
          (crates-api! {:action :add-owner
                        :database database
                        :route-params {}
@@ -101,7 +101,7 @@
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field users is incorrect\n"
          (crates-api! {:action :remove-owner
                        :database database
                        :route-params {:crate-name "crate2"}
@@ -110,7 +110,7 @@
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field crate-name missing in route-params\n"
          (crates-api! {:action :remove-owner
                        :database database
                        :route-params {}
@@ -133,7 +133,7 @@
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field crate-name missing in route-params\n"
          (crates-api! {:action :list-owners
                        :database database
                        :route-params {}})))))

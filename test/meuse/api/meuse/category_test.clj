@@ -27,6 +27,6 @@
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field name missing in body\n"
          (meuse-api! {:action :new-category
                       :body {:description "the description"}})))))

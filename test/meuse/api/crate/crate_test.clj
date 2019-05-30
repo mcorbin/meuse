@@ -131,7 +131,7 @@
                    {:action :new})]
       (is (thrown-with-msg?
            ExceptionInfo
-           #"invalid parameters"
+           #"Wrong input parameters:\n - field version_req missing in deps\n"
            (crates-api! request))))
     (let [name "toto"
           version "1.0.3"
@@ -144,7 +144,7 @@
                    {:action :new})]
       (is (thrown-with-msg?
            ExceptionInfo
-           #"invalid parameters"
+           #"Wrong input parameters:\n - field name: the value should be a non empty string\n"
            (crates-api! request))))
     (let [name "toto"
           version "aaa"
@@ -157,7 +157,7 @@
                    {:action :new})]
       (is (thrown-with-msg?
            ExceptionInfo
-           #"invalid parameters"
+           #"Wrong input parameters:\n - field name: the value should be a non empty string\n - field vers: the value should be a valid semver string\n"
            (crates-api! request))))))
 
 (deftest ^:integration crates-api-yank-unyank-test
@@ -189,13 +189,13 @@
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field crate-version missing in route-params\n"
          (crates-api! {:route-params {:crate-name "crate1"}
                        :action :yank}))))
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"invalid parameters"
+         #"Wrong input parameters:\n - field crate-version: the value should be a valid semver string\n"
          (crates-api! {:route-params {:crate-name "crate1"
                                       :crate-version "1.1"}
                        :action :yank})))))

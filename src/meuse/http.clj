@@ -20,6 +20,7 @@
             meuse.api.meuse.category
             meuse.api.meuse.token
             [meuse.api.default :refer [default-api!]]
+            [meuse.auth.token :as auth-token]
             [meuse.config :refer [config]]
             [meuse.db :refer [database]]
             [meuse.git :refer [git]]
@@ -79,26 +80,27 @@
                          (:url metadata-config))]
     (fn handler
       [request]
-      (let [uri (:uri request)
-            ;; add a request id
-            request (->> (assoc request :request-id (str (UUID/randomUUID)))
-                         (match-route* routes uri))
-            ;; todo: clean this mess
-            request (assoc request
-                           :database database
-                           :git git
-                           :config {:crate crate-config
-                                    :metadata metadata-config}
-                           :subsystem (-> request :handler namespace keyword)
-                           :action (-> request :handler name keyword)
-                           :registry-config registry-config)]
-        (try
+      (try
+        (let [uri (:uri request)
+              ;; add a request id
+              request (->> (assoc request :request-id (str (UUID/randomUUID)))
+                           (match-route* routes uri))
+              ;; todo: clean this mess
+              request (assoc request
+                             :database database
+                             :git git
+                             :config {:crate crate-config
+                                      :metadata metadata-config}
+                             :subsystem (-> request :handler namespace keyword)
+                             :action (-> request :handler name keyword)
+                             :registry-config registry-config)]
           (debug "request " (:request-id request)
                  "with subsystem" (:subsystem request)
                  "with action" (:action request))
-          (route! request)
-          (catch Exception e
-            (handle-req-errors request e)))))))
+          (info (:headers request))
+          (route! request))
+        (catch Exception e
+              (handle-req-errors request e))))))
 
 (defn start-server
   [http-config crate-config metadata-config database git]

@@ -1,15 +1,22 @@
 (ns meuse.spec
   "Specs of the project"
   (:require [meuse.semver :as semver]
+            [spec-tools.swagger.core :as swagger]
             [clojure.spec.alpha :as s]))
 
 (s/def ::non-empty-string (s/and string? not-empty))
 (s/def ::null-or-non-empty-string (s/or :nil nil?
                                         :string (s/and string? not-empty)))
+(s/def ::semver semver/valid?)
+(s/def ::boolean boolean?)
+(s/def ::uuid uuid?)
+(s/def ::pos-int pos-int?)
+(s/def ::inst inst?)
+
 ;; crate
 
 (s/def :crate/name ::non-empty-string)
-(s/def :crate/version semver/valid?)
+(s/def :crate/version ::semver)
 
 ;; user
 
@@ -20,19 +27,19 @@
 (s/def :user/password (s/and ::non-empty-string
                              #(>= (count %) min-password-size)))
 (s/def :user/description ::non-empty-string)
-(s/def :user/active boolean?)
+(s/def :user/active ::boolean)
 (s/def :user/role user-roles)
 
 ;; token
 
-(s/def :token/id uuid?)
+(s/def :token/id ::uuid)
 (s/def :token/name ::non-empty-string)
-(s/def :token/validity pos-int?)
+(s/def :token/validity ::pos-int)
 (s/def :token/user :user/name)
 (s/def :token/token ::non-empty-string)
-(s/def :token/created-at inst?)
-(s/def :token/expired-at inst?)
-(s/def :token/user-id uuid?)
+(s/def :token/created-at ::inst)
+(s/def :token/expired-at ::inst)
+(s/def :token/user-id ::uuid)
 
 ;; category
 
@@ -48,7 +55,7 @@
                                      :db/user
                                      :db/password]))
 
-(s/def :http/port pos-int?)
+(s/def :http/port ::pos-int)
 (s/def :http/address ::non-empty-string)
 (s/def :http/http (s/keys :req-un [:http/port
                                    :http/address]))
@@ -65,7 +72,7 @@
 
 (s/def ::level #{"debug" "info"})
 (s/def ::encoder #{"json"})
-(s/def ::console (s/or :boot boolean?
+(s/def ::console (s/or :bool ::boolean
                        :map (s/keys :req-un [::encoder])))
 (s/def ::logging (s/keys :req-un [::level ::console]))
 
@@ -98,8 +105,8 @@
 (s/def :deps/name :crate/name)
 (s/def :deps/version_req ::non-empty-string)
 (s/def :deps/features (s/coll-of ::non-empty-string))
-(s/def :deps/optional boolean?)
-(s/def :deps/default_features boolean?)
+(s/def :deps/optional ::boolean)
+(s/def :deps/default_features ::boolean)
 (s/def :deps/target ::null-or-non-empty-string)
 (s/def :deps/kind ::non-empty-string)
 (s/def :deps/registry ::null-or-non-empty-string)
@@ -250,5 +257,3 @@
 
 (s/def :meuse.api.meuse.token/create
   (s/keys :req-un [:meuse.api.meuse.token-create/body]))
-
-

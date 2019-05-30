@@ -7,7 +7,7 @@
   :dependencies [[org.clojure/clojure "1.10.1-beta2"]
                  [org.clojure/java.jdbc "0.7.9"]
                  [org.clojure/tools.logging "0.4.1"]
-                 [aleph "0.4.6"]
+                 [aleph "0.4.7-alpha5"]
                  [bidi "2.1.5"]
                  [cheshire "5.8.1"]
                  [clj-time "0.15.1"]
@@ -22,6 +22,7 @@
                  [ring/ring-core "1.7.1"]
                  [spootnik/signal "0.2.2"]
                  [spootnik/unilog "0.7.24"]
+                 [metosin/spec-tools "0.9.2"]
                  [digest "1.4.9"]]
   :main ^:skip-aot meuse.core
   :target-path "target/%s"
