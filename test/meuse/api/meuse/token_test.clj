@@ -48,12 +48,19 @@
 
 (deftest ^:integration create-token-test
   (testing "success"
-    (= {:status 200} (meuse-api! {:database database
-                                  :action :create-token
-                                  :body {:user "user2"
-                                         :validity 10
-                                         :name "mynewtoken"}}))
-    (is (= 1 (count (token-db/get-user-tokens database "user2")))))
+    (let [result (meuse-api! {:database database
+                              :action :create-token
+                              :body {:user "user2"
+                                     :validity 10
+                                     :name "mynewtoken"
+                                     :password "user2user2"}})
+          tokens (token-db/get-user-tokens database "user2")
+          ]
+      (is (= 200 (:status result)))
+      (is (string? (get-in result [:body :token])))
+      (is (= 1 (count tokens)))
+      (is (meuse.auth.token/valid? (get-in result [:body :token])
+                                   (first tokens)))))
   (testing "the user does not exist"
     (is (thrown-with-msg?
          ExceptionInfo
@@ -62,6 +69,7 @@
                       :action :create-token
                       :body {:name "mytoken"
                              :user "foo"
+                             :password "azertyui"
                              :validity 10}}))))
   (testing "invalid parameters"
     (is (thrown-with-msg?
@@ -71,12 +79,14 @@
                       :name ""
                       :body {:name ""
                              :user "foo"
+                             :password "azertyui"
                              :validity 10}})))
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field user missing in body\n"
          (meuse-api! {:action :create-token
                       :body {:name "mytoken"
+                             :password "azertyui"
                              :validity 10}})))
     (is (thrown-with-msg?
          ExceptionInfo
@@ -84,6 +94,7 @@
          (meuse-api! {:action :create-token
                       :body {:name "mytoken"
                              :user "foo"
+                             :password "azertyui"
                              :validity "foo"}})))))
 
 

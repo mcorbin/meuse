@@ -5,9 +5,9 @@
             [clojure.test :refer :all]))
 
 (def db-state
-  {:users [{:role "admin" :name "user1" :password "user1" :description "desc1"}
-           {:role "tech" :name "user2" :password "user2" :description "desc2"}
-           {:role "tech" :name "user3" :password "user3" :description "desc3"}]
+  {:users [{:role "admin" :name "user1" :password "user1user1" :description "desc1"}
+           {:role "tech" :name "user2" :password "user2user2" :description "desc2"}
+           {:role "tech" :name "user3" :password "user3user3" :description "desc3"}]
    :categories [{:name "email"
                  :description "the email category"}
                 {:name "system"

@@ -253,7 +253,8 @@
 (s/def :meuse.api.meuse.token-create/body
   (s/keys :req-un [:token/name
                    :token/validity
-                   :token/user]))
+                   :token/user
+                   :user/password]))
 
 (s/def :meuse.api.meuse.token/create
   (s/keys :req-un [:meuse.api.meuse.token-create/body]))
