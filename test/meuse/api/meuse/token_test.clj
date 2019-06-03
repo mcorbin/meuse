@@ -54,8 +54,7 @@
                                      :validity 10
                                      :name "mynewtoken"
                                      :password "user2user2"}})
-          tokens (token-db/get-user-tokens database "user2")
-          ]
+          tokens (token-db/get-user-tokens database "user2")]
       (is (= 200 (:status result)))
       (is (string? (get-in result [:body :token])))
       (is (= 1 (count tokens)))
@@ -69,6 +68,16 @@
                       :action :create-token
                       :body {:name "mytoken"
                              :user "foo"
+                             :password "azertyui"
+                             :validity 10}}))))
+  (testing "invalid password"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"invalid password"
+         (meuse-api! {:database database
+                      :action :create-token
+                      :body {:name "mytoken"
+                             :user "user2"
                              :password "azertyui"
                              :validity 10}}))))
   (testing "invalid parameters"

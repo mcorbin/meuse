@@ -97,7 +97,6 @@
           (debug "request " (:request-id request)
                  "with subsystem" (:subsystem request)
                  "with action" (:action request))
-          (info (:headers request))
           (route! request))
         (catch Exception e
               (handle-req-errors request e))))))
