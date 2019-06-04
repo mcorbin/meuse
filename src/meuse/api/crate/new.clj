@@ -1,6 +1,7 @@
 (ns meuse.api.crate.new
   (:require [meuse.api.crate.http :refer (crates-api!)]
             [meuse.api.params :as params]
+            [meuse.auth.request :as auth-request]
             [meuse.db.crate :as crate-db]
             [meuse.crate :as crate]
             [meuse.crate-file :as crate-file]
@@ -18,6 +19,7 @@
   (let [{:keys [git-metadata raw-metadata crate-file] :as crate}
         (crate/request->crate request)]
     (params/validate-params crate ::crate)
+    (auth-request/admin-or-tech? request)
     (info "publishing crate" (:name raw-metadata)
           "version" (:vers raw-metadata))
     ;; check if the dependencies registry is allowed

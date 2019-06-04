@@ -19,8 +19,7 @@
           user (user-db/get-user-by-name database "user2")
           request {:database database
                    :headers {"authorization" token}}
-          result (check-user request)
-          ]
+          result (check-user request)]
       (is (= result (assoc request :auth {:user-name "user2"
                                           :user-id (:user-id user)
                                           :role-name "tech"}))))
@@ -64,3 +63,36 @@
                (check-user {:database database
                             :headers {"authorization" (str token "a")}}))))))
 
+(deftest admin?-test
+  (is (admin? {:auth {:role-name "admin"}}))
+  (is (thrown-with-msg?
+       ExceptionInfo
+       #"bad permissions"
+       (admin? {:auth {:role-name "tech"}})))
+  (is (thrown-with-msg?
+       ExceptionInfo
+       #"bad permissions"
+       (admin? {:auth {}}))))
+
+(deftest tech?-test
+  (is (tech? {:auth {:role-name "tech"}}))
+  (is (thrown-with-msg?
+       ExceptionInfo
+       #"bad permissions"
+       (tech? {:auth {:role-name "admin"}})))
+  (is (thrown-with-msg?
+       ExceptionInfo
+       #"bad permissions"
+       (tech? {:auth {}}))))
+
+(deftest admin-or-tech?-test
+  (is (admin-or-tech? {:auth {:role-name "tech"}}))
+  (is (admin-or-tech? {:auth {:role-name "admin"}}))
+  (is (thrown-with-msg?
+       ExceptionInfo
+       #"bad permissions"
+       (admin-or-tech? {:auth {:role-name "foo"}})))
+  (is (thrown-with-msg?
+       ExceptionInfo
+       #"bad permissions"
+       (admin-or-tech? {:auth {}}))))

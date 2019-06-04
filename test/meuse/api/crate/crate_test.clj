@@ -158,6 +158,21 @@
       (is (thrown-with-msg?
            ExceptionInfo
            #"Wrong input parameters:\n - field name: the value should be a non empty string\n - field vers: the value should be a valid semver string\n"
+           (crates-api! request)))))
+  (testing "invalid role"
+    (let [name "toto"
+          version "1.0.1"
+          metadata {:name "aaa"
+                    :vers version
+                    :yanked false}
+          crate-file "random content"
+          request (merge
+                   (create-publish-request metadata crate-file)
+                   {:action :new
+                    :auth {:role-name "lol"}})]
+      (is (thrown-with-msg?
+           ExceptionInfo
+           #"bad permissions"
            (crates-api! request))))))
 
 (deftest ^:integration crates-api-yank-unyank-test

@@ -1,6 +1,7 @@
 (ns meuse.api.crate.search
   "Search API"
   (:require [meuse.api.crate.http :refer (crates-api!)]
+            [meuse.auth.request :as auth-request]
             [meuse.db.search :as search-db]
             [meuse.api.params :as params]
             [meuse.semver :as semver]
@@ -34,6 +35,7 @@
 (defmethod crates-api! :search
   [request]
   (params/validate-params request ::search)
+  (auth-request/admin-or-tech? request)
   (let [{query :q nb-results :per_page} (:params request)
         search-result (->> (search-db/search (:database request) query)
                            format-search-result

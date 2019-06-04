@@ -44,7 +44,7 @@
                             (:category-id category))))
     (throw (ex-info (format "the category %s does not exist"
                             category-name)
-                    {}))))
+                    {:status 404}))))
 
 (defn create-crate-categories
   "Creates categories for a crate."
@@ -81,7 +81,7 @@
           (throw (ex-info (format "release %s for crate %s already exists"
                                   (:name metadata)
                                   (:vers metadata))
-                          {})))
+                          {:status 200})))
         ;; insert the new version
         (jdbc/execute! db-tx (crate-queries/create-version
                               metadata
@@ -111,7 +111,8 @@
            (ex-info
             (format "cannot %s the crate: the version does not exist"
                     (yanked?->msg yanked?))
-            {:crate-name crate-name
+            {:status 404
+             :crate-name crate-name
              :crate-version crate-version})))
         (when (= yanked? (:version-yanked crate))
           (throw
@@ -119,10 +120,12 @@
             (format "cannot %s the crate: crate state is already %s"
                     (yanked?->msg yanked?)
                     (yanked?->msg yanked?))
-            {:crate-name crate-name
+            {:status 404
+             :crate-name crate-name
              :crate-version crate-version})))
         (jdbc/execute! db-tx (crate-queries/update-yanked (:version-id crate) yanked?)))
       (throw (ex-info (format "cannot %s the crate: the crate does not exist"
                               (yanked?->msg yanked?))
-                      {:crate-name crate-name
+                      {:status 400
+                       :crate-name crate-name
                        :crate-version crate-version})))))

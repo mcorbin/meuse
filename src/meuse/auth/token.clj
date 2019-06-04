@@ -24,7 +24,9 @@
 (defn extract-identifier
   "Takes a token, and extract the identifier from it."
   [token]
-  (subs token 0 identifier-size))
+  (if (> (count token) identifier-size)
+    (subs token 0 identifier-size)
+    (throw (ex-info "invalid token" {:status 403}))))
 
 (defn valid?
   "Takes a token and a token encrypted with bcrypt.

@@ -3,6 +3,7 @@
             [meuse.api.crate.http :refer [crates-api!]]
             [meuse.crate-file :as crate-file]
             [meuse.helpers.fixtures :refer :all]
+            [meuse.helpers.request :refer [add-auth]]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 
@@ -14,28 +15,42 @@
                                  {:raw-metadata {:name "foo"
                                                  :vers "1.0.0"}
                                   :crate-file (.getBytes "file content")}))
-  (is (= (slurp (:body (crates-api! {:action :download
-                                     :config {:crate {:path tmp-dir}}
-                                     :route-params {:crate-name "foo"
-                                                    :crate-version "1.0.0"}})))
+  (is (= (slurp (:body (crates-api!
+                        (add-auth {:action :download
+                                   :config {:crate {:path tmp-dir}}
+                                   :route-params {:crate-name "foo"
+                                                  :crate-version "1.0.0"}}))))
          "file content"))
+  (testing "bad permissions"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"bad permissions"
+         (crates-api! {:action :download
+                       :auth {}
+                       :config {:crate {:path tmp-dir}}
+                       :route-params {:crate-name "foo"
+                                      :crate-version "1.0.0"}}))))
   (testing "error"
-    (is (thrown-with-msg? ExceptionInfo
-                            #"the file test/resources/tmp/bar/1.0.0/download does not exist"
-                            (crates-api! {:action :download
-                                          :config {:crate {:path tmp-dir}}
-                                          :route-params {:crate-name "bar"
-                                                         :crate-version "1.0.0"}}))))
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"the file test/resources/tmp/bar/1.0.0/download does not exist"
+         (crates-api!
+          (add-auth {:action :download
+                     :config {:crate {:path tmp-dir}}
+                     :route-params {:crate-name "bar"
+                                    :crate-version "1.0.0"}})))))
   (testing "invalid parameters"
-    (is (thrown-with-msg? ExceptionInfo
-                          #"Wrong input parameters:\n - field crate-name: the value should be a non empty string\n"
-                          (crates-api! {:action :download
-                                        :config {:crate {:path tmp-dir}}
-                                        :route-params {:crate-name ""
-                                                       :crate-version "1.0.0"}})))
-    (is (thrown-with-msg? ExceptionInfo
-                          #"Wrong input parameters:\n - field crate-version: the value should be a valid semver string\n"
-                          (crates-api! {:action :download
-                                        :config {:crate {:path tmp-dir}}
-                                        :route-params {:crate-name "aaaa"
-                                                       :crate-version "1.1"}})))))
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"Wrong input parameters:\n - field crate-name: the value should be a non empty string\n"
+         (crates-api! (add-auth {:action :download
+                                 :config {:crate {:path tmp-dir}}
+                                 :route-params {:crate-name ""
+                                                :crate-version "1.0.0"}}))))
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"Wrong input parameters:\n - field crate-version: the value should be a valid semver string\n"
+         (crates-api! (add-auth {:action :download
+                                 :config {:crate {:path tmp-dir}}
+                                 :route-params {:crate-name "aaaa"
+                                                :crate-version "1.1"}}))))))

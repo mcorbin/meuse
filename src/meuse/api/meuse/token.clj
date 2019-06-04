@@ -10,7 +10,14 @@
   [request]
   (params/validate-params request ::delete)
   (let [token-name (get-in request [:body :name])
-        user-name (get-in request [:body :user])]
+        user-name (get-in request [:body :user])
+        auth-user-name (get-in request [:auth :user-name])]
+    ;; todo: also check if the user is admin
+    (when-not (= (get-in request [:auth :user-name])
+             user-name)
+      (throw (ex-info
+              (format "user %s cannot delete token for %s" auth-user-name user-name)
+              {:status 403})))
     (info (format "deleting token %s for user %s" token-name user-name))
     (token-db/delete-token (:database request)
                            user-name

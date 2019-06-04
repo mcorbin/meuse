@@ -17,12 +17,10 @@
                          (byte 0)
                          (byte 0)]
         crate-file (.getBytes crate-file)
-        crate-file-length [(byte (count crate-file)) (byte 0) (byte 0) (byte 0)]
-        request {:body (byte-array (concat metadata-length
-                                           metadata
-                                           crate-file-length
-                                           crate-file))}]
-    {:body (byte-array (concat metadata-length
+        crate-file-length [(byte (count crate-file)) (byte 0) (byte 0) (byte 0)]]
+    {:auth {:user-name "user2"
+            :role-name "tech"}
+     :body (byte-array (concat metadata-length
                                metadata
                                crate-file-length
                                crate-file))}))

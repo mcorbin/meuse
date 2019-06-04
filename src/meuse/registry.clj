@@ -12,7 +12,8 @@
   [base-path registry-url]
   (let [config-path (path/new-path base-path "config.json")]
     (when-not (.exists (io/file config-path))
-      (throw (ex-info (str "the file " config-path " does not exist") {})))
+      (throw (ex-info (str "the file " config-path " does not exist")
+                      {:status 500})))
     (-> (slurp config-path)
         (json/parse-string true)
         (update :allowed-registries #(if (seq %)
@@ -32,5 +33,5 @@
     (when-let [registry (:registry dep)]
       (when-not ((set allowed-registries) registry)
         (throw (ex-info (str "the registry " registry " is not allowed")
-                        {})))))
+                        {:status 401})))))
   true)

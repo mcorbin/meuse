@@ -3,6 +3,7 @@
             [meuse.api.crate.http :refer [crates-api!]]
             [meuse.db :refer [database]]
             [meuse.helpers.fixtures :refer :all]
+            [meuse.helpers.request :refer [add-auth]]
             [clojure.test :refer :all])
   (:import java.util.UUID
            clojure.lang.ExceptionInfo))
@@ -105,9 +106,9 @@
 
 (deftest crate-api-search-test
   (testing "success"
-    (let [request {:action :search
-                   :database database
-                   :params {:q "foobar"}}
+    (let [request (add-auth {:action :search
+                             :database database
+                             :params {:q "foobar"}})
           result (crates-api! request)]
       (is (= {:status 200
               :body {:meta {:total 1}
@@ -115,9 +116,9 @@
                                :max_version "1.1.5"
                                :description "the crate1 description, this crate is for foobar"}]}}
              result)))
-    (let [request {:action :search
-                   :database database
-                   :params {:q "description"}}
+    (let [request (add-auth {:action :search
+                             :database database
+                             :params {:q "description"}})
           result (crates-api! request)]
       (is (= {:status 200
               :body {:meta {:total 2}
@@ -128,9 +129,9 @@
                                :max_version "1.3.0"
                                :description "the crate2 description, this crate is for barbaz"}]}}
              result)))
-    (let [request {:action :search
-                   :database database
-                   :params {:q "description" :per_page "1"}}
+    (let [request (add-auth {:action :search
+                             :database database
+                             :params {:q "description" :per_page "1"}})
           result (crates-api! request)]
       (is (= {:status 200
               :body {:meta {:total 1}
@@ -142,17 +143,17 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field q: the value should be a non empty string\n"
-         (crates-api! {:action :search
-                       :params {:q ""}}))))
+         (crates-api! (add-auth {:action :search
+                                 :params {:q ""}})))))
   (testing "invalid params"
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field q missing in params\n"
-         (crates-api! {:action :search
-                       :params {}}))))
+         (crates-api! (add-auth {:action :search
+                                 :params {}})))))
   (testing "invalid params"
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field per_page is incorrect\n"
-         (crates-api! {:action :search
-                       :params {:q "foo" :per_page "aaa"}})))))
+         (crates-api! (add-auth {:action :search
+                                 :params {:q "foo" :per_page "aaa"}}))))))

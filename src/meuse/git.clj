@@ -27,7 +27,8 @@
              "err="(:err result))
       (when-not (= 0 (:exit result))
         (throw (ex-info "error executing git command"
-                        {:exit-code (:exit result)
+                        {:status 500
+                         :exit-code (:exit result)
                          :stdout (:out result)
                          :stderr (:err result)
                          :command args})))))

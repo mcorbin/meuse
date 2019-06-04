@@ -30,7 +30,8 @@
     (when-not (.exists (io/file dir))
       (when-not (io/make-parents metadata-path)
         (throw (ex-info "fail to create directory for crate"
-                        {:crate {:name crate-name
+                        {:status 500
+                         :crate {:name crate-name
                                  :directory dir}}))))
     (spit metadata-path
           (str (->> metadata

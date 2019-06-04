@@ -24,3 +24,25 @@
         (throw (ex-info "user is not active" {:status 403})))
       (throw (ex-info "token not found" {:status 403})))
     (throw (ex-info "token missing in the header" {:status 403}))))
+
+(defn admin?
+  "Takes a request, verifies is the user is admin."
+  [request]
+  (when-not (= "admin" (get-in request [:auth :role-name]))
+    (throw (ex-info "bad permissions" {:status 403})))
+  true)
+
+(defn tech?
+  "Takes a request, verifies is the user is tech."
+  [request]
+  (when-not (= "tech" (get-in request [:auth :role-name]))
+    (throw (ex-info "bad permissions" {:status 403})))
+  true)
+
+(defn admin-or-tech?
+  "Takes a request, verifies is the user is admin or tech."
+  [request]
+  (when-not (or (= "tech" (get-in request [:auth :role-name]))
+                (= "admin" (get-in request [:auth :role-name])))
+    (throw (ex-info "bad permissions" {:status 403})))
+  true)

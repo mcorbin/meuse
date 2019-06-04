@@ -15,7 +15,7 @@
   [byte-array size]
   (when (< (alength byte-array) size)
     (throw (ex-info (format "invalid request size %d" (alength byte-array))
-                    {}))))
+                    {:status 400}))))
 
 
 (def git-metadata-keys [:name :vers :deps :cksum :features :yanked :links])

@@ -3,6 +3,7 @@
             [meuse.db :refer [database]]
             [meuse.db.token :as token-db]
             [meuse.helpers.fixtures :refer :all]
+            [meuse.helpers.request :refer [add-auth]]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 

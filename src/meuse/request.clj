@@ -16,5 +16,5 @@
       (catch Exception e
         (error e "fail to convert the request body to json")
         (throw (ex-info "fail to convert the request body to json"
-                        {}))))
+                        {:status 400}))))
     request))

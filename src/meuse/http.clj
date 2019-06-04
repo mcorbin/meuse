@@ -16,11 +16,12 @@
             meuse.api.crate.yank
             meuse.api.crate.download
             meuse.api.crate.search
-            [meuse.api.meuse.http :refer [meuse-routes meuse-api!]]
+            [meuse.api.meuse.http :as meuse-http]
             meuse.api.meuse.category
             meuse.api.meuse.token
             [meuse.api.default :refer [default-api!]]
             [meuse.auth.token :as auth-token]
+            [meuse.auth.request :as auth-request]
             [meuse.config :refer [config]]
             [meuse.db :refer [database]]
             [meuse.git :refer [git]]
@@ -35,18 +36,21 @@
 (def routes
   ["/"
    [["api/v1/crates" crates-routes]
-    ["api/v1/meuse" meuse-routes]
+    ["api/v1/meuse" meuse-http/meuse-routes]
     [true :meuse.api.default/not-found]]])
 
 (defmulti route! :subsystem)
 
 (defmethod route! :meuse.api.crate.http
   [request]
-  (crates-api! request))
+  (crates-api! (auth-request/check-user request)))
 
 (defmethod route! :meuse.api.meuse.http
   [request]
-  (meuse-api! (convert-body-edn request)))
+  (let [request (if (meuse-http/skip-auth (:action request))
+                  request
+                  (auth-request/check-user request))])
+  (meuse-http/meuse-api! (-> (convert-body-edn request))))
 
 (defmethod route! :meuse.api.default
   [request]
@@ -60,14 +64,14 @@
   "Handles HTTP exceptions."
   [request ^Exception e]
   (let [data (ex-data e)
+        message (if (:status data)
+                  (.getMessage e)
+                  default-error-msg)
         ;; cargo expects a status 200 OK even for errors x_x
         status (if (= (:subsystem request) :meuse.api.crate.http)
                  200
                  (:status data))
-        request-id (:request-id request)
-        message (if status
-                  (.getMessage e)
-                  default-error-msg)]
+        request-id (:request-id request)]
     (error request-id e "http error" (pr-str data))
     {:status (or status 500)
      :body {:errors [{:detail message}]}}))
@@ -97,9 +101,12 @@
           (debug "request " (:request-id request)
                  "with subsystem" (:subsystem request)
                  "with action" (:action request))
-          (route! request))
+          (try (route! request)
+               (catch Exception e
+                 (handle-req-errors request e))))
         (catch Exception e
-              (handle-req-errors request e))))))
+          {:status 500
+           :body {:errors [{:detail default-error-msg}]}})))))
 
 (defn start-server
   [http-config crate-config metadata-config database git]

@@ -79,10 +79,10 @@
                               (:user-id user))))
       (throw (ex-info (format "the crate %s does not exist"
                               crate-name)
-                      {})))
+                      {:status 404})))
     (throw (ex-info (format "the user %s does not exist"
                             user-name)
-                    {}))))
+                    {:status 404}))))
 
 (defn create-crate-users
   "Add multiple users as owner of a crate"
@@ -103,16 +103,16 @@
             (throw (ex-info (format "the user %s does not own the crate %s"
                                     user-name
                                     crate-name)
-                            {})))
+                            {:status 400})))
           (jdbc/execute! db-tx (user-queries/delete-crate-user
                                 (:crate-id crate)
                                 (:user-id user))))
         (throw (ex-info (format "the crate %s does not exist"
                                 crate-name)
-                        {})))
+                        {:status 404})))
       (throw (ex-info (format "the user %s does not exist"
                               user-name)
-                      {})))))
+                      {:status 404})))))
 
 (defn delete-crate-users
   "Remove multiple users as owner of a crate"
@@ -134,4 +134,4 @@
                                      :user_name :user-name})))
       (throw (ex-info (format "the crate %s does not exist"
                               crate-name)
-                      {})))))
+                      {:status 404})))))

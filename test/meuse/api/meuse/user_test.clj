@@ -6,6 +6,7 @@
             [meuse.db.user :as user-db]
             [meuse.db.role :as role-db]
             [meuse.helpers.fixtures :refer :all]
+            [meuse.helpers.request :refer [add-auth]]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 
@@ -18,9 +19,11 @@
               :active true
               :description "it's me mathieu"
               :role "admin"}
-        request {:database database
-                 :action :new-user
-                 :body user}]
+        request (add-auth {:database database
+                           :action :new-user
+                           :body user}
+                          "user1"
+                          "admin")]
     (is (= {:status 200} (meuse-api! request)))
     (let [user-db (user-db/get-user-by-name database "mathieu")
           admin-role (role-db/get-admin-role database)]
@@ -37,33 +40,69 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field active missing in body\n - field password: the password should have at least 8 characters\n"
-         (meuse-api! {:action :new-user
-                      :body {:name "mathieu"
-                             :password "foobar"
-                             :description "it's me mathieu"
-                             :role "admin"}})))
+         (meuse-api! (add-auth {:action :new-user
+                                :body {:name "mathieu"
+                                       :password "foobar"
+                                       :description "it's me mathieu"
+                                       :role "admin"}}
+                               "user1"
+                               "admin"))))
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field password missing in body\n"
-         (meuse-api! {:action :new-user
-                      :body {:name "mathieu"
-                             :active true
-                             :description "it's me mathieu"
-                             :role "admin"}})))
+         (meuse-api! (add-auth {:action :new-user
+                                :body {:name "mathieu"
+                                       :active true
+                                       :description "it's me mathieu"
+                                       :role "admin"}}
+                               "user1"
+                               "admin"))))
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field password missing in body\n - field role: the role should be 'admin' or 'tech'\n"
-         (meuse-api! {:action :new-user
-                      :body {:name "mathieu"
-                             :active true
-                             :description "it's me mathieu"
-                             :role "lol"}})))))
+         (meuse-api! (add-auth {:action :new-user
+                                :body {:name "mathieu"
+                                       :active true
+                                       :description "it's me mathieu"
+                                       :role "lol"}}
+                               "user1"
+                               "admin")))))
+  (testing "bad permissions: not admin"
+    (let [user {:name "mathieu"
+              :password "foobarbaz"
+              :active true
+              :description "it's me mathieu"
+              :role "admin"}
+        request (add-auth {:database database
+                           :action :new-user
+                           :body user}
+                          "user1"
+                          "tech")]
+      (is (thrown-with-msg?
+         ExceptionInfo
+         #"bad permissions"
+         (meuse-api! request)))))
+  (testing "bad permissions: no auth"
+    (let [user {:name "mathieu"
+              :password "foobarbaz"
+              :active true
+              :description "it's me mathieu"
+              :role "admin"}
+          request {:database database
+                     :action :new-user
+                     :body user}]
+      (is (thrown-with-msg?
+         ExceptionInfo
+         #"bad permissions"
+         (meuse-api! request))))))
 
 (deftest ^:integration delete-user-test
   (let [username "user2"
-        request {:database database
-                 :action :delete-user
-                 :body {:name username}}]
+        request (add-auth {:database database
+                           :action :delete-user
+                           :body {:name username}}
+                          "user1"
+                          "admin")]
     (is (= {:status 200} (meuse-api! request)))
     (is (nil? (user-db/get-user-by-name database "user2"))))
   (testing "invalid parameters"
@@ -76,4 +115,13 @@
          ExceptionInfo
          #"Wrong input parameters:\n - field name: the value should be a non empty string\n"
          (meuse-api! {:action :delete-user
-                      :body {:name ""}})))))
+                      :body {:name ""}}))))
+  (testing "bad permissions"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"bad permissions"
+         (meuse-api! (add-auth {:database database
+                                :action :delete-user
+                                :body {:name "user2"}}
+                               "user1"
+                               "tech"))))))
