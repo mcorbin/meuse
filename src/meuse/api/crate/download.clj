@@ -10,7 +10,7 @@
 (defmethod crates-api! :download
   [request]
   (params/validate-params request ::download)
-  (auth-request/admin-or-tech? request)
+  (auth-request/admin-or-tech?-throw request)
   (let [{:keys [crate-name crate-version]} (:route-params request)
         path (crate-file/crate-file-path
               (get-in request [:config :crate :path])

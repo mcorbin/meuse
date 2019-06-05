@@ -8,7 +8,7 @@
 (defmethod meuse-api! :new-user
   [request]
   (params/validate-params request ::new)
-  (auth-request/admin? request)
+  (auth-request/admin?-throw request)
   (info "create user" (get-in request [:body :name]))
   (db-user/create-user (:database request)
                        (:body request))
@@ -17,7 +17,7 @@
 (defmethod meuse-api! :delete-user
   [request]
   (params/validate-params request ::delete)
-  (auth-request/admin? request)
+  (auth-request/admin?-throw request)
   (info "delete user" (get-in request [:body :name]))
   (db-user/delete-user (:database request)
                        (get-in request [:body :name]))

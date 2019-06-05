@@ -8,6 +8,8 @@ http:
 logging:
   level: info
   console: true
+  overrides:
+    com.mchange.v2.c3p0: error
 metadata:
   path: "/home/mathieu/prog/rust/testregistry"
   target: "origin/master"

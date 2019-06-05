@@ -19,7 +19,7 @@
   (let [{:keys [git-metadata raw-metadata crate-file] :as crate}
         (crate/request->crate request)]
     (params/validate-params crate ::crate)
-    (auth-request/admin-or-tech? request)
+    (auth-request/admin-or-tech?-throw request)
     (info "publishing crate" (:name raw-metadata)
           "version" (:vers raw-metadata))
     ;; check if the dependencies registry is allowed

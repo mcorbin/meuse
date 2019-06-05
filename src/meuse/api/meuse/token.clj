@@ -2,6 +2,7 @@
   (:require [meuse.api.meuse.http :refer [meuse-api!]]
             [meuse.api.params :as params]
             [meuse.auth.password :as auth-password]
+            [meuse.auth.request :as auth-request]
             [meuse.db.token :as token-db]
             [meuse.db.user :as user-db]
             [clojure.tools.logging :refer [debug info error]]))
@@ -12,9 +13,10 @@
   (let [token-name (get-in request [:body :name])
         user-name (get-in request [:body :user])
         auth-user-name (get-in request [:auth :user-name])]
-    ;; todo: also check if the user is admin
-    (when-not (= (get-in request [:auth :user-name])
-             user-name)
+
+    (when-not (or (= (get-in request [:auth :user-name])
+                     user-name)
+                  (auth-request/admin? request))
       (throw (ex-info
               (format "user %s cannot delete token for %s" auth-user-name user-name)
               {:status 403})))

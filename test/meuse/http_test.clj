@@ -15,7 +15,7 @@
               :body {:errors [{:detail error-msg}]}}
              (handle-req-errors
               {:subsystem :meuse.api.crate.http}
-              (ex-info error-msg {})))))
+              (ex-info error-msg {:status 403})))))
     (testing "non crate error"
       (is (= {:status 401
               :body {:errors [{:detail error-msg}]}}

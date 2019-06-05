@@ -35,7 +35,7 @@
 (defmethod crates-api! :search
   [request]
   (params/validate-params request ::search)
-  (auth-request/admin-or-tech? request)
+  (auth-request/admin-or-tech?-throw request)
   (let [{query :q nb-results :per_page} (:params request)
         search-result (->> (search-db/search (:database request) query)
                            format-search-result

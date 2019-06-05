@@ -16,36 +16,58 @@
                                      :validity 10
                                      :name "mytoken"})
     (is (= 1 (count (token-db/get-user-tokens database "user2"))))
-    (= {:status 200} (meuse-api! {:database database
-                                  :action :delete-token
-                                  :body {:name "mytoken"
-                                         :user "user2"}}))
+    (= {:status 200} (meuse-api! (add-auth {:database database
+                                            :action :delete-token
+                                            :body {:name "mytoken"
+                                                   :user "user2"}}
+                                           "user2"
+                                           "tech")))
+    (is (= 0 (count (token-db/get-user-tokens database "user2")))))
+  (testing "admin users can delete tokens"
+    (token-db/create-token database {:user "user2"
+                                     :validity 10
+                                     :name "mytoken"})
+    (is (= 1 (count (token-db/get-user-tokens database "user2"))))
+    (= {:status 200} (meuse-api! (add-auth {:database database
+                                            :action :delete-token
+                                            :body {:name "mytoken"
+                                                   :user "user2"}}
+                                           "user1"
+                                           "admin")))
     (is (= 0 (count (token-db/get-user-tokens database "user2")))))
   (testing "the token does not exist"
     (is (thrown-with-msg?
          ExceptionInfo
          #"the token doesnotexist does not exist for the user user2"
-         (meuse-api! {:database database
-                      :action :delete-token
-                      :body {:name "doesnotexist"
-                             :user "user2"}}))))
+         (meuse-api! (add-auth {:database database
+                                :action :delete-token
+                                :body {:name "doesnotexist"
+                                       :user "user2"}}
+                               "user2"
+                               "tech")))))
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field name missing in body\n"
-         (meuse-api! {:action :delete-token
-                      :body {:user "user2"}})))
+         (meuse-api! (add-auth {:action :delete-token
+                                :body {:user "user2"}}
+                               "user2"
+                               "tech"))))
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field name: the value should be a non empty string\n"
-         (meuse-api! {:action :delete-token
-                      :body {:name ""
-                             :user "user2"}})))
+         (meuse-api! (add-auth {:action :delete-token
+                                :body {:name ""
+                                       :user "user2"}}
+                               "user2"
+                               "tech"))))
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field name missing in body\n - field user missing in body\n"
-         (meuse-api! {:action :delete-token
-                      :body {}})))))
+         (meuse-api! (add-auth {:action :delete-token
+                                :body {}}
+                               "user2"
+                               "tech"))))))
 
 (deftest ^:integration create-token-test
   (testing "success"

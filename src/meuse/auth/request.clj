@@ -26,23 +26,31 @@
     (throw (ex-info "token missing in the header" {:status 403}))))
 
 (defn admin?
-  "Takes a request, verifies is the user is admin."
   [request]
-  (when-not (= "admin" (get-in request [:auth :role-name]))
-    (throw (ex-info "bad permissions" {:status 403})))
-  true)
+  (= "admin" (get-in request [:auth :role-name])))
 
 (defn tech?
-  "Takes a request, verifies is the user is tech."
   [request]
-  (when-not (= "tech" (get-in request [:auth :role-name]))
+  (= "tech" (get-in request [:auth :role-name])))
+
+(defn admin?-throw
+  "Takes a request, verifies is the user is admin."
+  [request]
+  (when-not (admin? request)
     (throw (ex-info "bad permissions" {:status 403})))
   true)
 
-(defn admin-or-tech?
+(defn tech?-throw
+  "Takes a request, verifies is the user is tech."
+  [request]
+  (when-not (tech? request)
+    (throw (ex-info "bad permissions" {:status 403})))
+  true)
+
+(defn admin-or-tech?-throw
   "Takes a request, verifies is the user is admin or tech."
   [request]
-  (when-not (or (= "tech" (get-in request [:auth :role-name]))
-                (= "admin" (get-in request [:auth :role-name])))
+  (when-not (or (admin? request)
+                (tech? request))
     (throw (ex-info "bad permissions" {:status 403})))
   true)
