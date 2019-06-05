@@ -8,7 +8,7 @@
 (defmethod meuse-api! :new-category
   [request]
   (params/validate-params request ::new)
-  (auth-request/admin? request)
+  (auth-request/admin?-throw request)
   (info "create category" (get-in request [:body :name]))
   (db-category/create-category (:database request)
                                (get-in request [:body :name])

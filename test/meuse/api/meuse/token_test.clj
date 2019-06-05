@@ -28,12 +28,22 @@
                                      :validity 10
                                      :name "mytoken"})
     (is (= 1 (count (token-db/get-user-tokens database "user2"))))
-    (= {:status 200} (meuse-api! (add-auth {:database database
-                                            :action :delete-token
-                                            :body {:name "mytoken"
-                                                   :user "user2"}}
-                                           "user1"
-                                           "admin")))
+    ;; non admin cannot delete the token
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"user user3 cannot delete token for user2"
+         (meuse-api! (add-auth {:database database
+                                :action :delete-token
+                                :body {:name "mytoken"
+                                       :user "user2"}}
+                               "user3"
+                               "tech"))))
+    (is (= {:status 200} (meuse-api! (add-auth {:database database
+                                                :action :delete-token
+                                                :body {:name "mytoken"
+                                                       :user "user2"}}
+                                               "user1"
+                                               "admin"))))
     (is (= 0 (count (token-db/get-user-tokens database "user2")))))
   (testing "the token does not exist"
     (is (thrown-with-msg?

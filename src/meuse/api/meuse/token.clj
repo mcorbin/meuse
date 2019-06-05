@@ -13,7 +13,7 @@
   (let [token-name (get-in request [:body :name])
         user-name (get-in request [:body :user])
         auth-user-name (get-in request [:auth :user-name])]
-
+    ;; the user or an admin can delete a token
     (when-not (or (= (get-in request [:auth :user-name])
                      user-name)
                   (auth-request/admin? request))
