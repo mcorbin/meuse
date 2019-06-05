@@ -2,6 +2,7 @@
   (:require [meuse.db :refer [database]]
             [meuse.db.crate :refer :all]
             [meuse.db.category :as category-db]
+            [meuse.db.user :as user-db]
             [meuse.helpers.db :refer :all]
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all])
@@ -14,17 +15,18 @@
 (deftest ^:integration create-crate-test
   (let [crate {:name "test1"
                :vers "0.1.3"
-               :yanked false}]
-    (create-crate database crate)
+               :yanked false}
+        {:keys [user-id]} (user-db/get-user-by-name database "user2")]
+    (create-crate database crate user-id)
     (is (thrown-with-msg? ExceptionInfo
                           #"already exists$"
-                          (create-crate database crate)))
+                          (create-crate database crate user-id)))
     (test-crate-version database {:crate-name "test1"
                                   :version-version "0.1.3"
                                   :version-yanked false
                                   :version-description nil})
     (test-crate database {:crate-name "test1"})
-    (create-crate database (assoc crate :vers "2.0.0"))
+    (create-crate database (assoc crate :vers "2.0.0") user-id)
     (test-crate-version database {:crate-name "test1"
                                   :version-version "2.0.0"
                                   :version-yanked false
@@ -35,8 +37,9 @@
   (let [crate {:name "test-crate-category"
                :vers "0.1.3"
                :categories ["email" "system"]
-               :yanked false}]
-    (create-crate database crate)
+               :yanked false}
+        {:keys [user-id]} (user-db/get-user-by-name database "user2")]
+    (create-crate database crate user-id)
     (let [crate-db (get-crate-by-name database "test-crate-category")
           [c1 c2 :as categories] (->> (get-crate-join-crates-categories
                                        database
@@ -56,10 +59,11 @@
   (let [crate {:name "test1"
                :vers "0.1.3"
                :categories ["cat1" "cat2"]
-               :yanked false}]
+               :yanked false}
+        {:keys [user-id]} (user-db/get-user-by-name database "user2")]
     (is (thrown-with-msg? ExceptionInfo
                             #"the category cat1 does not exist"
-                            (create-crate database crate)))))
+                            (create-crate database crate user-id)))))
 
 (deftest ^:integration update-yank-test
   (testing "success"

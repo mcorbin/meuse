@@ -25,6 +25,10 @@
       (throw (ex-info "token not found" {:status 403})))
     (throw (ex-info "token missing in the header" {:status 403}))))
 
+(defn user-id
+  [request]
+  (get-in request [:auth :user-id]))
+
 (defn admin?
   [request]
   (= "admin" (get-in request [:auth :role-name])))

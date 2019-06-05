@@ -100,6 +100,8 @@
     (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
                                   database
                                   "crate2"))
+          ;; user1 is created by the test fixture
+          user0-db-id (:user-id (get-user-by-name database "user1"))
           user1-db-id (:user-id (get-user-by-name database "user2"))
           user2-db-id (:user-id (get-user-by-name database "user3"))
           crate-user1 (get-crate-user
@@ -119,7 +121,10 @@
       (let [crate-users (get-crate-join-crates-users database "crate2")]
         (is (int? (:user-cargo-id (first crate-users))))
         (is (int? (:user-cargo-id (second crate-users))))
-        (is (= (set [{:user-id user1-db-id
+        (is (= (set [{:user-id user0-db-id
+                      :user-name "user1"
+                      :crate-id crate-db-id}
+                     {:user-id user1-db-id
                       :user-name "user2"
                       :crate-id crate-db-id}
                      {:user-id user2-db-id

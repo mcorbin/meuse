@@ -28,7 +28,9 @@
                                         [:registry-config
                                          :allowed-registries]))
     ;; create the crate in the db
-    (crate-db/create-crate (:database request) raw-metadata)
+    (crate-db/create-crate (:database request)
+                           raw-metadata
+                           (auth-request/user-id request))
     ;; write the metadata file
     (metadata/write-metadata (get-in request [:config :metadata :path]) git-metadata)
     ;; write the crate binary file

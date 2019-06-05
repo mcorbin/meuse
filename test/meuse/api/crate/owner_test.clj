@@ -126,7 +126,9 @@
                         [:body :users]
                         (fn [u] (set (map #(dissoc % :id) u))))
              {:status 200
-              :body {:users (set [{:login "user2"
+              :body {:users (set [{:login "user1"
+                                   :name "user1"}
+                                  {:login "user2"
                                    :name "user2"}
                                   {:login "user3"
                                    :name "user3"}])}}))))

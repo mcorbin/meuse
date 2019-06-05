@@ -40,14 +40,15 @@
   [database]
   (doseq [user (:users db-state)]
     (user-db/create-user database user))
-  (doseq [category (:categories db-state)]
-    (category-db/create-category database
-                                 (:name category)
-                                 (:description category)))
-  (doseq [crate (:crates db-state)]
-    (crate-db/create-crate database crate))
-  (doseq [crate-user (:crates-users db-state)]
-    (user-db/create-crate-users database (:crate crate-user) (:users crate-user))))
+  (let [user1 (user-db/get-user-by-name database "user1")]
+    (doseq [category (:categories db-state)]
+      (category-db/create-category database
+                                   (:name category)
+                                   (:description category)))
+    (doseq [crate (:crates db-state)]
+      (crate-db/create-crate database crate (:user-id user1)))
+    (doseq [crate-user (:crates-users db-state)]
+      (user-db/create-crate-users database (:crate crate-user) (:users crate-user)))))
 
 (defn test-crate-version
   "Takes a crate with its version, checks if the crate/version exists in the database."

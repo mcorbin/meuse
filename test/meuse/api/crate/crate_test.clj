@@ -3,6 +3,7 @@
             [meuse.api.crate.new :refer :all]
             [meuse.api.crate.yank :refer :all]
             [meuse.db.crate :as crate-db]
+            [meuse.db.user :as user-db]
             [meuse.message :refer [publish-commit-msg
                                    yank-commit-msg]]
             [meuse.db :refer [database]]
@@ -39,141 +40,168 @@
     (swap! state conj {:cmd "pull"})))
 
 (deftest ^:integration crates-api-new-test
-  (testing "no deps"
-    (let [name "toto"
-          version "1.0.1"
-          metadata {:name name :vers version :yanked false}
-          crate-file "random content"
-          git-actions (atom [])
-          request (merge
-                   (create-publish-request metadata crate-file)
-                   {:git (GitMock. git-actions)
-                    :registry-config {:allowed-registries ["default"]}
-                    :action :new
-                    :config {:crate {:path tmp-dir}
-                             :metadata {:path tmp-dir}}
-                    :database database})]
-      (= (crates-api! request)
-         {:status 200
-          :body {:warning {:invalid_categories []
-                           :invalid_badges []
-                           :other []}}})
-      (is (= @git-actions [{:cmd "add"}
-                           {:cmd "commit"
-                            :args (publish-commit-msg metadata)}
-                           {:cmd "push"}]))
-      (is (= (slurp (str tmp-dir "/toto/1.0.1/download"))
-             crate-file))
-      (test-crate-version database {:crate-name "toto"
-                                    :version-version "1.0.1"
-                                    :version-yanked false
-                                    :version-description nil})
-      (is (thrown-with-msg? ExceptionInfo
-                            #"already exists$"
-                            (crates-api! request)))))
-  (testing "allowed deps"
-    (let [name "toto"
-          version "1.0.2"
-          metadata {:name name
-                    :vers version
-                    :yanked false
-                    :deps [{:name "bar"
-                            :version_req "^1.0.3"
-                            :registry "default"}]}
-          crate-file "random content"
-          git-actions (atom [])
-          request (merge
-                   (create-publish-request metadata crate-file)
-                   {:git (GitMock. git-actions)
-                    :registry-config {:allowed-registries ["default"]}
-                    :action :new
-                    :config {:crate {:path tmp-dir}
-                             :metadata {:path tmp-dir}}
-                    :database database})]
-      (= (crates-api! request)
-         {:status 200
-          :body {:warning {:invalid_categories []
-                           :invalid_badges []
-                           :other []}}})))
-  (testing "not allowed deps"
-    (let [name "toto"
-          version "1.0.3"
-          metadata {:name name
-                    :vers version
-                    :yanked false
-                    :deps [{:name "bar"
-                            :version_req "^1.0.3"
-                            :registry "default"}]}
-          crate-file "random content"
-          git-actions (atom [])
-          request (merge
-                   (create-publish-request metadata crate-file)
-                   {:git (GitMock. git-actions)
-                    :registry-config {:allowed-registries ["another"]}
-                    :action :new
-                    :config {:crate {:path tmp-dir}
-                             :metadata {:path tmp-dir}}
-                    :database database})]
-      (is (thrown-with-msg?
-           ExceptionInfo
-           #"the registry default is not allowed"
-           (crates-api! request)))))
-  (testing "invalid parameters"
-    (let [name "toto"
-          version "1.0.3"
-          metadata {:name name
-                    :vers version
-                    :yanked false
-                    :deps [{:name "foo"}]}
-          crate-file "random content"
-          request (merge
-                   (create-publish-request metadata crate-file)
-                   {:action :new})]
-      (is (thrown-with-msg?
-           ExceptionInfo
-           #"Wrong input parameters:\n - field version_req missing in deps\n"
-           (crates-api! request))))
-    (let [name "toto"
-          version "1.0.3"
-          metadata {:name ""
-                    :vers version
-                    :yanked false}
-          crate-file "random content"
-          request (merge
-                   (create-publish-request metadata crate-file)
-                   {:action :new})]
-      (is (thrown-with-msg?
-           ExceptionInfo
-           #"Wrong input parameters:\n - field name: the value should be a non empty string\n"
-           (crates-api! request))))
-    (let [name "toto"
-          version "aaa"
-          metadata {:name ""
-                    :vers version
-                    :yanked false}
-          crate-file "random content"
-          request (merge
-                   (create-publish-request metadata crate-file)
-                   {:action :new})]
-      (is (thrown-with-msg?
-           ExceptionInfo
-           #"Wrong input parameters:\n - field name: the value should be a non empty string\n - field vers: the value should be a valid semver string\n"
-           (crates-api! request)))))
-  (testing "invalid role"
-    (let [name "toto"
-          version "1.0.1"
-          metadata {:name "aaa"
-                    :vers version
-                    :yanked false}
-          crate-file "random content"
-          request (merge
-                   (create-publish-request metadata crate-file)
-                   {:action :new
-                    :auth {:role-name "lol"}})]
-      (is (thrown-with-msg?
-           ExceptionInfo
-           #"bad permissions"
-           (crates-api! request))))))
+  (let [{:keys [user-id]} (user-db/get-user-by-name database "user2")
+        user-id-3 (:user-id (user-db/get-user-by-name database "user3"))]
+    (testing "no deps"
+      (let [name "toto"
+            version "1.0.1"
+            metadata {:name name :vers version :yanked false}
+            crate-file "random content"
+            git-actions (atom [])
+            request (merge
+                     (create-publish-request metadata crate-file)
+                     {:git (GitMock. git-actions)
+                      :registry-config {:allowed-registries ["default"]}
+                      :action :new
+                      :auth {:user-id user-id
+                             :role-name "tech"}
+                      :config {:crate {:path tmp-dir}
+                               :metadata {:path tmp-dir}}
+                      :database database})]
+        (= (crates-api! request)
+           {:status 200
+            :body {:warning {:invalid_categories []
+                             :invalid_badges []
+                             :other []}}})
+        (is (= @git-actions [{:cmd "add"}
+                             {:cmd "commit"
+                              :args (publish-commit-msg metadata)}
+                             {:cmd "push"}]))
+        (is (= (slurp (str tmp-dir "/toto/1.0.1/download"))
+               crate-file))
+        (test-crate-version database {:crate-name "toto"
+                                      :version-version "1.0.1"
+                                      :version-yanked false
+                                      :version-description nil})
+        (is (thrown-with-msg? ExceptionInfo
+                              #"already exists$"
+                              (crates-api! request)))))
+    (testing "allowed deps"
+      (let [name "toto"
+            version "1.0.2"
+            metadata {:name name
+                      :vers version
+                      :yanked false
+                      :deps [{:name "bar"
+                              :version_req "^1.0.3"
+                              :registry "default"}]}
+            crate-file "random content"
+            git-actions (atom [])
+            request (merge
+                     (create-publish-request metadata crate-file)
+                     {:git (GitMock. git-actions)
+                      :auth {:user-id user-id
+                             :role-name "tech"}
+                      :registry-config {:allowed-registries ["default"]}
+                      :action :new
+                      :config {:crate {:path tmp-dir}
+                               :metadata {:path tmp-dir}}
+                      :database database})]
+        (= (crates-api! request)
+           {:status 200
+            :body {:warning {:invalid_categories []
+                             :invalid_badges []
+                             :other []}}})))
+    (testing "not allowed deps"
+      (let [name "toto"
+            version "1.0.3"
+            metadata {:name name
+                      :vers version
+                      :yanked false
+                      :deps [{:name "bar"
+                              :version_req "^1.0.3"
+                              :registry "default"}]}
+            crate-file "random content"
+            git-actions (atom [])
+            request (merge
+                     (create-publish-request metadata crate-file)
+                     {:git (GitMock. git-actions)
+                      :auth {:user-id user-id
+                             :role-name "tech"}
+                      :registry-config {:allowed-registries ["another"]}
+                      :action :new
+                      :config {:crate {:path tmp-dir}
+                               :metadata {:path tmp-dir}}
+                      :database database})]
+        (is (thrown-with-msg?
+             ExceptionInfo
+             #"the registry default is not allowed"
+             (crates-api! request)))))
+    (testing "does not own the crate"
+      (let [name "toto"
+            version "1.0.10"
+            metadata {:name name :vers version :yanked false}
+            crate-file "random content"
+            git-actions (atom [])
+            request (merge
+                     (create-publish-request metadata crate-file)
+                     {:git (GitMock. git-actions)
+                      :registry-config {:allowed-registries ["default"]}
+                      :action :new
+                      :auth {:user-id user-id-3
+                             :role-name "tech"}
+                      :config {:crate {:path tmp-dir}
+                               :metadata {:path tmp-dir}}
+                      :database database})]
+        (is (thrown-with-msg? ExceptionInfo
+                              #"the user does not own the crate"
+                              (crates-api! request)))))
+    (testing "invalid parameters"
+      (let [name "toto"
+            version "1.0.3"
+            metadata {:name name
+                      :vers version
+                      :yanked false
+                      :deps [{:name "foo"}]}
+            crate-file "random content"
+            request (merge
+                     (create-publish-request metadata crate-file)
+                     {:action :new})]
+        (is (thrown-with-msg?
+             ExceptionInfo
+             #"Wrong input parameters:\n - field version_req missing in deps\n"
+             (crates-api! request))))
+      (let [name "toto"
+            version "1.0.3"
+            metadata {:name ""
+                      :vers version
+                      :yanked false}
+            crate-file "random content"
+            request (merge
+                     (create-publish-request metadata crate-file)
+                     {:action :new})]
+        (is (thrown-with-msg?
+             ExceptionInfo
+             #"Wrong input parameters:\n - field name: the value should be a non empty string\n"
+             (crates-api! request))))
+      (let [name "toto"
+            version "aaa"
+            metadata {:name ""
+                      :vers version
+                      :yanked false}
+            crate-file "random content"
+            request (merge
+                     (create-publish-request metadata crate-file)
+                     {:action :new})]
+        (is (thrown-with-msg?
+             ExceptionInfo
+             #"Wrong input parameters:\n - field name: the value should be a non empty string\n - field vers: the value should be a valid semver string\n"
+             (crates-api! request)))))
+    (testing "invalid role"
+      (let [name "toto"
+            version "1.0.1"
+            metadata {:name "aaa"
+                      :vers version
+                      :yanked false}
+            crate-file "random content"
+            request (merge
+                     (create-publish-request metadata crate-file)
+                     {:action :new
+                      :auth {:role-name "lol"}})]
+        (is (thrown-with-msg?
+             ExceptionInfo
+             #"bad permissions"
+             (crates-api! request)))))))
 
 (deftest ^:integration crates-api-yank-unyank-test
   (let [git-actions (atom [])

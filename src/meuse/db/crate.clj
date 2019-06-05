@@ -4,6 +4,7 @@
             [clojure.tools.logging :refer [debug info error]]
             [meuse.db.queries.crate :as crate-queries]
             [meuse.db.queries.category :as category-queries]
+            [meuse.db.queries.user :as user-queries]
             [meuse.db.category :as category]
             [meuse.message :refer [yanked?->msg]])
   (:import java.util.UUID))
@@ -70,7 +71,7 @@
 
 (defn create-crate
   "Creates a crate in the database."
-  [database metadata]
+  [database metadata user-id]
   (jdbc/with-db-transaction [db-tx database]
     (if-let [crate (get-crate-and-version db-tx
                                           (:name metadata)
@@ -82,6 +83,12 @@
                                   (:name metadata)
                                   (:vers metadata))
                           {:status 200})))
+        ;; the user should own the crate
+        (when-not (-> (jdbc/query db-tx (user-queries/get-crate-user
+                                         (:crate-id crate)
+                                         user-id))
+                      first)
+          (throw (ex-info "the user does not own the crate" {:status 403})))
         ;; insert the new version
         (jdbc/execute! db-tx (crate-queries/create-version
                               metadata
@@ -97,7 +104,11 @@
         (jdbc/execute! db-tx create-version)
         (create-crate-categories db-tx
                                  crate-id
-                                 (:categories metadata))))))
+                                 (:categories metadata))
+        ;; the user should own the crate
+        (jdbc/execute! db-tx (user-queries/create-crate-user
+                              crate-id
+                              user-id))))))
 
 (defn update-yank
   "Updates the `yanked` field in the database for a crate version."
