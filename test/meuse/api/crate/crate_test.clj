@@ -204,31 +204,64 @@
              (crates-api! request)))))))
 
 (deftest ^:integration crates-api-yank-unyank-test
-  (let [git-actions (atom [])
-        request {:git (GitMock. git-actions)
-                 :database database
-                 :action :yank
-                 :config {:crate {:path tmp-dir}
-                          :metadata {:path tmp-dir}}
-                 :route-params {:crate-name "crate1"
-                                :crate-version "1.1.0"}}]
-    (metadata/write-metadata tmp-dir {:name "crate1" :vers "1.1.0" :yanked false})
-    (crates-api! request)
-    (test-crate-version database {:crate-name "crate1"
-                                  :version-version "1.1.0"
-                                  :version-yanked true
-                                  :version-description "the crate1 description, this crate is for foobar"})
-    (is (thrown-with-msg? ExceptionInfo
-                          #"crate state is already yank$"
-                          (crates-api! (assoc request :action :yank))))
-    (crates-api! (assoc request :action :unyank))
-    (is (thrown-with-msg? ExceptionInfo
-                          #"crate state is already unyank$"
-                          (crates-api! (assoc request :action :unyank))))
-    (test-crate-version database {:crate-name "crate1"
-                                  :version-version "1.1.0"
-                                  :version-yanked false
-                                  :version-description "the crate1 description, this crate is for foobar"}))
+  (testing "success:admin"
+    (let [git-actions (atom [])
+          user5-id (:user-id (user-db/get-user-by-name database "user5"))
+          request {:git (GitMock. git-actions)
+                   :database database
+                   :action :yank
+                   :auth {:user-id user5-id
+                          :role-name "admin"}
+                   :config {:crate {:path tmp-dir}
+                            :metadata {:path tmp-dir}}
+                   :route-params {:crate-name "crate1"
+                                  :crate-version "1.1.0"}}]
+      (metadata/write-metadata tmp-dir {:name "crate1" :vers "1.1.0" :yanked false})
+      (crates-api! request)
+      (test-crate-version database {:crate-name "crate1"
+                                    :version-version "1.1.0"
+                                    :version-yanked true
+                                    :version-description "the crate1 description, this crate is for foobar"})
+      (is (thrown-with-msg? ExceptionInfo
+                            #"crate state is already yank$"
+                            (crates-api! (assoc request :action :yank))))
+      (crates-api! (assoc request :action :unyank))
+      (is (thrown-with-msg? ExceptionInfo
+                            #"crate state is already unyank$"
+                            (crates-api! (assoc request :action :unyank))))
+      (test-crate-version database {:crate-name "crate1"
+                                    :version-version "1.1.0"
+                                    :version-yanked false
+                                    :version-description "the crate1 description, this crate is for foobar"})))
+  (testing "success: the user owns the crate"
+    (let [git-actions (atom [])
+          user2-id (:user-id (user-db/get-user-by-name database "user2"))
+          request {:git (GitMock. git-actions)
+                   :database database
+                   :action :yank
+                   :auth {:user-id user2-id
+                          :role-name "tech"}
+                   :config {:crate {:path tmp-dir}
+                            :metadata {:path tmp-dir}}
+                   :route-params {:crate-name "crate1"
+                                  :crate-version "1.1.0"}}]
+      (metadata/write-metadata tmp-dir {:name "crate1" :vers "1.1.0" :yanked false})
+      (crates-api! request)
+      (test-crate-version database {:crate-name "crate1"
+                                    :version-version "1.1.0"
+                                    :version-yanked true
+                                    :version-description "the crate1 description, this crate is for foobar"})
+      (is (thrown-with-msg? ExceptionInfo
+                            #"crate state is already yank$"
+                            (crates-api! (assoc request :action :yank))))
+      (crates-api! (assoc request :action :unyank))
+      (is (thrown-with-msg? ExceptionInfo
+                            #"crate state is already unyank$"
+                            (crates-api! (assoc request :action :unyank))))
+      (test-crate-version database {:crate-name "crate1"
+                                    :version-version "1.1.0"
+                                    :version-yanked false
+                                    :version-description "the crate1 description, this crate is for foobar"})))
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo

@@ -55,6 +55,22 @@
                               user-name)
                       {:status 400})))))
 
+(defn owned-by?
+  "Checks if a crate is owned by an user."
+  [database crate-name user-id]
+  (if-let [crate (crate/get-crate-by-name database crate-name)]
+    (if (-> (jdbc/query database (user-queries/get-crate-user
+                                  (:crate-id crate)
+                                  user-id))
+            first)
+      true
+      (throw (ex-info (format "user does not own the crate %s"
+                              crate-name)
+                    {:status 403})))
+    (throw (ex-info (format "the crate %s does not exist"
+                            crate-name)
+                    {:status 404}))))
+
 (defn get-crate-user
   "Get the crate/user relation for a crate and an user."
   [db-tx crate-id user-id]

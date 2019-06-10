@@ -159,4 +159,16 @@
                                    :name "bar"})
   (delete-user database "user2")
   (is (= nil (get-user-by-name database "user2"))))
->
+
+(deftest owned-by?-test
+  (testing "success"
+    (let [user2-id (:user-id (get-user-by-name database "user2"))]
+      (is (owned-by? database "crate1" user2-id))))
+  (testing "failures"
+    (let [user4-id (:user-id (get-user-by-name database "user4"))]
+      (is (thrown-with-msg? ExceptionInfo
+                            #"user does not own the crate"
+                            (owned-by? database "crate1" user4-id)))
+      (is (thrown-with-msg? ExceptionInfo
+                            #"the crate doesnotexist does not exist"
+                            (owned-by? database "doesnotexist" user4-id))))))

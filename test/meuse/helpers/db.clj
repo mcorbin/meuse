@@ -8,7 +8,8 @@
   {:users [{:role "admin" :name "user1" :password "user1user1" :description "desc1" :active true}
            {:role "tech" :name "user2" :password "user2user2" :description "desc2" :active true}
            {:role "tech" :name "user3" :password "user3user3" :description "desc3" :active true}
-           {:role "tech" :name "user4" :password "user4user4" :description "desc4" :active false}]
+           {:role "tech" :name "user4" :password "user4user4" :description "desc4" :active false}
+           {:role "admin" :name "user5" :password "user5user5" :description "desc5" :active true}]
    :categories [{:name "email"
                  :description "the email category"}
                 {:name "system"
@@ -31,7 +32,11 @@
             {:name "crate2"
              :vers "1.3.0"
              :yanked false
-             :description "the crate2 description, this crate is for barbaz"}]
+             :description "the crate2 description, this crate is for barbaz"}
+            {:name "crate3"
+             :vers "1.4.0"
+             :yanked false
+             :description "blablabla"}]
    :crates-users [{:crate "crate1"
                    :users ["user2" "user3"]}]})
 

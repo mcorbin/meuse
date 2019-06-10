@@ -2,6 +2,7 @@
   "Owner Cargo API"
   (:require [meuse.api.crate.http :refer (crates-api!)]
             [meuse.api.params :as params]
+            [meuse.auth.request :as auth-request]
             [meuse.db.user :as user-db]
             [meuse.request :refer [convert-body-edn]]
             [clojure.string :as string]
@@ -14,6 +15,10 @@
         crate-name (get-in request [:route-params
                                     :crate-name])
         users (get-in request [:body :users])]
+    (when-not (auth-request/admin? request)
+      (user-db/owned-by? (:database request)
+                         crate-name
+                         (auth-request/user-id request)))
     (info "add owners" (string/join ", " users) "to crate" crate-name)
     (user-db/create-crate-users (:database request)
                                 crate-name
@@ -31,6 +36,10 @@
         crate-name (get-in request [:route-params
                                     :crate-name])
         users (get-in request [:body :users])]
+    (when-not (auth-request/admin? request)
+      (user-db/owned-by? (:database request)
+                         crate-name
+                         (auth-request/user-id request)))
     (info "remove owners" (string/join ", " users) "to crate" crate-name)
     (user-db/delete-crate-users (:database request)
                                 crate-name

@@ -1,0 +1,2 @@
+(ns meuse.db.owner)
+
