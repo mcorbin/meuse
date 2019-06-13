@@ -6,7 +6,7 @@ http:
   address: 127.0.0.1
   port: 8855
 logging:
-  level: info
+  level: debug
   console: true
   overrides:
     com.mchange.v2.c3p0: error

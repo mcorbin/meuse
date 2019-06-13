@@ -37,6 +37,7 @@
   ["/"
    [["api/v1/crates" crates-routes]
     ["api/v1/meuse" meuse-http/meuse-routes]
+    [#"me/?" :meuse.api.default/me]
     [true :meuse.api.default/not-found]]])
 
 (defmulti route! :subsystem)
