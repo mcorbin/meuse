@@ -4,6 +4,8 @@ A Rust registry written in Clojure.
 
 Work in progress, cf https://mcorbin.fr/posts/2019-05-01-meuse-rust-registry/
 
+**important: this documentation is out of date (mostly because Meuse now handles authentication. The new doc will arrive soon.**
+
 ## Run the project
 
 ### PostgreSQL
