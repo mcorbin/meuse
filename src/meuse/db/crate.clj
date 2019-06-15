@@ -3,6 +3,7 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]
             [meuse.db.queries.crate :as crate-queries]
+            [meuse.db.queries.crate-version :as crate-version-queries]
             [meuse.db.queries.category :as category-queries]
             [meuse.db.queries.user :as user-queries]
             [meuse.db.category :as category]
@@ -12,7 +13,7 @@
 (defn get-crate-by-name
   "Takes a crate name and returns the crate if it exists."
   [db-tx crate-name]
-  (-> (jdbc/query db-tx (crate-queries/get-crate-by-name crate-name))
+  (-> (jdbc/query db-tx (crate-queries/get-crate [:= :c.name crate-name]))
       first
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :crate_name :crate-name})))
@@ -56,7 +57,9 @@
 (defn get-crate-and-version
   "Takes a crate name and version and returns the crate version if it exists."
   [db-tx crate-name crate-version]
-  (-> (jdbc/query db-tx (crate-queries/get-crate-and-version crate-name crate-version))
+  (-> (jdbc/query db-tx (crate-version-queries/get-crate-and-version
+                         crate-name
+                         crate-version))
       first
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :crate_name :crate-name
@@ -90,7 +93,7 @@
                       first)
           (throw (ex-info "the user does not own the crate" {:status 403})))
         ;; insert the new version
-        (jdbc/execute! db-tx (crate-queries/create-version
+        (jdbc/execute! db-tx (crate-version-queries/create-version
                               metadata
                               (:crate-id crate)))
         (create-crate-categories db-tx
@@ -99,7 +102,8 @@
       ;; the crate does not exist
       (let [crate-id (UUID/randomUUID)
             create-crate (crate-queries/create-crate metadata crate-id)
-            create-version (crate-queries/create-version metadata crate-id)]
+            create-version (crate-version-queries/create-version metadata
+                                                                 crate-id)]
         (jdbc/execute! db-tx create-crate)
         (jdbc/execute! db-tx create-version)
         (create-crate-categories db-tx
@@ -134,7 +138,7 @@
             {:status 404
              :crate-name crate-name
              :crate-version crate-version})))
-        (jdbc/execute! db-tx (crate-queries/update-yanked (:version-id crate) yanked?)))
+        (jdbc/execute! db-tx (crate-version-queries/update-yanked (:version-id crate) yanked?)))
       (throw (ex-info (format "cannot %s the crate: the crate does not exist"
                               (yanked?->msg yanked?))
                       {:status 400

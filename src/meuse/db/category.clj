@@ -8,7 +8,8 @@
   "Takes a db transaction and a category name, and get this category
   from the database"
   [db-tx category-name]
-  (-> (jdbc/query db-tx (queries/get-category-by-name category-name))
+  (-> (jdbc/query db-tx (queries/get-category
+                         [:= :c.name category-name]))
       first
       (clojure.set/rename-keys {:category_id :category-id
                                 :category_name :category-name

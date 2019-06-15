@@ -3,13 +3,13 @@
             [honeysql.helpers :as h])
   (:import java.util.UUID))
 
-(defn get-category-by-name
-  [category-name]
+(defn get-category
+  [where-clause]
   (-> (h/select [:c.id "category_id"]
                 [:c.name "category_name"]
                 [:c.description "category_description"])
       (h/from [:categories :c])
-      (h/where [:= :c.name category-name])
+      (h/where where-clause)
       sql/format))
 
 (defn get-crate-category
