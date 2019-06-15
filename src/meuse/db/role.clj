@@ -2,7 +2,7 @@
   "Manage roles in the database"
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]
-            [meuse.db.queries.user :as user-queries]
+            [meuse.db.queries.role :as role-queries]
             [meuse.message :refer [yanked?->msg]])
   (:import java.util.UUID))
 
@@ -12,7 +12,7 @@
 (defn get-role-by-name
   "Get a roles by name."
   [db-tx role-name]
-  (-> (jdbc/query db-tx (user-queries/get-role-by-name role-name))
+  (-> (jdbc/query db-tx (role-queries/by-name role-name))
       first
       (clojure.set/rename-keys {:role_id :role-id
                                 :role_name :role-name})))

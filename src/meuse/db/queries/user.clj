@@ -4,14 +4,6 @@
             [meuse.auth.password :as password])
   (:import java.util.UUID))
 
-(defn get-role-by-name
-  [role-name]
-  (-> (h/select [:r.id "role_id"]
-                [:r.name "role_name"])
-      (h/from [:roles :r])
-      (h/where [:= :r.name role-name])
-      sql/format))
-
 (defn get-user-by-name
   [user-name]
   (-> (h/select [:u.id "user_id"]
