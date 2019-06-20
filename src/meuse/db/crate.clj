@@ -29,10 +29,10 @@
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :category_id :category-id})))
 
-(defn crate-join-crates-categories
+(defn get-crate-join-crates-categories
   "Get the crate/category relation for a crate and a category."
   [db-tx crate-id]
-  (->> (jdbc/query db-tx (category-queries/get-crate-join-crates-categories crate-id))
+  (->> (jdbc/query db-tx (category-queries/crate-join-crates-categories crate-id))
        (map #(clojure.set/rename-keys % {:category_id :category-id
                                          :category_name :category-name
                                          :category_description :category-description}))))
