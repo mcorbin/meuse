@@ -4,6 +4,7 @@
             [meuse.db :refer [database]]
             [meuse.db.crate :as crate-db]
             [meuse.db.user :as user-db]
+            [meuse.db.crate-user :as crate-user-db]
             [meuse.helpers.fixtures :refer :all]
             [cheshire.core :as json]
             [clojure.string :as string]
@@ -39,11 +40,11 @@
             user2-db-id (:user-id (user-db/get-user-by-name
                                    database
                                    "user3"))
-            crate-user1 (user-db/get-crate-user
+            crate-user1 (crate-user-db/get-crate-user
                          database
                          crate-db-id
                          user1-db-id)
-            crate-user2 (user-db/get-crate-user
+            crate-user2 (crate-user-db/get-crate-user
                          database
                          crate-db-id
                          user2-db-id)]
@@ -72,7 +73,7 @@
             user4-db-id (:user-id (user-db/get-user-by-name
                                    database
                                    "user4"))
-            crate-user4 (user-db/get-crate-user
+            crate-user4 (crate-user-db/get-crate-user
                          database
                          crate-db-id
                          user4-db-id)]
@@ -135,11 +136,11 @@
             user2-db-id (:user-id (user-db/get-user-by-name
                                    database
                                    "user3"))]
-        (is (nil? (user-db/get-crate-user
+        (is (nil? (crate-user-db/get-crate-user
                    database
                    crate-db-id
                    user1-db-id)))
-        (is (nil? (user-db/get-crate-user
+        (is (nil? (crate-user-db/get-crate-user
                    database
                    crate-db-id
                    user2-db-id)))))
@@ -159,7 +160,7 @@
       (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
                                     database
                                     "crate1"))]
-        (is (nil? (user-db/get-crate-user
+        (is (nil? (crate-user-db/get-crate-user
                    database
                    crate-db-id
                    user1-id)))))

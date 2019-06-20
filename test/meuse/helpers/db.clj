@@ -2,6 +2,7 @@
   (:require [meuse.db.category :as category-db]
             [meuse.db.crate :as crate-db]
             [meuse.db.user :as user-db]
+            [meuse.db.crate-user :as crate-user-db]
             [clojure.test :refer :all]))
 
 (def db-state
@@ -53,7 +54,7 @@
     (doseq [crate (:crates db-state)]
       (crate-db/create-crate database crate (:user-id user1)))
     (doseq [crate-user (:crates-users db-state)]
-      (user-db/create-crate-users database (:crate crate-user) (:users crate-user)))))
+      (crate-user-db/create-crate-users database (:crate crate-user) (:users crate-user)))))
 
 (defn test-crate-version
   "Takes a crate with its version, checks if the crate/version exists in the database."

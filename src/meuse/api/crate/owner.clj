@@ -4,6 +4,7 @@
             [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
             [meuse.db.user :as user-db]
+            [meuse.db.crate-user :as crate-user-db]
             [meuse.request :refer [convert-body-edn]]
             [clojure.string :as string]
             [clojure.tools.logging :refer [debug info error]]))
@@ -16,11 +17,11 @@
                                     :crate-name])
         users (get-in request [:body :users])]
     (when-not (auth-request/admin? request)
-      (user-db/owned-by? (:database request)
+      (crate-user-db/owned-by? (:database request)
                          crate-name
                          (auth-request/user-id request)))
     (info "add owners" (string/join ", " users) "to crate" crate-name)
-    (user-db/create-crate-users (:database request)
+    (crate-user-db/create-crate-users (:database request)
                                 crate-name
                                 users)
     {:status 200
@@ -37,11 +38,11 @@
                                     :crate-name])
         users (get-in request [:body :users])]
     (when-not (auth-request/admin? request)
-      (user-db/owned-by? (:database request)
+      (crate-user-db/owned-by? (:database request)
                          crate-name
                          (auth-request/user-id request)))
     (info "remove owners" (string/join ", " users) "to crate" crate-name)
-    (user-db/delete-crate-users (:database request)
+    (crate-user-db/delete-crate-users (:database request)
                                 crate-name
                                 users)
     {:status 200

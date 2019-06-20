@@ -1,7 +1,7 @@
 (ns meuse.api.crate.yank
   (:require [meuse.api.crate.http :refer (crates-api!)]
             [meuse.auth.request :as auth-request]
-            [meuse.db.user :as user-db]
+            [meuse.db.crate-user :as crate-user-db]
             [meuse.db.crate-version :as crate-version-db]
             [meuse.api.params :as params]
             [meuse.git :as git]
@@ -14,7 +14,7 @@
   (params/validate-params request ::yank)
   (let [{:keys [crate-name crate-version]} (:route-params request)]
     (when-not (auth-request/admin? request)
-      (user-db/owned-by? (:database request)
+      (crate-user-db/owned-by? (:database request)
                          crate-name
                          (auth-request/user-id request)))
     (info (msg/yanked?->msg yanked?) "crate" crate-name "version" crate-version)
