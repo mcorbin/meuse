@@ -10,9 +10,9 @@
   (params/validate-params request ::new)
   (auth-request/admin?-throw request)
   (info "create category" (get-in request [:body :name]))
-  (db-category/create-category (:database request)
-                               (get-in request [:body :name])
-                               (get-in request [:body :description]))
+  (db-category/create (:database request)
+                      (get-in request [:body :name])
+                      (get-in request [:body :description]))
   {:status 200})
 
 

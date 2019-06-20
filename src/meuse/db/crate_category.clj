@@ -17,7 +17,7 @@
 (defn create-crate-category
   "Assigns a crate to a category."
   [db-tx crate-id category-name]
-  (if-let [category (category/get-category-by-name db-tx category-name)]
+  (if-let [category (category/by-name db-tx category-name)]
     (when-not (get-crate-category db-tx
                                   crate-id
                                   (:category-id category))

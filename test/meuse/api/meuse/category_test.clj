@@ -20,7 +20,7 @@
                           "user1"
                           "admin")]
     (is (= {:status 200} (meuse-api! request)))
-    (let [category (get-category-by-name database "foo")]
+    (let [category (by-name database "foo")]
       (is (uuid? (:category-id category)))
       (is (= "foo" (:category-name category)))
       (is (= "the description" (:category-description category))))

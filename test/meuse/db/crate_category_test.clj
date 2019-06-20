@@ -15,7 +15,7 @@
   (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
                                 database
                                 "crate2"))
-        category-db-id (:category-id (category-db/get-category-by-name
+        category-db-id (:category-id (category-db/by-name
                                       database
                                       "email"))
         _ (create-crate-category database crate-db-id "email")

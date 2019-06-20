@@ -48,9 +48,9 @@
     (user-db/create-user database user))
   (let [user1 (user-db/get-user-by-name database "user1")]
     (doseq [category (:categories db-state)]
-      (category-db/create-category database
-                                   (:name category)
-                                   (:description category)))
+      (category-db/create database
+                          (:name category)
+                          (:description category)))
     (doseq [crate (:crates db-state)]
       (crate-db/create-crate database crate (:user-id user1)))
     (doseq [crate-user (:crates-users db-state)]
