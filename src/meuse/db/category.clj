@@ -25,3 +25,11 @@
                               category-name)
                       {:status 400}))
       (jdbc/execute! db-tx (queries/create category-name description)))))
+
+(defn by-crate-id
+  "Get the crate/category relation for a crate and a category."
+  [db-tx crate-id]
+  (->> (jdbc/query db-tx (queries/by-crate-id crate-id))
+       (map #(clojure.set/rename-keys % {:category_id :category-id
+                                         :category_name :category-name
+                                         :category_description :category-description}))))

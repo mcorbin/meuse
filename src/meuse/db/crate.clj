@@ -3,12 +3,10 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]
             [meuse.db.queries.crate :as crate-queries]
-            [meuse.db.queries.crate-category :as crate-category-queries]
             [meuse.db.queries.crate-version :as crate-version-queries]
-            [meuse.db.queries.category :as category-queries]
             [meuse.db.queries.crate-user :as crate-user-queries]
             [meuse.db.category :as category]
-            [meuse.message :refer [yanked?->msg]])
+            [meuse.db.crate-category :as crate-category])
   (:import java.util.UUID))
 
 (defn get-crate-by-name
@@ -18,44 +16,6 @@
       first
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :crate_name :crate-name})))
-
-(defn get-crate-category
-  "Get the crate/category relation for a crate and a category."
-  [db-tx crate-id category-id]
-  (-> (jdbc/query db-tx (crate-category-queries/by-crate-and-category
-                         crate-id
-                         category-id))
-      first
-      (clojure.set/rename-keys {:crate_id :crate-id
-                                :category_id :category-id})))
-
-(defn get-crate-join-crates-categories
-  "Get the crate/category relation for a crate and a category."
-  [db-tx crate-id]
-  (->> (jdbc/query db-tx (category-queries/crate-join-crates-categories crate-id))
-       (map #(clojure.set/rename-keys % {:category_id :category-id
-                                         :category_name :category-name
-                                         :category_description :category-description}))))
-
-(defn create-crate-category
-  "Assigns a crate to a category."
-  [db-tx crate-id category-name]
-  (if-let [category (category/get-category-by-name db-tx category-name)]
-    (when-not (get-crate-category db-tx
-                                  crate-id
-                                  (:category-id category))
-      (jdbc/execute! db-tx (crate-category-queries/create
-                            crate-id
-                            (:category-id category))))
-    (throw (ex-info (format "the category %s does not exist"
-                            category-name)
-                    {:status 404}))))
-
-(defn create-crate-categories
-  "Creates categories for a crate."
-  [db-tx crate-id categories]
-  (doseq [category categories]
-    (create-crate-category db-tx crate-id category)))
 
 (defn get-crate-and-version
   "Takes a crate name and version and returns the crate version if it exists."
@@ -99,7 +59,7 @@
         (jdbc/execute! db-tx (crate-version-queries/create
                               metadata
                               (:crate-id crate)))
-        (create-crate-categories db-tx
+        (crate-category/create-crate-categories db-tx
                                  (:crate-id crate)
                                  (:categories metadata)))
       ;; the crate does not exist
@@ -109,41 +69,10 @@
                                                          crate-id)]
         (jdbc/execute! db-tx create-crate)
         (jdbc/execute! db-tx create-version)
-        (create-crate-categories db-tx
-                                 crate-id
-                                 (:categories metadata))
+        (crate-category/create-crate-categories db-tx
+                                                crate-id
+                                                (:categories metadata))
         ;; the user should own the crate
         (jdbc/execute! db-tx (crate-user-queries/create
                               crate-id
                               user-id))))))
-
-(defn update-yank
-  "Updates the `yanked` field in the database for a crate version."
-  [database crate-name crate-version yanked?]
-  (info (yanked?->msg yanked?) "crate" crate-name crate-version)
-  (jdbc/with-db-transaction [db-tx database]
-    (if-let [crate (get-crate-and-version db-tx crate-name crate-version)]
-      (do
-        (when-not (:version-version crate)
-          (throw
-           (ex-info
-            (format "cannot %s the crate: the version does not exist"
-                    (yanked?->msg yanked?))
-            {:status 404
-             :crate-name crate-name
-             :crate-version crate-version})))
-        (when (= yanked? (:version-yanked crate))
-          (throw
-           (ex-info
-            (format "cannot %s the crate: crate state is already %s"
-                    (yanked?->msg yanked?)
-                    (yanked?->msg yanked?))
-            {:status 404
-             :crate-name crate-name
-             :crate-version crate-version})))
-        (jdbc/execute! db-tx (crate-version-queries/update-yanked (:version-id crate) yanked?)))
-      (throw (ex-info (format "cannot %s the crate: the crate does not exist"
-                              (yanked?->msg yanked?))
-                      {:status 400
-                       :crate-name crate-name
-                       :crate-version crate-version})))))

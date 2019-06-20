@@ -16,7 +16,7 @@
   [category-name]
   (get-category [:= :c.name category-name]))
 
-(defn crate-join-crates-categories
+(defn by-crate-id
   [crate-id]
   (-> (h/select [:c.id "category_id"]
                 [:c.name "category_name"]

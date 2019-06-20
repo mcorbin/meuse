@@ -2,7 +2,7 @@
   (:require [meuse.api.crate.http :refer (crates-api!)]
             [meuse.auth.request :as auth-request]
             [meuse.db.user :as user-db]
-            [meuse.db.crate :as crate-db]
+            [meuse.db.crate-version :as crate-version-db]
             [meuse.api.params :as params]
             [meuse.git :as git]
             [meuse.metadata :as metadata]
@@ -18,7 +18,7 @@
                          crate-name
                          (auth-request/user-id request)))
     (info (msg/yanked?->msg yanked?) "crate" crate-name "version" crate-version)
-    (crate-db/update-yank (:database request) crate-name crate-version yanked?)
+    (crate-version-db/update-yank (:database request) crate-name crate-version yanked?)
     (metadata/update-yank (get-in request [:config :metadata :path])
                           crate-name
                           crate-version
