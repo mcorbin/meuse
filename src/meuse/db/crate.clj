@@ -9,7 +9,7 @@
             [meuse.db.crate-category :as crate-category])
   (:import java.util.UUID))
 
-(defn get-crate-by-name
+(defn by-name
   "Takes a crate name and returns the crate if it exists."
   [db-tx crate-name]
   (-> (jdbc/query db-tx (crate-queries/by-name crate-name))

@@ -12,7 +12,7 @@
 (use-fixtures :each table-fixture)
 
 (deftest ^:integration create-crate-category-test
-  (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+  (let [crate-db-id (:crate-id (crate-db/by-name
                                 database
                                 "crate2"))
         category-db-id (:category-id (category-db/by-name

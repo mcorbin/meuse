@@ -23,7 +23,7 @@
     (testing "success"
       (user-db/create-user database user)
       (crate-user-db/create-crate-user database "crate1" (:name user))
-      (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+      (let [crate-db-id (:crate-id (crate-db/by-name
                                     database
                                     "crate1"))
             user-db-id (:user-id (user-db/get-user-by-name database (:name user)))
@@ -49,7 +49,7 @@
 (deftest ^:integration delete-crate-user-test
   (testing "success"
     (crate-user-db/delete-crate-user database "crate1" "user2")
-    (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+    (let [crate-db-id (:crate-id (crate-db/by-name
                                   database
                                   "crate1"))
           user-db-id (:user-id (user-db/get-user-by-name database "user2"))]
@@ -70,7 +70,7 @@
     (crate-user-db/create-crate-users database
                         "crate2"
                         ["user2" "user3"])
-    (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+    (let [crate-db-id (:crate-id (crate-db/by-name
                                   database
                                   "crate2"))
           ;; user1 is created by the test fixture
@@ -110,7 +110,7 @@
     (crate-user-db/delete-crate-users database
                         "crate1"
                         ["user2" "user3"])
-    (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+    (let [crate-db-id (:crate-id (crate-db/by-name
                                   database
                                   "crate1"))
           user1-db-id (:user-id (user-db/get-user-by-name database "user2"))

@@ -40,7 +40,7 @@
                :yanked false}
         {:keys [user-id]} (user-db/get-user-by-name database "user2")]
     (create-crate database crate user-id)
-    (let [crate-db (get-crate-by-name database "test-crate-category")
+    (let [crate-db (by-name database "test-crate-category")
           [c1 c2 :as categories] (->> (category-db/by-crate-id
                                        database
                                        (:crate-id crate-db))

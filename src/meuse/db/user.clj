@@ -60,7 +60,7 @@
   "Get the crate users"
   [database crate-name]
   (jdbc/with-db-transaction [db-tx database]
-    (if-let [crate (crate/get-crate-by-name db-tx crate-name)]
+    (if-let [crate (crate/by-name db-tx crate-name)]
       (->> (jdbc/query db-tx (user-queries/users-join-crates-users
                               (:crate-id crate)))
            (map #(set/rename-keys % {:crate_id :crate-id

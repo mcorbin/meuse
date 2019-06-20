@@ -20,7 +20,7 @@
   "Add an user as a owner of a crate"
   [db-tx crate-name user-name]
   (if-let [user (user-db/get-user-by-name db-tx user-name)]
-    (if-let [crate (crate/get-crate-by-name db-tx crate-name)]
+    (if-let [crate (crate/by-name db-tx crate-name)]
       (do
         (when (get-crate-user db-tx (:crate-id crate) (:user-id user))
           (throw (ex-info (format "the user %s already owns the crate %s"
@@ -47,7 +47,7 @@
 (defn owned-by?
   "Checks if a crate is owned by an user."
   [database crate-name user-id]
-  (if-let [crate (crate/get-crate-by-name database crate-name)]
+  (if-let [crate (crate/by-name database crate-name)]
     (if (-> (jdbc/query database (crate-user-queries/by-crate-and-user
                                   (:crate-id crate)
                                   user-id))
@@ -65,7 +65,7 @@
   [database crate-name user-name]
   (jdbc/with-db-transaction [db-tx database]
     (if-let [user (user-db/get-user-by-name database user-name)]
-      (if-let [crate (crate/get-crate-by-name db-tx crate-name)]
+      (if-let [crate (crate/by-name db-tx crate-name)]
         (do
           (when-not (get-crate-user db-tx (:crate-id crate) (:user-id user))
             (throw (ex-info (format "the user %s does not own the crate %s"

@@ -31,7 +31,7 @@
                            :body (json/generate-string
                                   {:users ["user2"
                                            "user3"]})})))
-      (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+      (let [crate-db-id (:crate-id (crate-db/by-name
                                     database
                                     "crate2"))
             user1-db-id (:user-id (user-db/get-user-by-name
@@ -67,7 +67,7 @@
                                   :role-name "tech"}
                            :body (json/generate-string
                                   {:users ["user4"]})})))
-      (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+      (let [crate-db-id (:crate-id (crate-db/by-name
                                     database
                                     "crate2"))
             user4-db-id (:user-id (user-db/get-user-by-name
@@ -127,7 +127,7 @@
                            :body (json/generate-string
                                   {:users ["user2"
                                            "user3"]})})))
-      (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+      (let [crate-db-id (:crate-id (crate-db/by-name
                                     database
                                     "crate1"))
             user1-db-id (:user-id (user-db/get-user-by-name
@@ -157,7 +157,7 @@
                            :route-params {:crate-name "crate1"}
                            :body (json/generate-string
                                   {:users ["user1"]})})))
-      (let [crate-db-id (:crate-id (crate-db/get-crate-by-name
+      (let [crate-db-id (:crate-id (crate-db/by-name
                                     database
                                     "crate1"))]
         (is (nil? (crate-user-db/get-crate-user
