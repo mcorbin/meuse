@@ -16,7 +16,7 @@
       (h/where [:= :u.name user-name])
       sql/format))
 
-(defn create-user
+(defn create
   [user role-id]
   (-> (h/insert-into :users)
       (h/columns :id
@@ -33,46 +33,13 @@
                   role-id]])
       sql/format))
 
-(defn delete-user
+(defn delete
   [user-id]
   (-> (h/delete-from :users)
       (h/where [:= :id user-id])
       sql/format))
 
-(defn create-crate-user
-  [crate-id user-id]
-  (-> (h/insert-into :crates_users)
-      (h/columns :crate_id
-                 :user_id)
-      (h/values [[crate-id
-                  user-id]])
-      sql/format))
-
-(defn delete-crate-user
-  [crate-id user-id]
-  (-> (h/delete-from :crates_users)
-      (h/where [:and
-                [:= :crate_id crate-id]
-                [:= :user_id user-id]])
-      sql/format))
-
-(defn delete-crates-user
-  [user-id]
-  (-> (h/delete-from :crates_users)
-      (h/where [:= :user_id user-id])
-      sql/format))
-
-(defn get-crate-user
-  [crate-id user-id]
-  (-> (h/select [:c.crate_id "crate_id"]
-                [:c.user_id "user_id"])
-      (h/from [:crates_users :c])
-      (h/where [:and
-                [:= :c.crate_id crate-id]
-                [:= :c.user_id user-id]])
-      sql/format))
-
-(defn get-crate-join-crates-users
+(defn users-join-crates-users
   [crate-id]
   (-> (h/select [:u.id "user_id"]
                 [:u.name "user_name"]

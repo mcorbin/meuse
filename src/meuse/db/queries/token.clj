@@ -6,7 +6,7 @@
            org.joda.time.DateTime
            java.util.UUID))
 
-(defn create-token
+(defn create
   [identifier token token-name user-id expired-at]
   (let [now (new Timestamp (.getTime (new Date)))]
     (-> (h/insert-into :tokens)
@@ -26,8 +26,8 @@
                     user-id]])
         sql/format)))
 
-(defn get-user-token
-  [user-id token-name]
+(defn get-token
+  [where-clause]
   (-> (h/select [:t.id "token_id"]
                 [:t.identifier "token_identifier"]
                 [:t.token "token_token"]
@@ -36,12 +36,16 @@
                 [:t.expired_at "token_expired_at"]
                 [:t.user_id "token_user_id"])
       (h/from [:tokens :t])
-      (h/where [:and
-                [:= :t.name token-name]
-                [:= :t.user_id user-id]])
+      (h/where where-clause)
       sql/format))
 
-(defn get-user-tokens
+(defn by-user-and-name
+  [user-id token-name]
+  (get-token [:and
+              [:= :t.user_id user-id]
+              [:= :t.name token-name]]))
+
+(defn by-user
   [user-id]
   (-> (h/select [:t.id "token_id"]
                 [:t.identifier "token_identifier"]
@@ -54,13 +58,13 @@
       (h/where [:= :t.user_id user-id])
       sql/format))
 
-(defn delete-token
+(defn delete
   [token-id]
   (-> (h/delete-from :tokens)
       (h/where [:= :id token-id])
       sql/format))
 
-(defn get-token-join-user-join-role
+(defn token-join-user-join-role
   [identifier]
   (-> (h/select [:t.id "token_id"]
                 [:t.identifier "token_identifier"]

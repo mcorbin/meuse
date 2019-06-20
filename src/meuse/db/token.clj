@@ -17,7 +17,7 @@
   (jdbc/with-db-transaction [db-tx database]
     (if-let [user (user-db/get-user-by-name db-tx (:user token))]
       (let [generated-token (auth-token/generate-token)]
-        (jdbc/execute! db-tx (token-queries/create-token
+        (jdbc/execute! db-tx (token-queries/create
                               (auth-token/extract-identifier generated-token)
                               (bcrypt/encrypt generated-token)
                               (:name token)
@@ -32,7 +32,7 @@
   "Get a token by name for an user."
   [db-tx user-name token-name]
   (if-let [user (user-db/get-user-by-name db-tx user-name)]
-    (-> (jdbc/query db-tx (token-queries/get-user-token
+    (-> (jdbc/query db-tx (token-queries/by-user-and-name
                            (:user-id user)
                            token-name))
         first
@@ -51,7 +51,7 @@
   "Get a token by value.
   Also returns informations about the user and the role."
   [db-tx token]
-  (-> (jdbc/query db-tx (token-queries/get-token-join-user-join-role
+  (-> (jdbc/query db-tx (token-queries/token-join-user-join-role
                          (auth-token/extract-identifier token)))
       first
       (clojure.set/rename-keys {:token_id :token-id
@@ -71,7 +71,7 @@
   [database user-name]
   (jdbc/with-db-transaction [db-tx database]
     (if-let [user (user-db/get-user-by-name db-tx user-name)]
-      (->> (jdbc/query db-tx (token-queries/get-user-tokens
+      (->> (jdbc/query db-tx (token-queries/by-user
                              (:user-id user)))
            (map #(clojure.set/rename-keys % {:token_id :token-id
                                              :token_identifier :token-identifier
@@ -89,7 +89,7 @@
   [database user-name token-name]
   (jdbc/with-db-transaction [db-tx database]
     (if-let [token (get-user-token db-tx user-name token-name)]
-      (jdbc/execute! db-tx (token-queries/delete-token
+      (jdbc/execute! db-tx (token-queries/delete
                             (:token-id token)))
       (throw (ex-info (format "the token %s does not exist for the user %s"
                               token-name
