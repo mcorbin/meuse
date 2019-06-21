@@ -11,7 +11,7 @@
   [database crate-name crate-version yanked?]
   (info (yanked?->msg yanked?) "crate" crate-name crate-version)
   (jdbc/with-db-transaction [db-tx database]
-    (if-let [crate (crate-db/get-crate-and-version db-tx crate-name crate-version)]
+    (if-let [crate (crate-db/by-name-and-version db-tx crate-name crate-version)]
       (do
         (when-not (:version-version crate)
           (throw

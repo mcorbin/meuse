@@ -52,16 +52,16 @@
                           (:name category)
                           (:description category)))
     (doseq [crate (:crates db-state)]
-      (crate-db/create-crate database crate (:user-id user1)))
+      (crate-db/create database crate (:user-id user1)))
     (doseq [crate-user (:crates-users db-state)]
       (crate-user-db/create-crate-users database (:crate crate-user) (:users crate-user)))))
 
 (defn test-crate-version
   "Takes a crate with its version, checks if the crate/version exists in the database."
   [database expected]
-  (let [crate (crate-db/get-crate-and-version database
-                                              (:crate-name expected)
-                                              (:version-version expected))]
+  (let [crate (crate-db/by-name-and-version database
+                                            (:crate-name expected)
+                                            (:version-version expected))]
       (is (uuid? (:crate-id crate)))
       (is (uuid? (:version-id crate)))
       (is (inst? (:version-created-at crate)))

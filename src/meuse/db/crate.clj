@@ -17,7 +17,7 @@
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :crate_name :crate-name})))
 
-(defn get-crate-and-version
+(defn by-name-and-version
   "Takes a crate name and version and returns the crate version if it exists."
   [db-tx crate-name crate-version]
   (-> (jdbc/query db-tx (crate-queries/by-name-join-version
@@ -35,13 +35,13 @@
                                 :version_document_vectors :version-document-vectors
                                 :version_crate_id :version-crate-id})))
 
-(defn create-crate
+(defn create
   "Creates a crate in the database."
   [database metadata user-id]
   (jdbc/with-db-transaction [db-tx database]
-    (if-let [crate (get-crate-and-version db-tx
-                                          (:name metadata)
-                                          (:vers metadata))]
+    (if-let [crate (by-name-and-version db-tx
+                                        (:name metadata)
+                                        (:vers metadata))]
       ;; the crate exists, let's check the version
       (do
         (when (:version-version crate)
@@ -64,11 +64,11 @@
                                  (:categories metadata)))
       ;; the crate does not exist
       (let [crate-id (UUID/randomUUID)
-            create-crate (crate-queries/create metadata crate-id)
-            create-version (crate-version-queries/create metadata
+            created-crate (crate-queries/create metadata crate-id)
+            created-version (crate-version-queries/create metadata
                                                          crate-id)]
-        (jdbc/execute! db-tx create-crate)
-        (jdbc/execute! db-tx create-version)
+        (jdbc/execute! db-tx created-crate)
+        (jdbc/execute! db-tx created-version)
         (crate-category/create-crate-categories db-tx
                                                 crate-id
                                                 (:categories metadata))
