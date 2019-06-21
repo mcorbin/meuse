@@ -59,9 +59,9 @@
         (jdbc/execute! db-tx (crate-version-queries/create
                               metadata
                               (:crate-id crate)))
-        (crate-category/create-crate-categories db-tx
-                                 (:crate-id crate)
-                                 (:categories metadata)))
+        (crate-category/create-categories db-tx
+                                          (:crate-id crate)
+                                          (:categories metadata)))
       ;; the crate does not exist
       (let [crate-id (UUID/randomUUID)
             created-crate (crate-queries/create metadata crate-id)
@@ -69,9 +69,9 @@
                                                          crate-id)]
         (jdbc/execute! db-tx created-crate)
         (jdbc/execute! db-tx created-version)
-        (crate-category/create-crate-categories db-tx
-                                                crate-id
-                                                (:categories metadata))
+        (crate-category/create-categories db-tx
+                                          crate-id
+                                          (:categories metadata))
         ;; the user should own the crate
         (jdbc/execute! db-tx (crate-user-queries/create
                               crate-id

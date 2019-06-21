@@ -4,7 +4,7 @@
             [meuse.db.queries.crate-category :as crate-category-queries]
             [meuse.db.category :as category]))
 
-(defn get-crate-category
+(defn by-crate-and-category
   "Get the crate/category relation for a crate and a category."
   [db-tx crate-id category-id]
   (-> (jdbc/query db-tx (crate-category-queries/by-crate-and-category
@@ -14,13 +14,13 @@
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :category_id :category-id})))
 
-(defn create-crate-category
+(defn create
   "Assigns a crate to a category."
   [db-tx crate-id category-name]
   (if-let [category (category/by-name db-tx category-name)]
-    (when-not (get-crate-category db-tx
-                                  crate-id
-                                  (:category-id category))
+    (when-not (by-crate-and-category db-tx
+                                     crate-id
+                                     (:category-id category))
       (jdbc/execute! db-tx (crate-category-queries/create
                             crate-id
                             (:category-id category))))
@@ -29,9 +29,9 @@
                     {:status 404}))))
 
 
-(defn create-crate-categories
+(defn create-categories
   "Creates categories for a crate."
   [db-tx crate-id categories]
   (doseq [category categories]
-    (create-crate-category db-tx crate-id category)))
+    (create db-tx crate-id category)))
 

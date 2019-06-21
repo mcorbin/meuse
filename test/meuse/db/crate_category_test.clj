@@ -11,24 +11,24 @@
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
 
-(deftest ^:integration create-crate-category-test
+(deftest create-crate-category-test
   (let [crate-db-id (:crate-id (crate-db/by-name
                                 database
                                 "crate2"))
         category-db-id (:category-id (category-db/by-name
                                       database
                                       "email"))
-        _ (create-crate-category database crate-db-id "email")
-        crate-category (get-crate-category database
-                                           crate-db-id
-                                           category-db-id)]
+        _ (create database crate-db-id "email")
+        crate-category (by-crate-and-category database
+                                              crate-db-id
+                                              category-db-id)]
     (is (= (:category-id crate-category) category-db-id))
     (is (= (:crate-id crate-category) crate-db-id))
-    (create-crate-category database crate-db-id "email"))
+    (create database crate-db-id "email"))
   (testing "errors"
     (is (thrown-with-msg? ExceptionInfo
                           #"the category foo does not exist$"
-                          (create-crate-category database
-                                                 (UUID/randomUUID)
-                                                 "foo")))))
+                          (create database
+                                  (UUID/randomUUID)
+                                  "foo")))))
 
