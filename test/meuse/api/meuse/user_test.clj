@@ -25,7 +25,7 @@
                           "user1"
                           "admin")]
     (is (= {:status 200} (meuse-api! request)))
-    (let [user-db (user-db/get-user-by-name database "mathieu")
+    (let [user-db (user-db/by-name database "mathieu")
           admin-role (role-db/get-admin-role database)]
       (is (uuid? (:user-id user-db)))
       (is (= (:name user) (:user-name user-db)))
@@ -104,7 +104,7 @@
                           "user1"
                           "admin")]
     (is (= {:status 200} (meuse-api! request)))
-    (is (nil? (user-db/get-user-by-name database "user2"))))
+    (is (nil? (user-db/by-name database "user2"))))
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo

@@ -19,14 +19,14 @@
                         (check-active! {:name "foo" :active false})))
   (is (check-active! {:name "foo" :active true})))
 
-(deftest ^:integration create-user-get-test
+(deftest ^:integration create-get-test
   (let [user {:name "mathieu"
               :password "foobar"
               :description "it's me mathieu"
               :active true
               :role "admin"}]
-    (create-user database user)
-    (let [user-db (get-user-by-name database "mathieu")
+    (create database user)
+    (let [user-db (by-name database "mathieu")
           admin-role (role/get-admin-role database)]
       (is (uuid? (:user-id user-db)))
       (is (= (:name user) (:user-name user-db)))
@@ -36,22 +36,22 @@
       (is (= (:role-id admin-role) (:user-role-id user-db))))
     (is (thrown-with-msg? ExceptionInfo
                           #"already exists$"
-                          (create-user database user))))
+                          (create database user))))
   (is (thrown-with-msg? ExceptionInfo
                         #"does not exist$"
-                        (create-user database {:role "foobar"}))))
+                        (create database {:role "foobar"}))))
 
-(deftest ^:integration get-crate-join-crates-users-error-test
+(deftest ^:integration crate-owners-test
   (is (thrown-with-msg? ExceptionInfo
                         #"the crate foobar does not exist"
-                        (get-crate-join-crates-users database "foobar"))))
+                        (crate-owners database "foobar"))))
 
-(deftest delete-user-test
-  (token-db/create-token database {:user "user2"
-                                   :validity 10
-                                   :name "foo"})
-  (token-db/create-token database {:user "user2"
-                                   :validity 20
-                                   :name "bar"})
-  (delete-user database "user2")
-  (is (= nil (get-user-by-name database "user2"))))
+(deftest delete-test
+  (token-db/create database {:user "user2"
+                             :validity 10
+                             :name "foo"})
+  (token-db/create database {:user "user2"
+                             :validity 20
+                             :name "bar"})
+  (delete database "user2")
+  (is (= nil (by-name database "user2"))))

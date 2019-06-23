@@ -13,20 +13,20 @@
 
 (deftest check-user-test
   (testing "success"
-    (let [token (token-db/create-token database {:user "user2"
-                                                 :validity 10
-                                                 :name "foo"})
-          user (user-db/get-user-by-name database "user2")
+    (let [token (token-db/create database {:user "user2"
+                                           :validity 10
+                                           :name "foo"})
+          user (user-db/by-name database "user2")
           request {:database database
                    :headers {"authorization" token}}
           result (check-user request)]
       (is (= result (assoc request :auth {:user-name "user2"
                                           :user-id (:user-id user)
                                           :role-name "tech"}))))
-    (let [token (token-db/create-token database {:user "user1"
-                                                 :validity 10
-                                                 :name "foo"})
-          user (user-db/get-user-by-name database "user1")
+    (let [token (token-db/create database {:user "user1"
+                                           :validity 10
+                                           :name "foo"})
+          user (user-db/by-name database "user1")
           request {:database database
                    :headers {"authorization" token}}
           result (check-user request)]
@@ -45,23 +45,23 @@
          (check-user {:database database
                       :headers {"authorization" (generate-token)}}))))
   (testing "user not active"
-    (let [token (token-db/create-token database {:user "user4"
-                                                 :validity 10
-                                                 :name "foo"})]
-          (is (thrown-with-msg?
-               ExceptionInfo
-               #"user is not active"
-               (check-user {:database database
-                            :headers {"authorization" token}})))))
+    (let [token (token-db/create database {:user "user4"
+                                           :validity 10
+                                           :name "foo"})]
+      (is (thrown-with-msg?
+           ExceptionInfo
+           #"user is not active"
+           (check-user {:database database
+                        :headers {"authorization" token}})))))
   (testing "invalid token"
-    (let [token (token-db/create-token database {:user "user2"
-                                                 :validity 10
-                                                 :name "foo"})]
-          (is (thrown-with-msg?
-               ExceptionInfo
-               #"invalid token"
-               (check-user {:database database
-                            :headers {"authorization" (str token "a")}}))))))
+    (let [token (token-db/create database {:user "user2"
+                                           :validity 10
+                                           :name "foo"})]
+      (is (thrown-with-msg?
+           ExceptionInfo
+           #"invalid token"
+           (check-user {:database database
+                        :headers {"authorization" (str token "a")}}))))))
 
 (deftest admin?-throw-test
   (is (admin?-throw {:auth {:role-name "admin"}}))

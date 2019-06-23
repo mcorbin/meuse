@@ -4,8 +4,8 @@
             [meuse.auth.password :as password])
   (:import java.util.UUID))
 
-(defn get-user-by-name
-  [user-name]
+(defn get-user
+  [where-clause]
   (-> (h/select [:u.id "user_id"]
                 [:u.name "user_name"]
                 [:u.password "user_password"]
@@ -13,8 +13,12 @@
                 [:u.active "user_active"]
                 [:u.role_id "user_role_id"])
       (h/from [:users :u])
-      (h/where [:= :u.name user-name])
+      (h/where where-clause)
       sql/format))
+
+(defn by-name
+  [user-name]
+  (get-user [:= :u.name user-name]))
 
 (defn create
   [user role-id]

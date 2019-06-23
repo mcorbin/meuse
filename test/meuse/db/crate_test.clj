@@ -16,7 +16,7 @@
   (let [crate {:name "test1"
                :vers "0.1.3"
                :yanked false}
-        {:keys [user-id]} (user-db/get-user-by-name database "user2")]
+        {:keys [user-id]} (user-db/by-name database "user2")]
     (create database crate user-id)
     (is (thrown-with-msg? ExceptionInfo
                           #"already exists$"
@@ -38,7 +38,7 @@
                :vers "0.1.3"
                :categories ["email" "system"]
                :yanked false}
-        {:keys [user-id]} (user-db/get-user-by-name database "user2")]
+        {:keys [user-id]} (user-db/by-name database "user2")]
     (create database crate user-id)
     (let [crate-db (by-name database "test-crate-category")
           [c1 c2 :as categories] (->> (category-db/by-crate-id
@@ -60,7 +60,7 @@
                :vers "0.1.3"
                :categories ["cat1" "cat2"]
                :yanked false}
-        {:keys [user-id]} (user-db/get-user-by-name database "user2")]
+        {:keys [user-id]} (user-db/by-name database "user2")]
     (is (thrown-with-msg? ExceptionInfo
                             #"the category cat1 does not exist"
                             (create database crate user-id)))))

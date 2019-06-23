@@ -18,10 +18,10 @@
                     {:status 400})))
   true)
 
-(defn get-user-by-name
+(defn by-name
   "Get an user by username."
   [db-tx user-name]
-  (-> (jdbc/query db-tx (user-queries/get-user-by-name user-name))
+  (-> (jdbc/query db-tx (user-queries/by-name user-name))
       first
       (clojure.set/rename-keys {:user_id :user-id
                                 :user_name :user-name
@@ -30,12 +30,12 @@
                                 :user_active :user-active
                                 :user_role_id :user-role-id})))
 
-(defn create-user
+(defn create
   "Crates an user."
   [database user]
   (jdbc/with-db-transaction [db-tx database]
-    (if-let [role (role/get-role-by-name db-tx (:role user))]
-      (if-let [user (get-user-by-name db-tx (:name user))]
+    (if-let [role (role/by-name db-tx (:role user))]
+      (if-let [user (by-name db-tx (:name user))]
         (throw (ex-info (format "the user %s already exists"
                                 (:name user))
                         {:status 400}))
@@ -44,11 +44,11 @@
                               (:role user))
                       {:status 400})))))
 
-(defn delete-user
+(defn delete
   "Deletes an user."
   [database user-name]
   (jdbc/with-db-transaction [db-tx database]
-    (if-let [user (get-user-by-name db-tx user-name)]
+    (if-let [user (by-name db-tx user-name)]
       (do
         (jdbc/execute! db-tx (crate-user-queries/delete-for-user (:user-id user)))
         (jdbc/execute! db-tx (user-queries/delete (:user-id user))))
@@ -56,8 +56,8 @@
                               user-name)
                       {:status 400})))))
 
-(defn get-crate-join-crates-users
-  "Get the crate users"
+(defn crate-owners
+  "Get the owners of a crate, by crate name"
   [database crate-name]
   (jdbc/with-db-transaction [db-tx database]
     (if-let [crate (crate/by-name db-tx crate-name)]

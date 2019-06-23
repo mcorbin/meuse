@@ -40,8 +40,8 @@
     (swap! state conj {:cmd "pull"})))
 
 (deftest ^:integration crates-api-new-test
-  (let [{:keys [user-id]} (user-db/get-user-by-name database "user2")
-        user-id-3 (:user-id (user-db/get-user-by-name database "user3"))]
+  (let [{:keys [user-id]} (user-db/by-name database "user2")
+        user-id-3 (:user-id (user-db/by-name database "user3"))]
     (testing "no deps"
       (let [name "toto"
             version "1.0.1"
@@ -206,7 +206,7 @@
 (deftest ^:integration crates-api-yank-unyank-test
   (testing "success:admin"
     (let [git-actions (atom [])
-          user5-id (:user-id (user-db/get-user-by-name database "user5"))
+          user5-id (:user-id (user-db/by-name database "user5"))
           request {:git (GitMock. git-actions)
                    :database database
                    :action :yank
@@ -235,7 +235,7 @@
                                     :version-description "the crate1 description, this crate is for foobar"})))
   (testing "success: the user owns the crate"
     (let [git-actions (atom [])
-          user2-id (:user-id (user-db/get-user-by-name database "user2"))
+          user2-id (:user-id (user-db/by-name database "user2"))
           request {:git (GitMock. git-actions)
                    :database database
                    :action :yank

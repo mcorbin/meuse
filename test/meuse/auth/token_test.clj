@@ -28,7 +28,7 @@
     (is (= (count token) (+ identifier-size token-size)))))
 
 (deftest valid?-test
-  (let [token (token-db/create-token database {:user "user2"
+  (let [token (token-db/create database {:user "user2"
                                                :validity 10
                                                :name "mytoken"})
         db-token (token-db/get-token-user-role database token)]

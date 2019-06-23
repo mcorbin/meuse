@@ -8,7 +8,7 @@
             [clojure.set :as set])
   (:import java.util.UUID))
 
-(defn get-crate-user
+(defn by-id
   "Get the crate/user relation for a crate and an user."
   [db-tx crate-id user-id]
   (-> (jdbc/query db-tx (crate-user-queries/by-crate-and-user crate-id user-id))
@@ -16,13 +16,13 @@
       (clojure.set/rename-keys {:crate_id :crate-id
                                 :user_id :user-id})))
 
-(defn create-crate-user
+(defn create
   "Add an user as a owner of a crate"
   [db-tx crate-name user-name]
-  (if-let [user (user-db/get-user-by-name db-tx user-name)]
+  (if-let [user (user-db/by-name db-tx user-name)]
     (if-let [crate (crate/by-name db-tx crate-name)]
       (do
-        (when (get-crate-user db-tx (:crate-id crate) (:user-id user))
+        (when (by-id db-tx (:crate-id crate) (:user-id user))
           (throw (ex-info (format "the user %s already owns the crate %s"
                                   user-name
                                   crate-name)
@@ -42,7 +42,7 @@
   [database crate-name users]
   (jdbc/with-db-transaction [db-tx database]
     (doseq [user users]
-      (create-crate-user db-tx crate-name user))))
+      (create db-tx crate-name user))))
 
 (defn owned-by?
   "Checks if a crate is owned by an user."
@@ -60,14 +60,14 @@
                             crate-name)
                     {:status 404}))))
 
-(defn delete-crate-user
+(defn delete
   "Remove an user as a owner of a crate"
   [database crate-name user-name]
   (jdbc/with-db-transaction [db-tx database]
-    (if-let [user (user-db/get-user-by-name database user-name)]
+    (if-let [user (user-db/by-name database user-name)]
       (if-let [crate (crate/by-name db-tx crate-name)]
         (do
-          (when-not (get-crate-user db-tx (:crate-id crate) (:user-id user))
+          (when-not (by-id db-tx (:crate-id crate) (:user-id user))
             (throw (ex-info (format "the user %s does not own the crate %s"
                                     user-name
                                     crate-name)
@@ -87,4 +87,4 @@
   [database crate-name users]
   (jdbc/with-db-transaction [db-tx database]
     (doseq [user users]
-      (delete-crate-user db-tx crate-name user))))
+      (delete db-tx crate-name user))))

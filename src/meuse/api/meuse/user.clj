@@ -10,7 +10,7 @@
   (params/validate-params request ::new)
   (auth-request/admin?-throw request)
   (info "create user" (get-in request [:body :name]))
-  (db-user/create-user (:database request)
+  (db-user/create (:database request)
                        (:body request))
   {:status 200})
 
@@ -19,8 +19,8 @@
   (params/validate-params request ::delete)
   (auth-request/admin?-throw request)
   (info "delete user" (get-in request [:body :name]))
-  (db-user/delete-user (:database request)
-                       (get-in request [:body :name]))
+  (db-user/delete (:database request)
+                  (get-in request [:body :name]))
   {:status 200})
 
 

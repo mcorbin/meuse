@@ -9,7 +9,7 @@
 (def admin-role-name "admin")
 (def tech-role-name "tech")
 
-(defn get-role-by-name
+(defn by-name
   "Get a roles by name."
   [db-tx role-name]
   (-> (jdbc/query db-tx (role-queries/by-name role-name))
@@ -20,10 +20,10 @@
 (defn get-admin-role
   "Get the admin role."
   [db-tx]
-  (get-role-by-name db-tx admin-role-name))
+  (by-name db-tx admin-role-name))
 
 (defn get-tech-role
   "Get the tech role."
   [db-tx]
-  (get-role-by-name db-tx tech-role-name))
+  (by-name db-tx tech-role-name))
 

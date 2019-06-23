@@ -9,13 +9,13 @@
             [meuse.db.user :as user-db])
   (:import java.util.UUID))
 
-(defn create-token
+(defn create
   "Creates a new token for an user. `validity` is the number of days before the
   expiration of the token.
   Returns the generated token."
   [database token]
   (jdbc/with-db-transaction [db-tx database]
-    (if-let [user (user-db/get-user-by-name db-tx (:user token))]
+    (if-let [user (user-db/by-name db-tx (:user token))]
       (let [generated-token (auth-token/generate-token)]
         (jdbc/execute! db-tx (token-queries/create
                               (auth-token/extract-identifier generated-token)
@@ -28,10 +28,10 @@
                               (:user token))
                       {:status 400})))))
 
-(defn get-user-token
+(defn by-user-and-name
   "Get a token by name for an user."
   [db-tx user-name token-name]
-  (if-let [user (user-db/get-user-by-name db-tx user-name)]
+  (if-let [user (user-db/by-name db-tx user-name)]
     (-> (jdbc/query db-tx (token-queries/by-user-and-name
                            (:user-id user)
                            token-name))
@@ -66,11 +66,11 @@
                                 :user_role_id :user-role-id
                                 :role_name :role-name})))
 
-(defn get-user-tokens
+(defn by-user
   "Get the tokens for an user."
   [database user-name]
   (jdbc/with-db-transaction [db-tx database]
-    (if-let [user (user-db/get-user-by-name db-tx user-name)]
+    (if-let [user (user-db/by-name db-tx user-name)]
       (->> (jdbc/query db-tx (token-queries/by-user
                              (:user-id user)))
            (map #(clojure.set/rename-keys % {:token_id :token-id
@@ -84,11 +84,11 @@
                               user-name)
                       {:status 404})))))
 
-(defn delete-token
+(defn delete
   "Deletes a token for an user."
   [database user-name token-name]
   (jdbc/with-db-transaction [db-tx database]
-    (if-let [token (get-user-token db-tx user-name token-name)]
+    (if-let [token (by-user-and-name db-tx user-name token-name)]
       (jdbc/execute! db-tx (token-queries/delete
                             (:token-id token)))
       (throw (ex-info (format "the token %s does not exist for the user %s"

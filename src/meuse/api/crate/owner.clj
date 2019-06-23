@@ -56,7 +56,7 @@
   (params/validate-params request ::list)
   (let [crate-name (get-in request [:route-params
                                     :crate-name])
-        users (user-db/get-crate-join-crates-users
+        users (user-db/crate-owners
                (:database request)
                crate-name)]
     (info "list owners for crate" crate-name)

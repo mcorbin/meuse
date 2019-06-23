@@ -12,22 +12,22 @@
 
 (deftest ^:integration delete-token-test
   (testing "success"
-    (token-db/create-token database {:user "user2"
-                                     :validity 10
-                                     :name "mytoken"})
-    (is (= 1 (count (token-db/get-user-tokens database "user2"))))
+    (token-db/create database {:user "user2"
+                               :validity 10
+                               :name "mytoken"})
+    (is (= 1 (count (token-db/by-user database "user2"))))
     (= {:status 200} (meuse-api! (add-auth {:database database
                                             :action :delete-token
                                             :body {:name "mytoken"
                                                    :user "user2"}}
                                            "user2"
                                            "tech")))
-    (is (= 0 (count (token-db/get-user-tokens database "user2")))))
+    (is (= 0 (count (token-db/by-user database "user2")))))
   (testing "admin users can delete tokens"
-    (token-db/create-token database {:user "user2"
-                                     :validity 10
-                                     :name "mytoken"})
-    (is (= 1 (count (token-db/get-user-tokens database "user2"))))
+    (token-db/create database {:user "user2"
+                               :validity 10
+                               :name "mytoken"})
+    (is (= 1 (count (token-db/by-user database "user2"))))
     ;; non admin cannot delete the token
     (is (thrown-with-msg?
          ExceptionInfo
@@ -44,7 +44,7 @@
                                                        :user "user2"}}
                                                "user1"
                                                "admin"))))
-    (is (= 0 (count (token-db/get-user-tokens database "user2")))))
+    (is (= 0 (count (token-db/by-user database "user2")))))
   (testing "the token does not exist"
     (is (thrown-with-msg?
          ExceptionInfo
@@ -87,7 +87,7 @@
                                      :validity 10
                                      :name "mynewtoken"
                                      :password "user2user2"}})
-          tokens (token-db/get-user-tokens database "user2")]
+          tokens (token-db/by-user database "user2")]
       (is (= 200 (:status result)))
       (is (string? (get-in result [:body :token])))
       (is (= 1 (count tokens)))
