@@ -24,7 +24,8 @@
     (token-db/delete (:database request)
                      user-name
                      token-name)
-    {:status 200}))
+    {:status 200
+     :body {:ok true}}))
 
 (defmethod meuse-api! :create-token
   [request]

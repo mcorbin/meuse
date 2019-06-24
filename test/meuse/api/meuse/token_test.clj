@@ -38,12 +38,14 @@
                                        :user "user2"}}
                                "user3"
                                "tech"))))
-    (is (= {:status 200} (meuse-api! (add-auth {:database database
-                                                :action :delete-token
-                                                :body {:name "mytoken"
-                                                       :user "user2"}}
-                                               "user1"
-                                               "admin"))))
+    (is (= {:status 200
+            :body {:ok true}}
+           (meuse-api! (add-auth {:database database
+                                  :action :delete-token
+                                  :body {:name "mytoken"
+                                         :user "user2"}}
+                                 "user1"
+                                 "admin"))))
     (is (= 0 (count (token-db/by-user database "user2")))))
   (testing "the token does not exist"
     (is (thrown-with-msg?

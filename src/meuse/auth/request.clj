@@ -3,7 +3,8 @@
             [meuse.auth.token :as auth-token]
             [meuse.db.token :as token-db]
             [meuse.db.user :as user-db]
-            [clojure.set :refer [rename-keys]]))
+            [clojure.set :refer [rename-keys]]
+            [clojure.tools.logging :refer [debug info error]]))
 
 ;; todo: clean
 (defn check-user
@@ -14,12 +15,14 @@
     (if-let [db-token (token-db/get-token-user-role (:database request) token)]
       (if (:user-active db-token)
         (if (auth-token/valid? token db-token)
-          (assoc request
-                 :auth
-                 (-> (select-keys db-token [:role-name
-                                            :user-name
-                                            :token-user-id])
-                     (rename-keys {:token-user-id :user-id})))
+          (do
+            (info "user" (:user-name token) "authenticated")
+            (assoc request
+                   :auth
+                   (-> (select-keys db-token [:role-name
+                                              :user-name
+                                              :token-user-id])
+                       (rename-keys {:token-user-id :user-id}))))
           (throw (ex-info "invalid token" {:status 403})))
         (throw (ex-info "user is not active" {:status 403})))
       (throw (ex-info "token not found" {:status 403})))

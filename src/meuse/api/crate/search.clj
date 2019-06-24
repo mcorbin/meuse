@@ -41,7 +41,7 @@
                            format-search-result
                            (take (Integer/parseInt
                                   (or nb-results default-nb-results))))]
-    (info "search crate with query" query)
+    (info "search crates with query" query)
     {:status 200
      :body {:crates search-result
             :meta {:total (count search-result)}}}))

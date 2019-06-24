@@ -19,7 +19,8 @@
                                   :description "the description"}}
                           "user1"
                           "admin")]
-    (is (= {:status 200} (meuse-api! request)))
+    (is (= {:status 200
+            :body {:ok true}} (meuse-api! request)))
     (let [category (by-name database "foo")]
       (is (uuid? (:category-id category)))
       (is (= "foo" (:category-name category)))

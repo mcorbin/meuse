@@ -13,6 +13,7 @@
   (db-category/create (:database request)
                       (get-in request [:body :name])
                       (get-in request [:body :description]))
-  {:status 200})
+  {:status 200
+   :body {:ok true}})
 
 

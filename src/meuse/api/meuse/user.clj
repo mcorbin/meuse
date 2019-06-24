@@ -12,7 +12,8 @@
   (info "create user" (get-in request [:body :name]))
   (db-user/create (:database request)
                        (:body request))
-  {:status 200})
+  {:status 200
+   :body {:ok true}})
 
 (defmethod meuse-api! :delete-user
   [request]
@@ -21,6 +22,7 @@
   (info "delete user" (get-in request [:body :name]))
   (db-user/delete (:database request)
                   (get-in request [:body :name]))
-  {:status 200})
+  {:status 200
+   :body {:ok true}})
 
 
