@@ -18,6 +18,7 @@
   "Assigns a crate to a category."
   [db-tx crate-id category-name]
   (if-let [category (category/by-name db-tx category-name)]
+    ;; do nothing is the crate already belongs to the category
     (when-not (by-crate-and-category db-tx
                                      crate-id
                                      (:category-id category))
@@ -27,7 +28,6 @@
     (throw (ex-info (format "the category %s does not exist"
                             category-name)
                     {:status 404}))))
-
 
 (defn create-categories
   "Creates categories for a crate."
