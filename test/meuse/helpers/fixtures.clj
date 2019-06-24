@@ -8,6 +8,7 @@
   (:import org.apache.commons.io.FileUtils))
 
 (def tmp-dir "test/resources/tmp/")
+(def db-started? (atom false))
 
 (defn tmp-fixture
   [f]
@@ -17,16 +18,19 @@
 
 (defn db-fixture
   [f]
-  (mount/start #'meuse.config/config #'meuse.db/database)
+  (when-not @db-started?
+    (mount/start #'meuse.config/config #'meuse.db/database)
+    (reset! db-started? true))
   (f)
-  (mount/stop #'meuse.config/config #'meuse.db/database))
+  (comment (mount/stop #'meuse.config/config #'meuse.db/database)))
 
 (defn table-fixture
   [f]
   (jdbc/execute! database ["TRUNCATE TABLE CRATES CASCADE;"])
+  (jdbc/execute! database ["TRUNCATE TABLE ROLES CASCADE;"])
   (jdbc/execute! database ["TRUNCATE TABLE CATEGORIES CASCADE;"])
   (jdbc/execute! database ["TRUNCATE TABLE TOKENS CASCADE;"])
   (jdbc/execute! database ["TRUNCATE TABLE USERS CASCADE;"])
   (jdbc/execute! database ["TRUNCATE TABLE CRATES_USERS CASCADE;"])
-  (helpers/create-test-db! database)
+  (helpers/load-test-db! database)
   (f))
