@@ -1,5 +1,6 @@
 (ns meuse.api.crate.http
-  (:require [meuse.api.default :as default]))
+  (:require [meuse.api.default :as default]
+            [clojure.tools.logging :refer [info debug error]]))
 
 (def crates-routes
   {#"/new/?" {:put ::new}
@@ -18,5 +19,5 @@
 
 (defmethod crates-api! :default
   [request]
-  (clojure.tools.logging/info "not found")
+  (info "not found")
   default/not-found)

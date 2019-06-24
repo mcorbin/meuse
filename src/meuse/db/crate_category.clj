@@ -1,8 +1,8 @@
 (ns meuse.db.crate-category
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]]
+  (:require [meuse.db.category :as category]
             [meuse.db.queries.crate-category :as crate-category-queries]
-            [meuse.db.category :as category]))
+            [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :refer [debug info error]]))
 
 (defn by-crate-and-category
   "Get the crate/category relation for a crate and a category."

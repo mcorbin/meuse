@@ -1,7 +1,7 @@
 (ns meuse.error
-  (:require [clojure.spec.alpha :as s]
+  (:require meuse.spec
             [cheshire.core :as json]
-            meuse.spec))
+            [clojure.spec.alpha :as s]))
 
 (def default-msg
   "Internal error. Please checks the logs.")

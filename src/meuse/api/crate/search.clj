@@ -1,9 +1,9 @@
 (ns meuse.api.crate.search
   "Search API"
   (:require [meuse.api.crate.http :refer (crates-api!)]
+            [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
             [meuse.db.search :as search-db]
-            [meuse.api.params :as params]
             [meuse.semver :as semver]
             [clojure.tools.logging :refer [debug info error]]))
 

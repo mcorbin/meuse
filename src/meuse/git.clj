@@ -1,12 +1,12 @@
 (ns meuse.git
   "Interacts with a git repository"
   (:require [meuse.config :refer [config]]
-            [meuse.metadata :as metadata]
             [mount.core :refer [defstate]]
-            [clojure.string :as string]
+            [meuse.crate :as crate]
+            [meuse.metadata :as metadata]
             [clojure.java.shell :as shell]
             [clojure.tools.logging :refer [debug info error]]
-            [meuse.crate :as crate]))
+            [clojure.string :as string]))
 
 (defprotocol Git
   (add [this])

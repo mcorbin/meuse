@@ -1,10 +1,10 @@
 (ns meuse.db.queries.token
   (:require [honeysql.core :as sql]
             [honeysql.helpers :as h])
-  (:import java.sql.Timestamp
-           java.util.Date
-           org.joda.time.DateTime
-           java.util.UUID))
+  (:import java.util.Date
+           java.util.UUID
+           java.sql.Timestamp
+           org.joda.time.DateTime))
 
 (defn create
   [identifier token token-name user-id expired-at]

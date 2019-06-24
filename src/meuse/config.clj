@@ -1,11 +1,11 @@
 (ns meuse.config
   "Load the project configuration."
-  (:require [clojure.tools.logging :refer [debug info error]]
+  (:require [meuse.spec :as spec]
             [environ.core :refer [env]]
             [mount.core :refer [defstate]]
             [unilog.config :refer [start-logging!]]
             [yummy.config :as yummy]
-            [meuse.spec :as spec]))
+            [clojure.tools.logging :refer [debug info error]]))
 
 (def default-db-config
   {:classname "org.postgresql.Driver"

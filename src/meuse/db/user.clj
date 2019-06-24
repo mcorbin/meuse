@@ -1,12 +1,12 @@
 (ns meuse.db.user
   "Manage users in the database."
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]]
-            [meuse.db.crate :as crate]
-            [meuse.db.queries.user :as user-queries]
+  (:require [meuse.db.crate :as crate]
             [meuse.db.queries.crate-user :as crate-user-queries]
+            [meuse.db.queries.user :as user-queries]
             [meuse.db.role :as role]
             [meuse.message :refer [yanked?->msg]]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :refer [debug info error]]
             [clojure.set :as set])
   (:import java.util.UUID))
 

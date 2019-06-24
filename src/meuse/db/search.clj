@@ -1,9 +1,9 @@
 (ns meuse.db.search
   "Search crates in the database."
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require [meuse.db.queries.search :as search-queries]
+            [clojure.java.jdbc :as jdbc]
             [clojure.string :as string]
-            [clojure.tools.logging :refer [debug info error]]
-            [meuse.db.queries.search :as search-queries]))
+            [clojure.tools.logging :refer [debug info error]]))
 
 (defn format-query-string
   "Takes a string, format it to be usable for search."

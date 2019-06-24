@@ -1,9 +1,9 @@
 (ns meuse.db.role
   "Manage roles in the database"
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]]
-            [meuse.db.queries.role :as role-queries]
-            [meuse.message :refer [yanked?->msg]])
+  (:require [meuse.db.queries.role :as role-queries]
+            [meuse.message :refer [yanked?->msg]]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :refer [debug info error]])
   (:import java.util.UUID))
 
 (def admin-role-name "admin")

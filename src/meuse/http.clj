@@ -1,25 +1,15 @@
 (ns meuse.http
   "HTTP server and handlers"
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]]
-            [aleph.http :as http]
-            [aleph.netty :as netty]
-            [bidi.bidi :refer [match-route*]]
-            [mount.core :refer [defstate]]
-            [ring.middleware.params :refer [wrap-params]]
-            [ring.middleware.keyword-params :refer [wrap-keyword-params]]
-            [ring.middleware.content-type :refer [wrap-content-type]]
+  (:require meuse.api.crate.download
             [meuse.api.crate.http :refer [crates-routes crates-api!]]
-            [meuse.api.default :refer [not-found]]
             meuse.api.crate.new
             meuse.api.crate.owner
-            meuse.api.crate.yank
-            meuse.api.crate.download
             meuse.api.crate.search
+            meuse.api.crate.yank
+            [meuse.api.default :refer [default-api! not-found]]
             [meuse.api.meuse.http :as meuse-http]
             meuse.api.meuse.category
             meuse.api.meuse.token
-            [meuse.api.default :refer [default-api!]]
             [meuse.auth.token :as auth-token]
             [meuse.auth.request :as auth-request]
             [meuse.config :refer [config]]
@@ -27,7 +17,16 @@
             [meuse.git :refer [git]]
             [meuse.middleware :refer [wrap-json]]
             [meuse.registry :as registry]
-            [meuse.request :refer [convert-body-edn]])
+            [meuse.request :refer [convert-body-edn]]
+            [aleph.http :as http]
+            [aleph.netty :as netty]
+            [bidi.bidi :refer [match-route*]]
+            [mount.core :refer [defstate]]
+            [ring.middleware.content-type :refer [wrap-content-type]]
+            [ring.middleware.keyword-params :refer [wrap-keyword-params]]
+            [ring.middleware.params :refer [wrap-params]]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :refer [debug info error]])
   (:import java.io.Closeable
            java.util.UUID))
 

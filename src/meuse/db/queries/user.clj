@@ -1,7 +1,7 @@
 (ns meuse.db.queries.user
-  (:require [honeysql.core :as sql]
-            [honeysql.helpers :as h]
-            [meuse.auth.password :as password])
+  (:require [meuse.auth.password :as password]
+            [honeysql.core :as sql]
+            [honeysql.helpers :as h])
   (:import java.util.UUID))
 
 (defn get-user

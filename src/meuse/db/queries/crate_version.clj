@@ -1,9 +1,9 @@
 (ns meuse.db.queries.crate-version
   (:require [honeysql.core :as sql]
             [honeysql.helpers :as h])
-  (:import java.sql.Timestamp
-           java.util.Date
-           java.util.UUID))
+  (:import java.util.Date
+           java.util.UUID
+           java.sql.Timestamp))
 
 (defn update-yanked
   [version-id yanked?]

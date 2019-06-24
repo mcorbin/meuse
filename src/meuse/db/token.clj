@@ -1,12 +1,12 @@
 (ns meuse.db.token
   "Manage tokens in the database"
-  (:require [clj-time.core :as t]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]]
-            [crypto.password.bcrypt :as bcrypt]
-            [meuse.auth.token :as auth-token]
+  (:require [meuse.auth.token :as auth-token]
             [meuse.db.queries.token :as token-queries]
-            [meuse.db.user :as user-db])
+            [meuse.db.user :as user-db]
+            [clj-time.core :as t]
+            [crypto.password.bcrypt :as bcrypt]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :refer [debug info error]])
   (:import java.util.UUID))
 
 (defn create

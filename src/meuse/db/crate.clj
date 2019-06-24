@@ -1,12 +1,12 @@
 (ns meuse.db.crate
   "Manages crates in the database."
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]]
+  (:require [meuse.db.category :as category]
+            [meuse.db.crate-category :as crate-category]
             [meuse.db.queries.crate :as crate-queries]
-            [meuse.db.queries.crate-version :as crate-version-queries]
             [meuse.db.queries.crate-user :as crate-user-queries]
-            [meuse.db.category :as category]
-            [meuse.db.crate-category :as crate-category])
+            [meuse.db.queries.crate-version :as crate-version-queries]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :refer [debug info error]])
   (:import java.util.UUID))
 
 (defn by-name

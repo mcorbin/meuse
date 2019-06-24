@@ -1,8 +1,8 @@
 (ns meuse.core
-  (:require [clojure.tools.logging :refer [info error]]
+  (:require [meuse.http :as http]
             [mount.core :as mount]
             [signal.handler :refer [with-handler]]
-            [meuse.http :as http])
+            [clojure.tools.logging :refer [info error]])
   (:gen-class))
 
 (defn stop!

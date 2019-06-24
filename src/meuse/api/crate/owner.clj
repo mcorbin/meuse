@@ -3,11 +3,11 @@
   (:require [meuse.api.crate.http :refer (crates-api!)]
             [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
-            [meuse.db.user :as user-db]
             [meuse.db.crate-user :as crate-user-db]
+            [meuse.db.user :as user-db]
             [meuse.request :refer [convert-body-edn]]
-            [clojure.string :as string]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.tools.logging :refer [debug info error]]
+            [clojure.string :as string]))
 
 (defmethod crates-api! :add-owner
   [request]

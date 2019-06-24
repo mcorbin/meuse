@@ -2,11 +2,11 @@
   "Crate utility functions"
   (:require [byte-streams :as bs]
             [cheshire.core :as json]
+            [digest :as digest]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]
             [clojure.set :as set]
-            [clojure.string :as string]
-            [digest :as digest])
+            [clojure.string :as string])
   (:import java.util.Arrays))
 
 (defn check-size

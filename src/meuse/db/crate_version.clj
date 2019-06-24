@@ -1,9 +1,9 @@
 (ns meuse.db.crate-version
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]]
-            [meuse.db.crate :as crate-db]
+  (:require [meuse.db.crate :as crate-db]
             [meuse.db.queries.crate-version :as crate-version-queries]
-            [meuse.message :refer [yanked?->msg]])
+            [meuse.message :refer [yanked?->msg]]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :refer [debug info error]])
   (:import java.util.UUID))
 
 (defn update-yank

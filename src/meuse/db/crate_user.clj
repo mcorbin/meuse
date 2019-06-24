@@ -1,11 +1,11 @@
 (ns meuse.db.crate-user
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]]
-            [meuse.db.crate :as crate]
-            [meuse.db.user :as user-db]
+  (:require [meuse.db.crate :as crate]
             [meuse.db.queries.crate-user :as crate-user-queries]
             [meuse.db.role :as role]
-            [clojure.set :as set])
+            [meuse.db.user :as user-db]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.set :as set]
+            [clojure.tools.logging :refer [debug info error]])
   (:import java.util.UUID))
 
 (defn by-id

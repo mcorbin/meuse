@@ -1,10 +1,10 @@
 (ns meuse.api.crate.download
-  (:require [meuse.crate-file :as crate-file]
-            [meuse.api.crate.http :refer (crates-api!)]
+  (:require [meuse.api.crate.http :refer (crates-api!)]
             [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
-            [clojure.tools.logging :refer [debug info error]]
-            [clojure.java.io :as io])
+            [meuse.crate-file :as crate-file]
+            [clojure.java.io :as io]
+            [clojure.tools.logging :refer [debug info error]])
   (:import java.io.File))
 
 (defmethod crates-api! :download

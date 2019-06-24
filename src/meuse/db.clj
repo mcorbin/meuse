@@ -1,10 +1,10 @@
 (ns meuse.db
   "The database content"
-  (:require [clojure.java.jdbc :as j]
-            [clojure.tools.logging :refer [debug info error]]
+  (:require [meuse.config :refer [config]]
             [aleph.http :as http]
             [mount.core :refer [defstate]]
-            [meuse.config :refer [config]])
+            [clojure.java.jdbc :as j]
+            [clojure.tools.logging :refer [debug info error]])
   (:import (com.mchange.v2.c3p0 ComboPooledDataSource)))
 
 (defn pool
