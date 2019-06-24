@@ -8,7 +8,7 @@
                                    yank-commit-msg]]
             [meuse.db :refer [database]]
             [meuse.crate-test :refer [create-publish-request]]
-            [meuse.helpers.db :refer :all]
+            [meuse.helpers.db-state :as db-state]
             [meuse.helpers.files :refer :all]
             [meuse.helpers.fixtures :refer :all]
             [meuse.git :refer [Git]]
@@ -69,10 +69,10 @@
                              {:cmd "push"}]))
         (is (= (slurp (str tmp-dir "/toto/1.0.1/download"))
                crate-file))
-        (test-crate-version database {:crate-name "toto"
-                                      :version-version "1.0.1"
-                                      :version-yanked false
-                                      :version-description nil})
+        (db-state/test-crate-version database {:crate-name "toto"
+                                               :version-version "1.0.1"
+                                               :version-yanked false
+                                               :version-description nil})
         (is (thrown-with-msg? ExceptionInfo
                               #"already exists$"
                               (crates-api! request)))))
@@ -218,10 +218,10 @@
                                   :crate-version "1.1.0"}}]
       (metadata/write-metadata tmp-dir {:name "crate1" :vers "1.1.0" :yanked false})
       (crates-api! request)
-      (test-crate-version database {:crate-name "crate1"
-                                    :version-version "1.1.0"
-                                    :version-yanked true
-                                    :version-description "the crate1 description, this crate is for foobar"})
+      (db-state/test-crate-version database {:crate-name "crate1"
+                                             :version-version "1.1.0"
+                                             :version-yanked true
+                                             :version-description "the crate1 description, this crate is for foobar"})
       (is (thrown-with-msg? ExceptionInfo
                             #"crate state is already yank$"
                             (crates-api! (assoc request :action :yank))))
@@ -229,10 +229,10 @@
       (is (thrown-with-msg? ExceptionInfo
                             #"crate state is already unyank$"
                             (crates-api! (assoc request :action :unyank))))
-      (test-crate-version database {:crate-name "crate1"
-                                    :version-version "1.1.0"
-                                    :version-yanked false
-                                    :version-description "the crate1 description, this crate is for foobar"})))
+      (db-state/test-crate-version database {:crate-name "crate1"
+                                             :version-version "1.1.0"
+                                             :version-yanked false
+                                             :version-description "the crate1 description, this crate is for foobar"})))
   (testing "success: the user owns the crate"
     (let [git-actions (atom [])
           user2-id (:user-id (user-db/by-name database "user2"))
@@ -247,10 +247,10 @@
                                   :crate-version "1.1.0"}}]
       (metadata/write-metadata tmp-dir {:name "crate1" :vers "1.1.0" :yanked false})
       (crates-api! request)
-      (test-crate-version database {:crate-name "crate1"
-                                    :version-version "1.1.0"
-                                    :version-yanked true
-                                    :version-description "the crate1 description, this crate is for foobar"})
+      (db-state/test-crate-version database {:crate-name "crate1"
+                                             :version-version "1.1.0"
+                                             :version-yanked true
+                                             :version-description "the crate1 description, this crate is for foobar"})
       (is (thrown-with-msg? ExceptionInfo
                             #"crate state is already yank$"
                             (crates-api! (assoc request :action :yank))))
@@ -258,10 +258,10 @@
       (is (thrown-with-msg? ExceptionInfo
                             #"crate state is already unyank$"
                             (crates-api! (assoc request :action :unyank))))
-      (test-crate-version database {:crate-name "crate1"
-                                    :version-version "1.1.0"
-                                    :version-yanked false
-                                    :version-description "the crate1 description, this crate is for foobar"})))
+      (db-state/test-crate-version database {:crate-name "crate1"
+                                             :version-version "1.1.0"
+                                             :version-yanked false
+                                             :version-description "the crate1 description, this crate is for foobar"})))
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo

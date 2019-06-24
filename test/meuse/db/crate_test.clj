@@ -3,7 +3,7 @@
             [meuse.db.crate :refer :all]
             [meuse.db.category :as category-db]
             [meuse.db.user :as user-db]
-            [meuse.helpers.db :refer :all]
+            [meuse.helpers.db-state :as db-state]
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo
@@ -21,17 +21,17 @@
     (is (thrown-with-msg? ExceptionInfo
                           #"already exists$"
                           (create database crate user-id)))
-    (test-crate-version database {:crate-name "test1"
-                                  :version-version "0.1.3"
-                                  :version-yanked false
-                                  :version-description nil})
-    (test-crate database {:crate-name "test1"})
+    (db-state/test-crate-version database {:crate-name "test1"
+                                           :version-version "0.1.3"
+                                           :version-yanked false
+                                           :version-description nil})
+    (db-state/test-crate database {:crate-name "test1"})
     (create database (assoc crate :vers "2.0.0") user-id)
-    (test-crate-version database {:crate-name "test1"
-                                  :version-version "2.0.0"
-                                  :version-yanked false
-                                  :version-description nil})
-    (test-crate database {:crate-name "test1"})))
+    (db-state/test-crate-version database {:crate-name "test1"
+                                           :version-version "2.0.0"
+                                           :version-yanked false
+                                           :version-description nil})
+    (db-state/test-crate database {:crate-name "test1"})))
 
 (deftest ^:integration create-with-categories
   (let [crate {:name "test-crate-category"
