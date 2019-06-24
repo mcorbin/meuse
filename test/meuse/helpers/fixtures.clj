@@ -1,10 +1,10 @@
 (ns meuse.helpers.fixtures
-  (:require [meuse.db :refer [database]]
+  (:require [meuse.core :as core]
+            [meuse.db :refer [database]]
             [meuse.helpers.db :as helpers]
+            [mount.core :as mount]
             [clojure.java.io :as io]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.test :refer :all]
-            [mount.core :as mount])
+            [clojure.test :refer :all])
   (:import org.apache.commons.io.FileUtils))
 
 (def tmp-dir "test/resources/tmp/")
@@ -26,11 +26,16 @@
 
 (defn table-fixture
   [f]
-  (jdbc/execute! database ["TRUNCATE TABLE CRATES CASCADE;"])
-  (jdbc/execute! database ["TRUNCATE TABLE ROLES CASCADE;"])
-  (jdbc/execute! database ["TRUNCATE TABLE CATEGORIES CASCADE;"])
-  (jdbc/execute! database ["TRUNCATE TABLE TOKENS CASCADE;"])
-  (jdbc/execute! database ["TRUNCATE TABLE USERS CASCADE;"])
-  (jdbc/execute! database ["TRUNCATE TABLE CRATES_USERS CASCADE;"])
+  (meuse.helpers.db/clean! database)
   (helpers/load-test-db! database)
   (f))
+
+
+(defn project-fixture
+  [f]
+  (core/start!)
+  (meuse.helpers.db/clean! database)
+  (helpers/load-test-db! database)
+  (f)
+  (core/stop!)
+  )

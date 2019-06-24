@@ -19,5 +19,5 @@
 
 (defmethod crates-api! :default
   [request]
-  (info "not found")
+  (info "crate uri not found:" (:request-method request) (:uri request))
   default/not-found)

@@ -49,8 +49,8 @@
   [request]
   (let [request (if (meuse-http/skip-auth (:action request))
                   request
-                  (auth-request/check-user request))])
-  (meuse-http/meuse-api! (-> (convert-body-edn request))))
+                  (auth-request/check-user request))]
+    (meuse-http/meuse-api! (-> (convert-body-edn request)))))
 
 (defmethod route! :meuse.api.default
   [request]
@@ -58,6 +58,7 @@
 
 (defmethod route! :default
   [request]
+  (info "uri not found:" (:request-method request) (:uri request))
   not-found)
 
 (defn handle-req-errors

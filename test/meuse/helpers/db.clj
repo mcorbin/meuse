@@ -3,6 +3,7 @@
             [meuse.db.crate :as crate-db]
             [meuse.db.user :as user-db]
             [meuse.db.crate-user :as crate-user-db]
+            [clojure.java.jdbc :as jdbc]
             [clojure.java.shell :as shell]
             [clojure.test :refer :all]))
 
@@ -72,3 +73,12 @@
                          :exit-code (:exit result)
                          :stdout (:out result)
                          :stderr (:err result)})))))
+
+(defn clean!
+  [database]
+  (jdbc/execute! database ["TRUNCATE TABLE CRATES CASCADE;"])
+  (jdbc/execute! database ["TRUNCATE TABLE ROLES CASCADE;"])
+  (jdbc/execute! database ["TRUNCATE TABLE CATEGORIES CASCADE;"])
+  (jdbc/execute! database ["TRUNCATE TABLE TOKENS CASCADE;"])
+  (jdbc/execute! database ["TRUNCATE TABLE USERS CASCADE;"])
+  (jdbc/execute! database ["TRUNCATE TABLE CRATES_USERS CASCADE;"]))

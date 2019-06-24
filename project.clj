@@ -30,6 +30,7 @@
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [pjstadig/humane-test-output "0.8.2"]
                                   [tortue/spy "1.6.0"]
+                                  [clj-http "3.10.0"]
                                   [ring/ring-mock "0.3.0"]
                                   [commons-io/commons-io 2.6]]
                    :global-vars    {*warn-on-reflection* true
