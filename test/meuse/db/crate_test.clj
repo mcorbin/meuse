@@ -12,7 +12,7 @@
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
 
-(deftest ^:integration create-test
+(deftest create-test
   (let [crate {:name "test1"
                :vers "0.1.3"
                :yanked false}
@@ -33,7 +33,7 @@
                                            :version-description nil})
     (db-state/test-crate database {:crate-name "test1"})))
 
-(deftest ^:integration create-with-categories
+(deftest create-with-categories
   (let [crate {:name "test-crate-category"
                :vers "0.1.3"
                :categories ["email" "system"]
@@ -55,7 +55,7 @@
               :category-description "the system category"}
              (dissoc c2 :category-id))))))
 
-(deftest ^:integration create-with-categories-error
+(deftest create-with-categories-error
   (let [crate {:name "test1"
                :vers "0.1.3"
                :categories ["cat1" "cat2"]

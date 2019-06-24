@@ -39,7 +39,7 @@
   (pull [this]
     (swap! state conj {:cmd "pull"})))
 
-(deftest ^:integration crates-api-new-test
+(deftest crates-api-new-test
   (let [{:keys [user-id]} (user-db/by-name database "user2")
         user-id-3 (:user-id (user-db/by-name database "user3"))]
     (testing "no deps"
@@ -203,7 +203,7 @@
              #"bad permissions"
              (crates-api! request)))))))
 
-(deftest ^:integration crates-api-yank-unyank-test
+(deftest crates-api-yank-unyank-test
   (testing "success:admin"
     (let [git-actions (atom [])
           user5-id (:user-id (user-db/by-name database "user5"))

@@ -13,7 +13,7 @@
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
 
-(deftest ^:integration new-user-test
+(deftest new-user-test
   (let [user {:name "mathieu"
               :password "foobarbaz"
               :active true
@@ -97,7 +97,7 @@
          #"bad permissions"
          (meuse-api! request))))))
 
-(deftest ^:integration delete-user-test
+(deftest delete-user-test
   (let [username "user2"
         request (add-auth {:database database
                            :action :delete-user

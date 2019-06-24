@@ -19,7 +19,7 @@
                         (check-active! {:name "foo" :active false})))
   (is (check-active! {:name "foo" :active true})))
 
-(deftest ^:integration create-get-test
+(deftest create-get-test
   (let [user {:name "mathieu"
               :password "foobar"
               :description "it's me mathieu"
@@ -41,7 +41,7 @@
                         #"does not exist$"
                         (create database {:role "foobar"}))))
 
-(deftest ^:integration crate-owners-test
+(deftest crate-owners-test
   (is (thrown-with-msg? ExceptionInfo
                         #"the crate foobar does not exist"
                         (crate-owners database "foobar"))))

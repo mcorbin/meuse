@@ -14,7 +14,7 @@
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
 
-(deftest ^:integration create-test
+(deftest create-test
   (let [user {:name "mathieu"
               :password "foobar"
               :description "it's me mathieu"
@@ -46,7 +46,7 @@
                                                 "crate1"))
                             (crate-user-db/create database "crate1" (:name user)))))))
 
-(deftest ^:integration delete-test
+(deftest delete-test
   (testing "success"
     (crate-user-db/delete database "crate1" "user2")
     (let [crate-db-id (:crate-id (crate-db/by-name
@@ -65,7 +65,7 @@
                           #"the user user2 does not own the crate crate1"
                           (crate-user-db/delete database "crate1" "user2")))))
 
-(deftest ^:integration create-crate-users-test
+(deftest create-crate-users-test
   (testing "success"
     (crate-user-db/create-crate-users database
                         "crate2"
@@ -105,7 +105,7 @@
                       :crate-id crate-db-id}])
                (set (map #(dissoc % :user-cargo-id) crate-users))))))))
 
-(deftest ^:integration delete-crate-users-test
+(deftest delete-crate-users-test
   (testing "success"
     (crate-user-db/delete-crate-users database
                         "crate1"

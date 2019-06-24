@@ -10,7 +10,7 @@
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
 
-(deftest ^:integration delete-token-test
+(deftest delete-token-test
   (testing "success"
     (token-db/create database {:user "user2"
                                :validity 10
@@ -81,7 +81,7 @@
                                "user2"
                                "tech"))))))
 
-(deftest ^:integration create-token-test
+(deftest create-token-test
   (testing "success"
     (let [result (meuse-api! {:database database
                               :action :create-token

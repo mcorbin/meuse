@@ -12,7 +12,7 @@
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
 
-(deftest ^:integration new-category-test
+(deftest new-category-test
   (let [request (add-auth {:database database
                            :action :new-category
                            :body {:name "foo"

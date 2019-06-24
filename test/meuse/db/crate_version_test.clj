@@ -10,7 +10,7 @@
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
 
-(deftest ^:integration update-yank-test
+(deftest update-yank-test
   (testing "success"
     (update-yank database "crate1" "1.1.0" true)
     (db-state/test-crate-version database

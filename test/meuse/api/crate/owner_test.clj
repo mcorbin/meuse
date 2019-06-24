@@ -14,7 +14,7 @@
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
 
-(deftest ^:integration add-owner-test
+(deftest add-owner-test
   (let [user5-id (:user-id (user-db/by-name database "user5"))
         user2-id (:user-id (user-db/by-name database "user2"))]
     (testing "success: admin"
@@ -110,7 +110,7 @@
                          :body (json/generate-string
                                 {:users ["foo"]})}))))))
 
-(deftest ^:integration remove-owner-test
+(deftest remove-owner-test
   (let [user5-id (:user-id (user-db/by-name database "user5"))
         user1-id (:user-id (user-db/by-name database "user1"))]
     (testing "success: admin"
