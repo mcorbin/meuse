@@ -24,7 +24,7 @@
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
 
-(defrecord GitMock [state]
+(defrecord GitMock [state lock]
   Git
   (add [this]
     (swap! state conj {:cmd "add"}))
@@ -50,7 +50,7 @@
             git-actions (atom [])
             request (merge
                      (create-publish-request metadata crate-file)
-                     {:git (GitMock. git-actions)
+                     {:git (GitMock. git-actions (java.lang.Object.))
                       :registry-config {:allowed-registries ["default"]}
                       :action :new
                       :auth {:user-id user-id
@@ -89,7 +89,7 @@
             git-actions (atom [])
             request (merge
                      (create-publish-request metadata crate-file)
-                     {:git (GitMock. git-actions)
+                     {:git (GitMock. git-actions (java.lang.Object.))
                       :auth {:user-id user-id
                              :role-name "tech"}
                       :registry-config {:allowed-registries ["default"]}
@@ -115,7 +115,7 @@
             git-actions (atom [])
             request (merge
                      (create-publish-request metadata crate-file)
-                     {:git (GitMock. git-actions)
+                     {:git (GitMock. git-actions (java.lang.Object.))
                       :auth {:user-id user-id
                              :role-name "tech"}
                       :registry-config {:allowed-registries ["another"]}
@@ -135,7 +135,7 @@
             git-actions (atom [])
             request (merge
                      (create-publish-request metadata crate-file)
-                     {:git (GitMock. git-actions)
+                     {:git (GitMock. git-actions (java.lang.Object.))
                       :registry-config {:allowed-registries ["default"]}
                       :action :new
                       :auth {:user-id user-id-3
@@ -207,7 +207,7 @@
   (testing "success:admin"
     (let [git-actions (atom [])
           user5-id (:user-id (user-db/by-name database "user5"))
-          request {:git (GitMock. git-actions)
+          request {:git (GitMock. git-actions (java.lang.Object.))
                    :database database
                    :action :yank
                    :auth {:user-id user5-id
@@ -236,7 +236,7 @@
   (testing "success: the user owns the crate"
     (let [git-actions (atom [])
           user2-id (:user-id (user-db/by-name database "user2"))
-          request {:git (GitMock. git-actions)
+          request {:git (GitMock. git-actions (java.lang.Object.))
                    :database database
                    :action :yank
                    :auth {:user-id user2-id

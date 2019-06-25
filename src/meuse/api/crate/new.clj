@@ -30,16 +30,18 @@
     (crate-db/create (:database request)
                      raw-metadata
                      (auth-request/user-id request))
-    ;; write the metadata file
-    (metadata/write-metadata (get-in request [:config :metadata :path]) git-metadata)
-    ;; write the crate binary file
-    (crate-file/write-crate-file (get-in request [:config :crate :path]) crate)
-    ;; git add
-    (git/add (:git request))
-    ;; git commit
-    (apply git/commit (:git request) (msg/publish-commit-msg raw-metadata))
-    ;; git push
-    (git/push (:git request))
+    (locking (get-in request [:git :lock])
+      ;; write the metadata file
+      (metadata/write-metadata (get-in request [:config :metadata :path])
+                               git-metadata)
+      ;; write the crate binary file
+      (crate-file/write-crate-file (get-in request [:config :crate :path]) crate)
+      ;; git add
+      (git/add (:git request))
+      ;; git commit
+      (apply git/commit (:git request) (msg/publish-commit-msg raw-metadata))
+      ;; git push
+      (git/push (:git request)))
     {:status 200
      :body {:warning {:invalid_categories []
                       :invalid_badges []

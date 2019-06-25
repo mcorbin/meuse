@@ -19,16 +19,17 @@
                          (auth-request/user-id request)))
     (info (msg/yanked?->msg yanked?) "crate" crate-name "version" crate-version)
     (crate-version-db/update-yank (:database request) crate-name crate-version yanked?)
-    (metadata/update-yank (get-in request [:config :metadata :path])
-                          crate-name
-                          crate-version
-                          yanked?)
-    (git/add (:git request))
-    (apply git/commit (:git request) (msg/yank-commit-msg
-                                      crate-name
-                                      crate-version
-                                      yanked?))
-    (git/push (:git request))
+    (locking (get-in request [:git :lock])
+      (metadata/update-yank (get-in request [:config :metadata :path])
+                            crate-name
+                            crate-version
+                            yanked?)
+      (git/add (:git request))
+      (apply git/commit (:git request) (msg/yank-commit-msg
+                                        crate-name
+                                        crate-version
+                                        yanked?))
+      (git/push (:git request)))
     {:status 200
      :body {:ok true}}))
 

@@ -8,7 +8,7 @@
            clojure.lang.ExceptionInfo))
 
 (deftest git-local-repo-test
-  (let [git (LocalRepository. tmp-dir "origin/master")]
+  (let [git (LocalRepository. tmp-dir "origin/master" (java.lang.Object.))]
     (with-redefs [clojure.java.shell/sh (spy/spy (spy/stub {:exit 0}))]
       (add git)
       (assert/called-once-with? clojure.java.shell/sh

@@ -15,7 +15,7 @@
   (pull [this])
   (push [this]))
 
-(defrecord LocalRepository [path target]
+(defrecord LocalRepository [path target lock]
   Git
   (add [this]
     (git-cmd this ["add" "."]))
@@ -40,4 +40,5 @@
     (git-cmd this ["pull" target])))
 
 (defstate git
-  :start (map->LocalRepository (:metadata config)))
+  :start (map->LocalRepository (merge (:metadata config)
+                                      {:lock (java.lang.Object.)})))
