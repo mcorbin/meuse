@@ -101,7 +101,7 @@
   (let [username "user2"
         request (add-auth {:database database
                            :action :delete-user
-                           :body {:name username}}
+                           :route-params {:name username}}
                           "user1"
                           "admin")]
     (is (= {:status 200
@@ -110,20 +110,20 @@
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
-         #"Wrong input parameters:\n - field name missing in body\n"
+         #"Wrong input parameters:\n - field name missing in route-params\n"
          (meuse-api! {:action :delete-user
-                      :body {}})))
+                      :route-params {}})))
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field name: the value should be a non empty string\n"
          (meuse-api! {:action :delete-user
-                      :body {:name ""}}))))
+                      :route-params {:name ""}}))))
   (testing "bad permissions"
     (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
          (meuse-api! (add-auth {:database database
                                 :action :delete-user
-                                :body {:name "user2"}}
+                                :route-params {:name "user2"}}
                                "user1"
                                "tech"))))))

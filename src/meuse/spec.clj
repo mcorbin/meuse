@@ -235,11 +235,11 @@
 (s/def :meuse.api.meuse.user/new
   (s/keys :req-un [:meuse.api.meuse.user-new/body]))
 
-(s/def :meuse.api.meuse.user-delete/body
+(s/def :meuse.api.meuse.user-delete/route-params
   (s/keys :req-un [:user/name]))
 
 (s/def :meuse.api.meuse.user/delete
-  (s/keys :req-un [:meuse.api.meuse.user-delete/body]))
+  (s/keys :req-un [:meuse.api.meuse.user-delete/route-params]))
 
 ;; token
 

@@ -29,8 +29,8 @@
 
 (deftest valid?-test
   (let [token (token-db/create database {:user "user2"
-                                               :validity 10
-                                               :name "mytoken"})
+                                         :validity 10
+                                         :name "mytoken"})
         db-token (token-db/get-token-user-role database token)]
     (is (valid? token db-token))
     (is (not (valid? token (assoc db-token :token-expired-at (t/now)))))

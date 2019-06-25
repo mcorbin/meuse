@@ -105,6 +105,16 @@
                              :user "foo"
                              :password "azertyui"
                              :validity 10}}))))
+  (testing "user is not active"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"user is not active"
+         (meuse-api! {:database database
+                      :action :create-token
+                      :body {:name "mytoken"
+                             :user "user4"
+                             :password "user4user4"
+                             :validity 10}}))))
   (testing "invalid password"
     (is (thrown-with-msg?
          ExceptionInfo

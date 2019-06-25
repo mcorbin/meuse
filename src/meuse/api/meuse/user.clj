@@ -21,7 +21,7 @@
   (auth-request/admin?-throw request)
   (info "delete user" (get-in request [:body :name]))
   (db-user/delete (:database request)
-                  (get-in request [:body :name]))
+                  (get-in request [:route-params :name]))
   {:status 200
    :body {:ok true}})
 

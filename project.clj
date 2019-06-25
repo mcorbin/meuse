@@ -44,4 +44,6 @@
                                 (pjstadig.humane-test-output/activate!)]
                    :repl-options {:init-ns user}
                    :source-paths ["dev"]}
-             :uberjar {:aot :all}})
+             :uberjar {:aot :all}}
+  :test-selectors {:default (fn [x] (not (:integration x)))
+                   :integration :integration})

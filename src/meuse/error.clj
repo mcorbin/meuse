@@ -88,7 +88,7 @@
     (with-out-str
       (println "Wrong input parameters:")
       (doseq [msg messages]
-        (println (format " - %s" msg))))))
+        (println (format " - %s"  msg))))))
 
 (defn explain->message
   "

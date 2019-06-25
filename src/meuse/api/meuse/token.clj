@@ -32,7 +32,9 @@
   (params/validate-params request ::create)
   (let [{:keys [name user password] :as body} (:body request)]
     (if-let [db-user (user-db/by-name (:database request) user)]
-      (do (auth-password/check password (:user-password db-user))
+      (do (when-not (:user-active db-user)
+            (throw (ex-info "user is not active" {:status 403})))
+          (auth-password/check password (:user-password db-user))
           (info (format "creating token %s for user %s"
                         name
                         user))
