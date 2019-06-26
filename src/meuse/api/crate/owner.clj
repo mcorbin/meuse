@@ -54,6 +54,7 @@
 (defmethod crates-api! :list-owners
   [request]
   (params/validate-params request ::list)
+  (auth-request/admin-or-tech?-throw request)
   (let [crate-name (get-in request [:route-params
                                     :crate-name])
         users (user-db/crate-owners

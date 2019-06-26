@@ -196,8 +196,11 @@
 
 (deftest list-owner-test
   (testing "success"
-    (let [crate-users (crates-api! {:action :list-owners
+    (let [user5-id (:user-id (user-db/by-name database "user5"))
+          crate-users (crates-api! {:action :list-owners
                                     :database database
+                                    :auth {:user-id user5-id
+                                           :role-name "admin"}
                                     :route-params {:crate-name "crate1"}})]
       (is (= (update-in crate-users
                         [:body :users]
