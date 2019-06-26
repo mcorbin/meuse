@@ -40,7 +40,7 @@
           (throw (ex-info (format "a token named %s already exists for user %s"
                                   (:name token)
                                   (:user token))
-                          {})))
+                          {:status 400})))
         (let [generated-token (auth-token/generate-token)]
           (jdbc/execute! db-tx (token-queries/create
                                 (auth-token/extract-identifier generated-token)
