@@ -56,7 +56,7 @@
   (testing "invalid token"
     (let [token (token-db/create database {:user "user2"
                                            :validity 10
-                                           :name "foo"})]
+                                           :name "foobar"})]
       (is (thrown-with-msg?
            ExceptionInfo
            #"invalid token"

@@ -32,8 +32,16 @@
         (is (t/within? (t/plus (t/minus (t/now) (t/minutes 1)) (t/days validity))
                        (t/plus (t/now) (t/days validity))
                        (DateTime. (:token-expired-at db-token))))
-        (is (auth-token/valid? token db-token)))))
-  (testing "errors"
+        (is (auth-token/valid? token db-token))
+        (is (thrown-with-msg?
+             ExceptionInfo
+             (re-pattern (format "a token named %s already exists for user %s"
+                                 token-name
+                                 user-name))
+             (token-db/create database {:user user-name
+                                        :validity validity
+                                        :name token-name}))))))
+  (testing "the user does not exist"
     (is (thrown-with-msg?
          ExceptionInfo
          #"the user toto does not exist"

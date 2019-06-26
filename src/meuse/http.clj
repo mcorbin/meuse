@@ -10,6 +10,7 @@
             [meuse.api.meuse.http :as meuse-http]
             meuse.api.meuse.category
             meuse.api.meuse.token
+            meuse.api.meuse.user
             [meuse.auth.token :as auth-token]
             [meuse.auth.request :as auth-request]
             [meuse.config :refer [config]]

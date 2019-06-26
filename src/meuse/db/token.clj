@@ -9,25 +9,6 @@
             [clojure.tools.logging :refer [debug info error]])
   (:import java.util.UUID))
 
-(defn create
-  "Creates a new token for an user. `validity` is the number of days before the
-  expiration of the token.
-  Returns the generated token."
-  [database token]
-  (jdbc/with-db-transaction [db-tx database]
-    (if-let [user (user-db/by-name db-tx (:user token))]
-      (let [generated-token (auth-token/generate-token)]
-        (jdbc/execute! db-tx (token-queries/create
-                              (auth-token/extract-identifier generated-token)
-                              (bcrypt/encrypt generated-token)
-                              (:name token)
-                              (:user-id user)
-                              (auth-token/expiration-date (:validity token))))
-        generated-token)
-      (throw (ex-info (format "the user %s does not exist"
-                              (:user token))
-                      {:status 400})))))
-
 (defn by-user-and-name
   "Get a token by name for an user."
   [db-tx user-name token-name]
@@ -46,6 +27,31 @@
     (throw (ex-info (format "the user %s does not exist"
                             user-name)
                     {:status 404}))))
+
+(defn create
+  "Creates a new token for an user. `validity` is the number of days before the
+  expiration of the token.
+  Returns the generated token."
+  [database token]
+  (jdbc/with-db-transaction [db-tx database]
+    (if-let [user (user-db/by-name db-tx (:user token))]
+      (do
+        (when (by-user-and-name db-tx (:user token) (:name token))
+          (throw (ex-info (format "a token named %s already exists for user %s"
+                                  (:name token)
+                                  (:user token))
+                          {})))
+        (let [generated-token (auth-token/generate-token)]
+          (jdbc/execute! db-tx (token-queries/create
+                                (auth-token/extract-identifier generated-token)
+                                (bcrypt/encrypt generated-token)
+                                (:name token)
+                                (:user-id user)
+                                (auth-token/expiration-date (:validity token))))
+          generated-token))
+      (throw (ex-info (format "the user %s does not exist"
+                              (:user token))
+                      {:status 400})))))
 
 (defn get-token-user-role
   "Get a token by value.

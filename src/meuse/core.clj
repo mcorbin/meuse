@@ -1,5 +1,6 @@
 (ns meuse.core
-  (:require [meuse.http :as http]
+  (:require [meuse.auth.password :as password]
+            [meuse.http :as http]
             [mount.core :as mount]
             [signal.handler :refer [with-handler]]
             [clojure.tools.logging :refer [info error]])
@@ -20,6 +21,13 @@
 (defn -main
   "Starts the application"
   [& args]
+  (when (and (seq args)
+             (= (first args) "password"))
+    (if-let [clear-password (second args)]
+      (do (info "your password is:" (password/encrypt clear-password))
+          (System/exit 0))
+      (do (error "missing parameter for the password subcommand")
+          (System/exit 1))))
   (with-handler :term
       (info "SIGTERM, stopping")
       (stop!)
