@@ -35,7 +35,8 @@
                                   [commons-io/commons-io 2.6]]
                    :global-vars    {*warn-on-reflection* true
                                     *assert* true}
-                   :cloverage {:ns-exclude-regex [#"meuse.core"
+                   :cloverage {:test-ns-regex [#"^((?!meuse.integration).)*$"]
+                               :ns-exclude-regex [#"meuse.core"
                                                   #"user"]}
                    :env {:meuse-configuration "dev/resources/config.yaml"}
                    :plugins [[lein-environ "1.1.0"]
