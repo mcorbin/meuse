@@ -295,6 +295,35 @@
                          :headers {"Authorization" token}
                          :throw-exceptions false
                          :body (js {:name "notfound"
-                                    :user "notfound"
-                                    })})))
-      )))
+                                    :user "notfound"})})))
+      ;; categories
+      (testing "create categories: success"
+        (test-http
+         {:status 200
+          :body (js {:ok true})}
+         (client/post (str meuse-url "/api/v1/meuse/category/")
+                      {:content-type :json
+                       :headers {"Authorization" token}
+                       :throw-exceptions false
+                       :body (js {:name "new_category"
+                                  :description "category_description"})})))
+      (testing "create categories: error already exists"
+        (test-http
+         {:status 400
+          :body (js {:errors [{:detail "the category new_category already exists"}]})}
+         (client/post (str meuse-url "/api/v1/meuse/category/")
+                      {:content-type :json
+                       :headers {"Authorization" token}
+                       :throw-exceptions false
+                       :body (js {:name "new_category"
+                                  :description "category_description"})})))
+      (testing "create categories: not admin"
+        (test-http
+         {:status 403
+          :body (js {:errors [{:detail "bad permissions"}]})}
+         (client/post (str meuse-url "/api/v1/meuse/category/")
+                      {:content-type :json
+                       :headers {"Authorization" integration-token}
+                       :throw-exceptions false
+                       :body (js {:name "new_category"
+                                  :description "category_description"})}))))))
