@@ -447,5 +447,146 @@
                                    :yanked false
                                    :categories ["web"]}
                                   "crate file content"))})))
-    ;; yank
+    ;; yank/unyank
+    (testing "yank a crate: success"
+      (test-http
+       {:status 200
+        :body (js {:ok true})}
+       (client/delete (str meuse-url "/api/v1/crates/foo/1.10.3/yank")
+                      {:content-type :json
+                       :headers {"Authorization" token}
+                       :throw-exceptions false})))
+    (testing "yank: error: already yank"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "cannot yank the crate: crate state is already yank"}]})}
+       (client/delete (str meuse-url "/api/v1/crates/foo/1.10.3/yank")
+                      {:content-type :json
+                       :headers {"Authorization" token}
+                       :throw-exceptions false})))
+    (testing "yank: error: does not own the crate"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "user does not own the crate foo"}]})}
+       (client/delete (str meuse-url "/api/v1/crates/foo/1.10.3/yank")
+                      {:content-type :json
+                       :headers {"Authorization" integration-token}
+                       :throw-exceptions false})))
+    (testing "yank: error: crate does not exist"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "cannot yank the crate: the crate does not exist"}]})}
+       (client/delete (str meuse-url "/api/v1/crates/bar/1.10.3/yank")
+                      {:content-type :json
+                       :headers {"Authorization" token}
+                       :throw-exceptions false})))
+    (testing "yank: error: version does not exist"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "cannot yank the crate: the version does not exist"}]})}
+       (client/delete (str meuse-url "/api/v1/crates/foo/3.10.3/yank")
+                      {:content-type :json
+                       :headers {"Authorization" token}
+                       :throw-exceptions false})))
+    (testing "unyank a crate: success"
+      (test-http
+       {:status 200
+        :body (js {:ok true})}
+       (client/put (str meuse-url "/api/v1/crates/foo/1.10.3/unyank")
+                   {:content-type :json
+                    :headers {"Authorization" token}
+                    :throw-exceptions false})))
+    ;; add/remove owner
+    (testing "add owner"
+      (test-http
+       {:status 200
+        :body (js {:ok true
+                   :msg "added user(s) integration as owner(s) of crate foo"})}
+       (client/put (str meuse-url "/api/v1/crates/foo/owners")
+                   {:content-type :json
+                    :headers {"Authorization" token}
+                    :throw-exceptions false
+                    :body (js {:users ["integration"]})})))
+    (testing "add owner: error: already owns the crate"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "the user integration already owns the crate foo"}]})}
+       (client/put (str meuse-url "/api/v1/crates/foo/owners")
+                   {:content-type :json
+                    :headers {"Authorization" token}
+                    :throw-exceptions false
+                    :body (js {:users ["integration"]})})))
+    (testing "remove owner"
+      (test-http
+       {:status 200
+        :body (js {:ok true
+                   :msg "removed user(s) integration as owner(s) of crate foo"})}
+       (client/delete (str meuse-url "/api/v1/crates/foo/owners")
+                      {:content-type :json
+                       :headers {"Authorization" token}
+                       :throw-exceptions false
+                       :body (js {:users ["integration"]})})))
+    (testing "remove owner: error: does not own the crate"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "the user integration does not own the crate foo"}]})}
+       (client/delete (str meuse-url "/api/v1/crates/foo/owners")
+                      {:content-type :json
+                       :headers {"Authorization" token}
+                       :throw-exceptions false
+                       :body (js {:users ["integration"]})})))
+    (testing "add owner: error: does not own the crate"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "user does not own the crate foo"}]})}
+       (client/put (str meuse-url "/api/v1/crates/foo/owners")
+                   {:content-type :json
+                    :headers {"Authorization" integration-token}
+                    :throw-exceptions false
+                    :body (js {:users ["integration"]})})))
+    (testing "add owner: error: the crate does not exist"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "the crate bar does not exist"}]})}
+       (client/put (str meuse-url "/api/v1/crates/bar/owners")
+                   {:content-type :json
+                    :headers {"Authorization" integration-token}
+                    :throw-exceptions false
+                    :body (js {:users ["integration"]})})))
+    (testing "add owner: error: the user does not exist"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "user does not own the crate foo"}]})}
+       (client/put (str meuse-url "/api/v1/crates/foo/owners")
+                   {:content-type :json
+                    :headers {"Authorization" integration-token}
+                    :throw-exceptions false
+                    :body (js {:users ["does not exist"]})})))
+    (testing "remove owner: error: does not own the crate"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "user does not own the crate foo"}]})}
+       (client/delete (str meuse-url "/api/v1/crates/foo/owners")
+                      {:content-type :json
+                       :headers {"Authorization" integration-token}
+                       :throw-exceptions false
+                       :body (js {:users ["integration"]})})))
+    (testing "remove owner: error: the crate does not exist"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "the crate bar does not exist"}]})}
+       (client/delete (str meuse-url "/api/v1/crates/bar/owners")
+                      {:content-type :json
+                       :headers {"Authorization" integration-token}
+                       :throw-exceptions false
+                       :body (js {:users ["integration"]})})))
+    (testing "remove owner: error: the user does not exist"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "user does not own the crate foo"}]})}
+       (client/delete (str meuse-url "/api/v1/crates/foo/owners")
+                      {:content-type :json
+                       :headers {"Authorization" integration-token}
+                       :throw-exceptions false
+                       :body (js {:users ["does not exist"]})})))
     ))

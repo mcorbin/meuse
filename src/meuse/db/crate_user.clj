@@ -26,7 +26,7 @@
           (throw (ex-info (format "the user %s already owns the crate %s"
                                   user-name
                                   crate-name)
-                          {})))
+                          {:status 400})))
         (jdbc/execute! db-tx (crate-user-queries/create
                               (:crate-id crate)
                               (:user-id user))))

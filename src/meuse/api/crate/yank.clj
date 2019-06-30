@@ -15,8 +15,8 @@
   (let [{:keys [crate-name crate-version]} (:route-params request)]
     (when-not (auth-request/admin? request)
       (crate-user-db/owned-by? (:database request)
-                         crate-name
-                         (auth-request/user-id request)))
+                               crate-name
+                               (auth-request/user-id request)))
     (info (msg/yanked?->msg yanked?) "crate" crate-name "version" crate-version)
     (crate-version-db/update-yank (:database request) crate-name crate-version yanked?)
     (locking (get-in request [:git :lock])
