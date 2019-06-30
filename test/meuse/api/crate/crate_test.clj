@@ -9,35 +9,21 @@
             [meuse.db :refer [database]]
             [meuse.crate-test :refer [create-publish-request]]
             [meuse.helpers.db-state :as db-state]
+            meuse.helpers.git
             [meuse.helpers.files :refer :all]
             [meuse.helpers.fixtures :refer :all]
-            [meuse.git :refer [Git]]
             [meuse.metadata :as metadata]
             [clojure.test :refer :all]
             [cheshire.core :as json]
             [meuse.db.crate :as crate-db]
             [meuse.crate :as crate])
-  (:import clojure.lang.ExceptionInfo))
+  (:import clojure.lang.ExceptionInfo
+           [meuse.helpers.git GitMock]))
 
 (use-fixtures :each tmp-fixture)
 
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
-
-(defrecord GitMock [state lock]
-  Git
-  (add [this]
-    (swap! state conj {:cmd "add"}))
-  (git-cmd [this args]
-    (swap! state conj {:cmd "git-cmd"
-                       :args [args]}))
-  (commit [this msg-header msg-body]
-    (swap! state conj {:cmd "commit"
-                       :args [msg-header msg-body]}))
-  (push [this]
-    (swap! state conj {:cmd "push"}))
-  (pull [this]
-    (swap! state conj {:cmd "pull"})))
 
 (deftest crates-api-new-test
   (let [{:keys [user-id]} (user-db/by-name database "user2")

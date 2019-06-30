@@ -19,7 +19,7 @@
 
 (def meuse-url "http://127.0.0.1:8855")
 
-(use-fixtures :once project-fixture)
+(use-fixtures :each project-fixture)
 
 (defn js
   [payload]
@@ -446,4 +446,6 @@
                                    :vers "1.10.4"
                                    :yanked false
                                    :categories ["web"]}
-                                  "crate file content"))})))))
+                                  "crate file content"))})))
+    ;; yank
+    ))

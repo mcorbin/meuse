@@ -2,10 +2,12 @@
   (:require [meuse.core :as core]
             [meuse.db :refer [database]]
             [meuse.helpers.db :as helpers]
+            meuse.helpers.git
             [mount.core :as mount]
             [clojure.java.io :as io]
             [clojure.test :refer :all])
-  (:import org.apache.commons.io.FileUtils))
+  (:import org.apache.commons.io.FileUtils
+           [meuse.helpers.git GitMock]))
 
 (def tmp-dir "test/resources/tmp/")
 (def db-started? (atom false))
@@ -30,10 +32,9 @@
   (helpers/load-test-db! database)
   (f))
 
-
 (defn project-fixture
   [f]
-  (core/start!)
+  (mount/start-with-states {#'meuse.git/git {:start #(GitMock. (atom []) (java.lang.Object.))}})
   (meuse.helpers.db/clean! database)
   (helpers/load-test-db! database)
   (f)
