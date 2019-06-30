@@ -46,8 +46,8 @@
       (do
         (when (:version-version crate)
           (throw (ex-info (format "release %s for crate %s already exists"
-                                  (:name metadata)
-                                  (:vers metadata))
+                                  (:vers metadata)
+                                  (:name metadata))
                           {:status 200})))
         ;; the user should own the crate
         (when-not (-> (jdbc/query db-tx (crate-user-queries/by-crate-and-user

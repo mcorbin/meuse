@@ -8,9 +8,10 @@
             meuse.api.meuse.token
             meuse.api.meuse.user
             [meuse.auth.token :as auth-token]
-            [meuse.helpers.fixtures :refer :all]
+            [meuse.crate-test :as crate-test]
             [meuse.db :refer [database]]
             [meuse.db.token :as token-db]
+            [meuse.helpers.fixtures :refer :all]
             [meuse.http :as http]
             [cheshire.core :as json]
             [clj-http.client :as client]
@@ -29,7 +30,7 @@
   (is (= expected
          (select-keys actual (keys expected)))))
 
-(deftest ^:integration integration-test
+(deftest ^:integration meuse-api-integration-test
   ;; create a token for an admin user
   (let [token (token-db/create database {:user "user1"
                                          :validity 10
@@ -327,3 +328,122 @@
                        :throw-exceptions false
                        :body (js {:name "new_category"
                                   :description "category_description"})}))))))
+
+(deftest ^:integration crate-api-integration-test
+  ;; create a token for an admin user
+  (let [token (token-db/create database {:user "user1"
+                                         :validity 10
+                                         :name "integration_token"})
+        _ (testing "creating user: success"
+            (test-http
+             {:status 200
+              :body (js {:ok true})}
+             (client/post (str meuse-url "/api/v1/meuse/user")
+                          {:headers {"Authorization" token}
+                           :content-type :json
+                           :body (js {:description "integration test user"
+                                      :password "azertyui"
+                                      :name "integration"
+                                      :active true
+                                      :role "tech"})
+                           :throw-exceptions false})))
+        _ (testing "creating user: not active"
+            (test-http
+             {:status 200
+              :body (js {:ok true})}
+             (client/post (str meuse-url "/api/v1/meuse/user")
+                          {:headers {"Authorization" token}
+                           :content-type :json
+                           :body (js {:description "integration test user not active"
+                                      :password "azertyui"
+                                      :name "integration_not_active"
+                                      :active false
+                                      :role "tech"})
+                           :throw-exceptions false})))
+        integration-token (token-db/create database
+                                           {:user "integration"
+                                            :validity 10
+                                            :name "integration_token_user"})
+        integration-na-token (token-db/create database
+                                              {:user "integration_not_active"
+                                               :validity 10
+                                               :name "integration_token_na"})]
+    ;; create crate
+    (testing "create a web category"
+      (test-http
+       {:status 200
+        :body (js {:ok true})}
+       (client/post (str meuse-url "/api/v1/meuse/category/")
+                    {:content-type :json
+                     :headers {"Authorization" token}
+                     :throw-exceptions false
+                     :body (js {:name "web"
+                                :description "category_description"})})))
+    (testing "publish a crate: success"
+      (test-http
+       {:status 200
+        :body (js {:warning {:invalid_categories []
+                             :invalid_badges []
+                             :other []}})}
+       (client/put (str meuse-url "/api/v1/crates/new/")
+                   {:content-type :json
+                    :headers {"Authorization" token}
+                    :throw-exceptions false
+                    :body (:body (crate-test/create-publish-request
+                                  {:name "foo" :vers "1.10.2" :yanked false}
+                                  "crate file content"))})))
+    (testing "publish a crate: invalid semver"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "Wrong input parameters:\n - field vers: the value should be a valid semver string\n"}]})}
+       (client/put (str meuse-url "/api/v1/crates/new/")
+                   {:content-type :json
+                    :headers {"Authorization" token}
+                    :throw-exceptions false
+                    :body (:body (crate-test/create-publish-request
+                                  {:name "foo" :vers "1.10" :yanked false}
+                                  "crate file content"))})))
+    (testing "publish a crate: new version with category"
+      (test-http
+       {:status 200
+        :body (js {:warning {:invalid_categories []
+                             :invalid_badges []
+                             :other []}})}
+       (client/put (str meuse-url "/api/v1/crates/new/")
+                   {:content-type :json
+                    :headers {"Authorization" token}
+                    :throw-exceptions false
+                    :body (:body (crate-test/create-publish-request
+                                  {:name "foo"
+                                   :vers "1.10.3"
+                                   :yanked false
+                                   :categories ["web"]}
+                                  "crate file content"))})))
+    (testing "publish a crate: error: version already exists"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "release 1.10.3 for crate foo already exists"}]})}
+       (client/put (str meuse-url "/api/v1/crates/new/")
+                   {:content-type :json
+                    :headers {"Authorization" token}
+                    :throw-exceptions false
+                    :body (:body (crate-test/create-publish-request
+                                  {:name "foo"
+                                   :vers "1.10.3"
+                                   :yanked false
+                                   :categories ["web"]}
+                                  "crate file content"))})))
+    (testing "publish a crate: error: the user does not own the crate"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "the user does not own the crate"}]})}
+       (client/put (str meuse-url "/api/v1/crates/new/")
+                   {:content-type :json
+                    :headers {"Authorization" integration-token}
+                    :throw-exceptions false
+                    :body (:body (crate-test/create-publish-request
+                                  {:name "foo"
+                                   :vers "1.10.4"
+                                   :yanked false
+                                   :categories ["web"]}
+                                  "crate file content"))})))))
