@@ -23,7 +23,8 @@
   (-> (clojure.set/rename-keys version {:crate-name :name
                                         :version-version :max_version
                                         :version-description :description})
-      (select-keys [:name :max_version :description])))
+      (select-keys [:name :max_version :description])
+      (update :description #(if % % ""))))
 
 (defn format-search-result
   "Takes a search result from the db, format it for the Cargo API."

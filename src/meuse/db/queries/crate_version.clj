@@ -38,4 +38,4 @@
                               ")"))]])
         sql/format
         (conj (:name metadata))
-        (conj (:description metadata)))))
+        (conj (:description metadata "")))))

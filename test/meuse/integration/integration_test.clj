@@ -589,4 +589,46 @@
                        :headers {"Authorization" integration-token}
                        :throw-exceptions false
                        :body (js {:users ["does not exist"]})})))
-    ))
+    ;; search
+    (testing "search: success"
+      (test-http
+       {:status 200
+        :body (js {:crates [{:name "foo"
+                             :max_version "1.10.3"
+                             :description ""}]
+                   :meta {:total 1}})}
+       (client/get (str meuse-url "/api/v1/crates?q=foo")
+                      {:content-type :json
+                       :headers {"Authorization" integration-token}
+                       :throw-exceptions false})))
+    (testing "search: no query"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "Wrong input parameters:\n - field q missing in params\n"}]})}
+       (client/get (str meuse-url "/api/v1/crates")
+                      {:content-type :json
+                       :headers {"Authorization" integration-token}
+                       :throw-exceptions false})))
+    (testing "search: no auth"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "token missing in the header"}]})}
+       (client/get (str meuse-url "/api/v1/crates")
+                      {:content-type :json
+                       :throw-exceptions false})))
+    ;; download
+    (testing "download crate file"
+      (test-http
+       {:status 200
+        :body "crate file content"}
+       (client/get (str meuse-url "/api/v1/crates/foo/1.10.3/download")
+                   {:content-type :json
+                    :headers {"Authorization" integration-token}
+                    :throw-exceptions false})))
+    (testing "download crate file: no auth"
+      (test-http
+       {:status 200
+        :body (js {:errors [{:detail "token missing in the header"}]})}
+       (client/get (str meuse-url "/api/v1/crates/foo/1.10.3/download")
+                   {:content-type :json
+                    :throw-exceptions false})))))
