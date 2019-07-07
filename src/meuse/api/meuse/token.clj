@@ -45,4 +45,29 @@
                                            [:name :user :validity]))}})
       (throw (ex-info (format "the user %s does not exist" user) {:status 400})))))
 
+(defmethod meuse-api! :list-token
+  [request]
+  (params/validate-params request ::list)
+  (let [request-user (get-in request [:params :user])]
+    (if request-user
+      (auth-request/admin?-throw request)
+      (auth-request/admin-or-tech?-throw request))
+    (let [user-name (or request-user (get-in request [:auth :user-name]))
+          tokens (->> (token-db/by-user (:database request) user-name)
+                      (map #(select-keys % [:token-id
+                                            :token-name
+                                            :token-created-at
+                                            :token-expired-at]))
+                      (map #(clojure.set/rename-keys
+                             %
+                             {:token-id :id
+                              :token-name :name
+                              :token-created-at :created-at
+                              :token-expired-at :expired-at})))]
+      {:status 200
+       :body {:tokens tokens}})))
+
+
+
+
 

@@ -12,6 +12,7 @@
    #"/user/?" {:post ::new-user}
    [#"/user/?" :name] {:delete ::delete-user}
    #"/token/?" {:post ::create-token}
+   #"/token/?" {:get ::list-token}
    [#"/token/?"] {:delete ::delete-token}})
 
 (defmulti meuse-api!

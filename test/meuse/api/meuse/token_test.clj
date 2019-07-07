@@ -151,5 +151,69 @@
                              :password "azertyui"
                              :validity "foo"}})))))
 
+(deftest list-token-test
+  (let [token1 (token-db/create database {:user "user2"
+                                         :validity 10
+                                          :name "token1"})
+        token2 (token-db/create database {:user "user2"
+                                          :validity 10
+                                          :name "token2"})
+        token3 (token-db/create database {:user "user1"
+                                          :validity 10
+                                          :name "token3"})
+        tokens (get-in (meuse-api! (add-auth {:action :list-token
+                                              :database database}
+                                             "user2"
+                                             "tech"))
+                       [:body :tokens])
+        tokens-admin (get-in (meuse-api! (add-auth {:action :list-token
+                                                    :params {:user "user2"}
+                                                    :database database}
+                                                   "user1"
+                                                   "admin"))
+                             [:body :tokens])]
+    (testing "an user can retrieve its tokens"
+      (is (= 2 (count tokens)))
+      (let [db-token-1 (first (filter #(= (:name %) "token1") tokens))
+            db-token-2 (first (filter #(= (:name %) "token2") tokens))]
+        (is (uuid? (:id db-token-1)))
+        (is (inst? (:created-at db-token-1)))
+        (is (inst? (:expired-at db-token-1)))
+        (is (= 4 (count (keys db-token-1))))
+        (is (uuid? (:id db-token-2)))
+        (is (inst? (:created-at db-token-2)))
+        (is (inst? (:expired-at db-token-2)))
+        (is (= 4 (count (keys db-token-2))))))
+    (testing "admin user can retrieve tokens for another user"
+      (is (= 2 (count tokens)))
+      (let [db-token-1 (first (filter #(= (:name %) "token1") tokens-admin))
+            db-token-2 (first (filter #(= (:name %) "token2") tokens-admin))]
+        (is (uuid? (:id db-token-1)))
+        (is (inst? (:created-at db-token-1)))
+        (is (inst? (:expired-at db-token-1)))
+        (is (= 4 (count (keys db-token-1))))
+        (is (uuid? (:id db-token-2)))
+        (is (inst? (:created-at db-token-2)))
+        (is (inst? (:expired-at db-token-2)))
+        (is (= 4 (count (keys db-token-2))))))
+    (testing "non-admin cannot retrieve the tokens for another user"
+      (is (thrown-with-msg?
+           ExceptionInfo
+           #"bad permissions"
+           (meuse-api! (add-auth {:action :list-token
+                                  :params {:user "user1"}
+                                  :database database}
+                                 "user2"
+                                 "tech")))))
+    (testing "bad parameters"
+      (is (thrown-with-msg?
+           ExceptionInfo
+           #"Wrong input parameters:\n - field user: the value should be a non empty string\n"
+           (meuse-api! (add-auth {:action :list-token
+                                  :params {:user 1}
+                                  :database database}
+                                 "user2"
+                                 "tech")))))))
+
 
 

@@ -7,7 +7,8 @@
   [request spec]
   (when-not (s/valid? spec request)
     (throw (ex-info (error/explain->message
-                     (s/explain-data spec request))
+                     ;; remove the db from the req to avoid json issue
+                     (s/explain-data spec (dissoc request :database)))
                     {:explain-str (s/explain-str spec request)
                      :status 400})))
   true)

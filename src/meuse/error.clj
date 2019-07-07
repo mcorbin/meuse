@@ -75,7 +75,7 @@
        (when-let [field (-> pred last last)]
          (format "field %s is missing" (name field))))
 
-     ;; :via is not a spec, return the invalud parameter
+     ;; :via is not a spec, return the invalid parameter
      (when value
        (format "invalid value %s" value))
 

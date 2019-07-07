@@ -297,6 +297,56 @@
                          :throw-exceptions false
                          :body (js {:name "notfound"
                                     :user "notfound"})})))
+      ;; list token
+      (testing "list tokens for the integration user"
+        (let [response (client/get (str meuse-url "/api/v1/meuse/token/")
+                                   {:content-type :json
+                                    :headers {"Authorization" integration-token}
+                                    :throw-exceptions false})
+              tokens (-> (:body response)
+                         (json/parse-string true)
+                         :tokens)]
+          (test-http
+           {:status 200}
+           response)
+          (is (= 1 (count tokens)))
+          (is (string? (:id (first tokens))))
+          (is (= "integration_token_user" (:name (first tokens))))
+          (is (string? (:created-at (first tokens))))
+          (is (string? (:expired-at (first tokens))))
+          (is (= 4 (count (keys (first tokens)))))))
+      (testing "list tokens: admin can list tokens for another user"
+        (let [response (client/get (str meuse-url "/api/v1/meuse/token?user=integration")
+                                   {:content-type :json
+                                    :headers {"Authorization" token}
+                                    :throw-exceptions false})
+              tokens (-> (:body response)
+                         (json/parse-string true)
+                         :tokens)]
+          (test-http
+           {:status 200}
+           response)
+          (is (= 1 (count tokens)))
+          (is (string? (:id (first tokens))))
+          (is (= "integration_token_user" (:name (first tokens))))
+          (is (string? (:created-at (first tokens))))
+          (is (string? (:expired-at (first tokens))))
+          (is (= 4 (count (keys (first tokens)))))))
+      (testing "list tokens: no auth"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "token missing in the header"}]})}
+       (client/get (str meuse-url "/api/v1/meuse/token")
+                   {:content-type :json
+                    :throw-exceptions false})))
+      (testing "list tokens: cannot list tokens for another user if non admin"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "bad permissions"}]})}
+       (client/get (str meuse-url "/api/v1/meuse/token?user=integration_not_active")
+                   {:content-type :json
+                    :headers {"Authorization" integration-token}
+                    :throw-exceptions false})))
       ;; categories
       (testing "create categories: success"
         (test-http

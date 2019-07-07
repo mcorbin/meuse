@@ -258,3 +258,9 @@
 
 (s/def :meuse.api.meuse.token/create
   (s/keys :req-un [:meuse.api.meuse.token-create/body]))
+
+(s/def :meuse.api.meuse.token-list/params
+  (s/keys :opt-un [:token/user]))
+
+(s/def :meuse.api.meuse.token/list
+  (s/keys :opt-un [:meuse.api.meuse.token-list/params]))
