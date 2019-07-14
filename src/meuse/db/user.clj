@@ -1,6 +1,7 @@
 (ns meuse.db.user
   "Manage users in the database."
-  (:require [meuse.db.crate :as crate]
+  (:require [meuse.auth.password :as password]
+            [meuse.db.crate :as crate]
             [meuse.db.queries.crate-user :as crate-user-queries]
             [meuse.db.queries.user :as user-queries]
             [meuse.db.role :as role]
@@ -70,3 +71,24 @@
       (throw (ex-info (format "the crate %s does not exist"
                               crate-name)
                       {:status 404})))))
+
+(defn update-user
+  "Updates an user."
+  [database user-name fields]
+  (jdbc/with-db-transaction [db-tx database]
+    (if-let [user (by-name db-tx user-name)]
+      (let [fields (cond-> fields
+                     (:password fields) (update :password password/encrypt)
+                     (:role fields) (assoc :role_id
+                                           (-> (role/by-name database (:role fields))
+                                               :role-id))
+                     :remove-role-name (dissoc :role)
+                     :select-keys (select-keys
+                                   [:role_id
+                                    :description
+                                    :password
+                                    :active]))]
+        (jdbc/execute! db-tx (user-queries/update-user (:user-id user) fields)))
+      (throw (ex-info (format "the user %s does not exist"
+                              user-name)
+                      {:status 400})))))

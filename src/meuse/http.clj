@@ -99,7 +99,7 @@
                                       :metadata metadata-config}
                              :subsystem (-> request :handler namespace keyword)
                              :action (-> request :handler name keyword)
-                             :registry-config registry-config)]
+                            :registry-config registry-config)]
           (debug "request " (:request-id request)
                  "with subsystem" (:subsystem request)
                  "with action" (:action request))

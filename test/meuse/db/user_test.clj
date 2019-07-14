@@ -55,3 +55,46 @@
                              :name "bar"})
   (delete database "user2")
   (is (= nil (by-name database "user2"))))
+
+(deftest update-user-test
+  (testing "success"
+    (let [user {:name "mathieu"
+                :password "foobar"
+                :description "it's me mathieu"
+                :active true
+                :role "tech"}]
+      (create database user)
+      (update-user database "mathieu" {:description "new"
+                                       :active false
+                                       :password "new password"
+                                       :name "notupdated"
+                                       :role "admin"})
+      (let [result (by-name database "mathieu")
+            role-admin (role/get-admin-role database)]
+        (is (= (:role-id role-admin) (:user-role-id result)))
+        (is (not (:user-active role-admin)))
+        (is (= (:user-description result) "new"))
+        (is (thrown-with-msg? ExceptionInfo
+                              #"invalid password"
+                              (password/check (:password user) (:user-password result))))
+        (is (password/check "new password" (:user-password result)))
+        ;; name not updated
+        (is (= (:name user) (:user-name result))))))
+  (testing "the user does not exist"
+    (is (thrown-with-msg? ExceptionInfo
+                          #"the user doesnotexist does not exist"
+                          (update-user database
+                                       "doesnotexist"
+                                       {:description "new"}))))
+  (testing "the role does not exist"
+    (is (thrown-with-msg? ExceptionInfo
+                          #"the role doesnotexist does not exist"
+                          (update-user database
+                                       "mathieu"
+                                       {:description "new"
+                                        :role "doesnotexist"
+                                        }))))
+  )
+
+
+

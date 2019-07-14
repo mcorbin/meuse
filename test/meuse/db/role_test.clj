@@ -2,7 +2,8 @@
   (:require [meuse.db :refer [database]]
             [meuse.db.role :refer :all]
             [meuse.helpers.fixtures :refer :all]
-            [clojure.test :refer :all]))
+            [clojure.test :refer :all])
+  (:import clojure.lang.ExceptionInfo))
 
 (use-fixtures :once db-fixture)
 (use-fixtures :each table-fixture)
@@ -11,7 +12,9 @@
   (let [role (by-name database "admin")]
     (is (uuid? (:role-id role)))
     (is (= "admin" (:role-name role))))
-  (is (nil? (by-name database "azerty"))))
+  (is (thrown-with-msg? ExceptionInfo
+                        #"the role azerty does not exist"
+                        (by-name database "azerty"))))
 
 (deftest get-tech-role-name
   (let [role (get-tech-role database)]

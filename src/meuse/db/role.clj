@@ -12,10 +12,14 @@
 (defn by-name
   "Get a roles by name."
   [db-tx role-name]
-  (-> (jdbc/query db-tx (role-queries/by-name role-name))
-      first
-      (clojure.set/rename-keys {:role_id :role-id
-                                :role_name :role-name})))
+  (let [role (-> (jdbc/query db-tx (role-queries/by-name role-name))
+                 first
+                 (clojure.set/rename-keys {:role_id :role-id
+                                           :role_name :role-name}))]
+    (when-not role
+      (throw (ex-info (format "the role %s does not exist" role-name)
+                      {:status 400})))
+    role))
 
 (defn get-admin-role
   "Get the admin role."

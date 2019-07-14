@@ -53,3 +53,10 @@
       (h/join [:crates_users :c] [:= :c.user_id :u.id])
       (h/where [:= :c.crate_id crate-id])
       sql/format))
+
+(defn update-user
+  [user-id fields]
+  (-> (h/update :users)
+      (h/sset fields)
+      (h/where [:= :id user-id])
+      sql/format))
