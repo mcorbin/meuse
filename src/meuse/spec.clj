@@ -241,6 +241,19 @@
 (s/def :meuse.api.meuse.user/delete
   (s/keys :req-un [:meuse.api.meuse.user-delete/route-params]))
 
+(s/def :meuse.api.meuse.user-update/route-params
+  (s/keys :req-un [:user/name]))
+
+(s/def :meuse.api.meuse.user-update/body
+  (s/keys :opt-un [:user/password
+                   :user/description
+                   :user/active
+                   :user/role]))
+
+(s/def :meuse.api.meuse.user/update
+  (s/keys :req-un [:meuse.api.meuse.user-update/route-params
+                   :meuse.api.meuse.user-update/body]))
+
 ;; token
 
 (s/def :meuse.api.meuse.token-delete/body

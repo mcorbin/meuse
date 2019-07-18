@@ -48,6 +48,19 @@
                                       :active true
                                       :role "tech"})
                            :throw-exceptions false})))
+        _ (testing "creating user: success"
+            (test-http
+             {:status 200
+              :body (js {:ok true})}
+             (client/post (str meuse-url "/api/v1/meuse/user")
+                          {:headers {"Authorization" token}
+                           :content-type :json
+                           :body (js {:description "integration2 test user"
+                                      :password "azertyui"
+                                      :name "integration2"
+                                      :active true
+                                      :role "tech"})
+                           :throw-exceptions false})))
         _ (testing "creating user: not active"
             (test-http
              {:status 200
@@ -65,6 +78,10 @@
                                            {:user "integration"
                                             :validity 10
                                             :name "integration_token_user"})
+        integration2-token (token-db/create database
+                                            {:user "integration2"
+                                             :validity 10
+                                             :name "integration2_token_user"})
         integration-na-token (token-db/create database
                                               {:user "integration_not_active"
                                                :validity 10
@@ -181,6 +198,76 @@
                         {:headers {"Authorization" (str integration-token "A")}
                          :content-type :json
                          :throw-exceptions false})))
+      ;; update user
+      (testing "update user by admin: success"
+        (test-http
+         {:status 200
+          :body (js {:ok true})}
+         (client/post (str meuse-url "/api/v1/meuse/user/integration2")
+                      {:headers {"Authorization" token}
+                       :content-type :json
+                       :body (js {:description "integration test user"
+                                  :password "new_password"
+                                  :active true
+                                  :role "admin"})
+                       :throw-exceptions false})))
+      (testing "update user by admin: success"
+        (test-http
+         {:status 200
+          :body (js {:ok true})}
+         (client/post (str meuse-url "/api/v1/meuse/user/integration2")
+                      {:headers {"Authorization" token}
+                       :content-type :json
+                       :body (js {:description "integration test user update"
+                                  :password "new_password"
+                                  :active true
+                                  :role "tech"})
+                       :throw-exceptions false})))
+      (testing "update user by itself (not admin): success"
+        (test-http
+         {:status 200
+          :body (js {:ok true})}
+         (client/post (str meuse-url "/api/v1/meuse/user/integration2")
+                      {:headers {"Authorization" integration2-token}
+                       :content-type :json
+                       :body (js {:description "integration test user update2"
+                                  :password "new_password2"})
+                       :throw-exceptions false})))
+      (testing "update user: invalid token"
+        (test-http
+         {:status 403
+          :body (js {:errors [{:detail "invalid token"}]})}
+         (client/post (str meuse-url "/api/v1/meuse/user/integration2")
+                      {:headers {"Authorization" (str integration2-token "A")}
+                       :content-type :json
+                       :throw-exceptions false})))
+      (testing "update user: cannot update a role if not admin"
+        (test-http
+         {:status 403
+          :body (js {:errors [{:detail "only admins can update an user role"}]})}
+         (client/post (str meuse-url "/api/v1/meuse/user/integration2")
+                      {:headers {"Authorization" integration2-token}
+                       :content-type :json
+                       :body (js {:role "admin"})
+                       :throw-exceptions false})))
+      (testing "update user: cannot update active if not admin"
+        (test-http
+         {:status 403
+          :body (js {:errors [{:detail "only admins can enable or disable an user"}]})}
+         (client/post (str meuse-url "/api/v1/meuse/user/integration2")
+                      {:headers {"Authorization" integration2-token}
+                       :content-type :json
+                       :body (js {:active false})
+                       :throw-exceptions false})))
+      (testing "update user: cannot update another user"
+        (test-http
+         {:status 403
+          :body (js {:errors [{:detail "bad permissions"}]})}
+         (client/post (str meuse-url "/api/v1/meuse/user/integration")
+                      {:headers {"Authorization" integration2-token}
+                       :body (js {:description "foo"})
+                       :content-type :json
+                       :throw-exceptions false})))
       ;; create token
       (testing "creating token: success"
         (test-http

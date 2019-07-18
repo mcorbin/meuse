@@ -19,10 +19,37 @@
   [request]
   (params/validate-params request ::delete)
   (auth-request/admin?-throw request)
-  (info "delete user" (get-in request [:body :name]))
+  (info "delete user" (get-in request [:route-params :name]))
   (db-user/delete (:database request)
                   (get-in request [:route-params :name]))
   {:status 200
    :body {:ok true}})
+
+
+(defmethod meuse-api! :update-user
+  [request]
+  (params/validate-params request ::update)
+  (auth-request/admin-or-tech?-throw request)
+  (let [user-name (get-in request [:route-params :name])
+        fields (:body request)]
+    (when (and (not (auth-request/admin? request))
+               (contains? fields :role))
+      (throw (ex-info "only admins can update an user role"
+                      {:status 403})))
+    (when (and (not (auth-request/admin? request))
+               (contains? fields :active))
+      (throw (ex-info "only admins can enable or disable an user"
+                      {:status 403})))
+    (when (and (not (auth-request/admin? request))
+               (not= (auth-request/user-name request)
+                     user-name))
+      (throw (ex-info "bad permissions"
+                      {:status 403})))
+    (info "update user" user-name)
+    (db-user/update-user (:database request)
+                         user-name
+                         fields)
+    {:status 200
+     :body {:ok true}}))
 
 

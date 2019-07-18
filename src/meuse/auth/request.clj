@@ -32,6 +32,10 @@
   [request]
   (get-in request [:auth :user-id]))
 
+(defn user-name
+  [request]
+  (get-in request [:auth :user-name]))
+
 (defn admin?
   [request]
   (= "admin" (get-in request [:auth :role-name])))

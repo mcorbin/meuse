@@ -92,9 +92,7 @@
                           (update-user database
                                        "mathieu"
                                        {:description "new"
-                                        :role "doesnotexist"
-                                        }))))
-  )
+                                        :role "doesnotexist"})))))
 
 
 

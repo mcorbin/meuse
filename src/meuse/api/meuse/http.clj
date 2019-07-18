@@ -11,6 +11,7 @@
    [#"/category/?" :crate-name] {:delete ::delete-category}
    #"/user/?" {:post ::new-user}
    [#"/user/?" :name] {:delete ::delete-user}
+   [#"/user/?" :name] {:post ::update-user}
    #"/token/?" {:post ::create-token}
    #"/token/?" {:get ::list-token}
    [#"/token/?"] {:delete ::delete-token}})
