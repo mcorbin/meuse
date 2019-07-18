@@ -94,5 +94,14 @@
                                        {:description "new"
                                         :role "doesnotexist"})))))
 
-
-
+(deftest get-users-test
+  (let [users (get-users database)
+        user1 (by-name database "user1")]
+    (is (= 5 (count users)))
+    (is (= {:name "user1"
+            :role "admin"
+            :description "desc1"
+            :active true
+            :id (:user-id user1)}
+           (-> (filter #(= (:name %) "user1") users)
+               first)))))

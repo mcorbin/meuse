@@ -10,6 +10,7 @@
   {#"/category/?" {:post ::new-category}
    [#"/category/?" :crate-name] {:delete ::delete-category}
    #"/user/?" {:post ::new-user}
+   #"/user/?" {:get ::list-users}
    [#"/user/?" :name] {:delete ::delete-user}
    [#"/user/?" :name] {:post ::update-user}
    #"/token/?" {:post ::create-token}

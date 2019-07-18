@@ -86,6 +86,39 @@
                                               {:user "integration_not_active"
                                                :validity 10
                                                :name "integration_token_na"})]
+    ;; list users
+    (testing "list users: success"
+      (let [response (client/get (str meuse-url "/api/v1/meuse/user")
+                               {:headers {"Authorization" token}
+                                :content-type :json
+                                :throw-exceptions false})
+            body (json/parse-string (:body response) true)
+            user1 (-> (filter #(= (:name %) "user1") body)
+                      first)]
+        (is (= 200 (:status response)))
+        (is (= 8 (count body)))
+        (is (= {:name "user1"
+                :role "admin"
+                :description "desc1"
+                :active true}
+               (dissoc user1 :id)))
+        (is (string? (:id user1)))))
+    (testing "list users: bad permissions"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "bad permissions"}]})}
+       (client/get (str meuse-url "/api/v1/meuse/user")
+                   {:headers {"Authorization" integration-token}
+                    :content-type :json
+                    :throw-exceptions false})))
+    (testing "list users: invalid token"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "invalid token"}]})}
+       (client/get (str meuse-url "/api/v1/meuse/user")
+                   {:headers {"Authorization" "lol"}
+                     :content-type :json
+                     :throw-exceptions false})))
     ;; create user
     (testing "creating user: auth issue"
       (test-http

@@ -92,3 +92,13 @@
       (throw (ex-info (format "the user %s does not exist"
                               user-name)
                       {:status 400})))))
+
+(defn get-users
+  "get all existing users"
+  [database]
+  (->> (jdbc/query database (user-queries/get-users-join-role))
+       (map #(clojure.set/rename-keys % {:user_id :id
+                                         :user_name :name
+                                         :user_description :description
+                                         :user_active :active
+                                         :role_name :role}))))

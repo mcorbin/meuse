@@ -25,7 +25,6 @@
   {:status 200
    :body {:ok true}})
 
-
 (defmethod meuse-api! :update-user
   [request]
   (params/validate-params request ::update)
@@ -51,5 +50,11 @@
                          fields)
     {:status 200
      :body {:ok true}}))
+
+(defmethod meuse-api! :list-users
+  [request]
+  (auth-request/admin?-throw request)
+  {:status 200
+   :body (db-user/get-users (:database request))})
 
 

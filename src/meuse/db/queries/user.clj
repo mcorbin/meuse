@@ -16,6 +16,17 @@
       (h/where where-clause)
       sql/format))
 
+(defn get-users-join-role
+  []
+  (-> (h/select [:u.id "user_id"]
+                [:u.name "user_name"]
+                [:u.description "user_description"]
+                [:u.active "user_active"]
+                [:r.name "role_name"])
+      (h/from [:users :u])
+      (h/join [:roles :r] [:= :u.role_id :r.id])
+      sql/format))
+
 (defn by-name
   [user-name]
   (get-user [:= :u.name user-name]))

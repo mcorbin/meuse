@@ -130,16 +130,18 @@
 
 (deftest update-user-test
   (testing "success: update by admin"
-    (meuse-api! (add-auth {:database database
-                           :action :update-user
-                           :route-params {:name "user3"}
-                           :body {:description "foo"
-                                  :active false
-                                  :role "admin"
-                                  :name "new_name" ;; does not work
-                                  :password "new_password"}}
-                          "user1"
-                          "admin"))
+    (is (= {:status 200
+            :body {:ok true}}
+           (meuse-api! (add-auth {:database database
+                                  :action :update-user
+                                  :route-params {:name "user3"}
+                                  :body {:description "foo"
+                                         :active false
+                                         :role "admin"
+                                         :name "new_name" ;; does not work
+                                         :password "new_password"}}
+                                 "user1"
+                                 "admin"))))
     (let [user-db (user-db/by-name database "user3")
           admin-role (role-db/get-admin-role database)]
       (is (password/check "new_password" (:user-password user-db)))
@@ -208,4 +210,29 @@
                                 :route-params {:name "user2"}
                                 :body {:active "lol"}}
                                "user2"
+                               "tech"))))))
+
+(deftest list-users-test
+  (testing "list users: success"
+    (let [result (meuse-api! (add-auth {:database database
+                                        :action :list-users}
+                                       "user1"
+                                       "admin"))
+          user1 (user-db/by-name database "user1")]
+      (is (= 200 (:status result)))
+      (is (= 5 (count (:body result))))
+      (is (= {:name "user1"
+              :role "admin"
+              :description "desc1"
+              :active true
+              :id (:user-id user1)}
+             (-> (filter #(= (:name %) "user1") (:body result))
+                 first)))))
+  (testing "list users: not admin"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"bad permissions"
+         (meuse-api! (add-auth {:database database
+                                :action :list-users}
+                               "user1"
                                "tech"))))))
