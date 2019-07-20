@@ -33,3 +33,11 @@
        (map #(clojure.set/rename-keys % {:category_id :category-id
                                          :category_name :category-name
                                          :category_description :category-description}))))
+
+(defn get-categories
+  "get all categories"
+  [database]
+  (->> (jdbc/query database (queries/get-categories))
+       (map #(clojure.set/rename-keys % {:category_id :category-id
+                                         :category_name :category-name
+                                         :category_description :category-description}))))

@@ -44,3 +44,35 @@
                                        :description "the description"}}
                                "user2"
                                "tech"))))))
+
+(deftest get-categories-test
+  (testing "success"
+    (let [request (add-auth {:database database
+                             :action :list-categories}
+                            "user1"
+                            "tech")
+          {:keys [status body]} (meuse-api! request)
+          categories (:categories body)
+          email (-> (filter #(= "email" (:name %)) categories)
+                    first)
+          system (-> (filter #(= "system" (:name %)) categories)
+                     first)]
+      (is (= status 200))
+      (is (= 2 (count categories)))
+      (is (uuid? (:id system)))
+      (is (= (dissoc system :id)
+             {:name "system"
+              :description "the system category"}))
+      (is (uuid? (:id email)))
+      (is (= (dissoc email :id)
+             {:name "email"
+              :description "the email category"}))))
+  (testing "bad permissions"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"bad permissions"
+         (meuse-api! {:database database
+                      :action :list-categories
+                      :body {:name "foo"
+                             :description "the description"}})))))
+

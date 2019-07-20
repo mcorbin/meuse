@@ -16,4 +16,15 @@
   {:status 200
    :body {:ok true}})
 
+(defmethod meuse-api! :list-categories
+  [request]
+  (auth-request/admin-or-tech?-throw request)
+  (info "get categories")
+  {:status 200
+   :body {:categories (->> (db-category/get-categories (:database request))
+                           (map #(clojure.set/rename-keys
+                                  % {:category-id :id
+                                     :category-name :name
+                                     :category-description :description})))}})
+
 

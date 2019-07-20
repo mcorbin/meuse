@@ -12,6 +12,14 @@
       (h/where where-clause)
       sql/format))
 
+(defn get-categories
+  []
+  (-> (h/select [:c.id "category_id"]
+                [:c.name "category_name"]
+                [:c.description "category_description"])
+      (h/from [:categories :c])
+      sql/format))
+
 (defn by-name
   [category-name]
   (get-category [:= :c.name category-name]))

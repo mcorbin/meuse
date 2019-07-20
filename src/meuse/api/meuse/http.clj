@@ -8,6 +8,7 @@
 
 (def meuse-routes
   {#"/category/?" {:post ::new-category}
+   #"/category/?" {:get ::list-categories}
    [#"/category/?" :crate-name] {:delete ::delete-category}
    #"/user/?" {:post ::new-user}
    #"/user/?" {:get ::list-users}

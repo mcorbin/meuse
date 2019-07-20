@@ -23,17 +23,18 @@
     (is (= "cat2" (:category-name category)))
     (is (= "another category" (:category-description category)))))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(deftest get-categories-test
+  (let [result (get-categories database)
+        email (-> (filter #(= "email" (:category-name %)) result)
+                  first)
+        system (-> (filter #(= "system" (:category-name %)) result)
+                   first)]
+    (is (= 2 (count result)))
+    (is (uuid? (:category-id system)))
+    (is (= (dissoc system :category-id)
+           {:category-name "system"
+            :category-description "the system category"}))
+    (is (uuid? (:category-id email)))
+    (is (= (dissoc email :category-id)
+           {:category-name "email"
+            :category-description "the email category"}))))
