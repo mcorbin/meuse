@@ -92,11 +92,11 @@
                                {:headers {"Authorization" token}
                                 :content-type :json
                                 :throw-exceptions false})
-            body (json/parse-string (:body response) true)
-            user1 (-> (filter #(= (:name %) "user1") body)
+            users (:users (json/parse-string (:body response) true))
+            user1 (-> (filter #(= (:name %) "user1") users)
                       first)]
         (is (= 200 (:status response)))
-        (is (= 8 (count body)))
+        (is (= 8 (count users)))
         (is (= {:name "user1"
                 :role "admin"
                 :description "desc1"

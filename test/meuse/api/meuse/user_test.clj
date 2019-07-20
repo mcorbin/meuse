@@ -218,15 +218,16 @@
                                         :action :list-users}
                                        "user1"
                                        "admin"))
+          users (get-in result [:body :users])
           user1 (user-db/by-name database "user1")]
       (is (= 200 (:status result)))
-      (is (= 5 (count (:body result))))
+      (is (= 5 (count users)))
       (is (= {:name "user1"
               :role "admin"
               :description "desc1"
               :active true
               :id (:user-id user1)}
-             (-> (filter #(= (:name %) "user1") (:body result))
+             (-> (filter #(= (:name %) "user1") users)
                  first)))))
   (testing "list users: not admin"
     (is (thrown-with-msg?

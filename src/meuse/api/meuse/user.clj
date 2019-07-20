@@ -55,6 +55,4 @@
   [request]
   (auth-request/admin?-throw request)
   {:status 200
-   :body (db-user/get-users (:database request))})
-
-
+   :body {:users (db-user/get-users (:database request))}})
