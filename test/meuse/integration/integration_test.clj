@@ -89,9 +89,9 @@
     ;; list users
     (testing "list users: success"
       (let [response (client/get (str meuse-url "/api/v1/meuse/user")
-                               {:headers {"Authorization" token}
-                                :content-type :json
-                                :throw-exceptions false})
+                                 {:headers {"Authorization" token}
+                                  :content-type :json
+                                  :throw-exceptions false})
             users (:users (json/parse-string (:body response) true))
             user1 (-> (filter #(= (:name %) "user1") users)
                       first)]
@@ -117,8 +117,8 @@
         :body (js {:errors [{:detail "invalid token"}]})}
        (client/get (str meuse-url "/api/v1/meuse/user")
                    {:headers {"Authorization" "lol"}
-                     :content-type :json
-                     :throw-exceptions false})))
+                    :content-type :json
+                    :throw-exceptions false})))
     ;; create user
     (testing "creating user: auth issue"
       (test-http
@@ -192,274 +192,274 @@
                                 :name "integration"
                                 :active true
                                 :role "tech"})
-                     :throw-exceptions false}))
-      ;; delete user
-      (testing "creating user: success"
-        (test-http
-         {:status 200
-          :body (js {:ok true})}
-         (client/post (str meuse-url "/api/v1/meuse/user")
+                     :throw-exceptions false})))
+    ;; delete user
+    (testing "creating user: success"
+      (test-http
+       {:status 200
+        :body (js {:ok true})}
+       (client/post (str meuse-url "/api/v1/meuse/user")
+                    {:headers {"Authorization" token}
+                     :content-type :json
+                     :body (js {:description "integration test user"
+                                :password "azertyui"
+                                :name "integration_deleted"
+                                :active true
+                                :role "tech"})
+                     :throw-exceptions false})))
+    (testing "deleting user: success"
+      (test-http
+       {:status 200
+        :body (js {:ok true})}
+       (client/delete (str meuse-url "/api/v1/meuse/user/integration_deleted")
                       {:headers {"Authorization" token}
                        :content-type :json
-                       :body (js {:description "integration test user"
-                                  :password "azertyui"
-                                  :name "integration_deleted"
-                                  :active true
-                                  :role "tech"})
                        :throw-exceptions false})))
-      (testing "deleting user: success"
-        (test-http
-         {:status 200
-          :body (js {:ok true})}
-         (client/delete (str meuse-url "/api/v1/meuse/user/integration_deleted")
-                        {:headers {"Authorization" token}
-                         :content-type :json
-                         :throw-exceptions false})))
-      (testing "deleting user: not admin"
-        (test-http
-         {:status 403
-          :body (js {:errors [{:detail "bad permissions"}]})}
-         (client/delete (str meuse-url "/api/v1/meuse/user/integration_deleted")
-                        {:headers {"Authorization" integration-token}
-                         :content-type :json
-                         :throw-exceptions false})))
-      (testing "deleting user: invalid token"
-        (test-http
-         {:status 403
-          :body (js {:errors [{:detail "invalid token"}]})}
-         (client/delete (str meuse-url "/api/v1/meuse/user/integration_deleted")
-                        {:headers {"Authorization" (str integration-token "A")}
-                         :content-type :json
-                         :throw-exceptions false})))
-      ;; update user
-      (testing "update user by admin: success"
-        (test-http
-         {:status 200
-          :body (js {:ok true})}
-         (client/post (str meuse-url "/api/v1/meuse/user/integration2")
-                      {:headers {"Authorization" token}
-                       :content-type :json
-                       :body (js {:description "integration test user"
-                                  :password "new_password"
-                                  :active true
-                                  :role "admin"})
-                       :throw-exceptions false})))
-      (testing "update user by admin: success"
-        (test-http
-         {:status 200
-          :body (js {:ok true})}
-         (client/post (str meuse-url "/api/v1/meuse/user/integration2")
-                      {:headers {"Authorization" token}
-                       :content-type :json
-                       :body (js {:description "integration test user update"
-                                  :password "new_password"
-                                  :active true
-                                  :role "tech"})
-                       :throw-exceptions false})))
-      (testing "update user by itself (not admin): success"
-        (test-http
-         {:status 200
-          :body (js {:ok true})}
-         (client/post (str meuse-url "/api/v1/meuse/user/integration2")
-                      {:headers {"Authorization" integration2-token}
-                       :content-type :json
-                       :body (js {:description "integration test user update2"
-                                  :password "new_password2"})
-                       :throw-exceptions false})))
-      (testing "update user: invalid token"
-        (test-http
-         {:status 403
-          :body (js {:errors [{:detail "invalid token"}]})}
-         (client/post (str meuse-url "/api/v1/meuse/user/integration2")
-                      {:headers {"Authorization" (str integration2-token "A")}
+    (testing "deleting user: not admin"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "bad permissions"}]})}
+       (client/delete (str meuse-url "/api/v1/meuse/user/integration_deleted")
+                      {:headers {"Authorization" integration-token}
                        :content-type :json
                        :throw-exceptions false})))
-      (testing "update user: cannot update a role if not admin"
-        (test-http
-         {:status 403
-          :body (js {:errors [{:detail "only admins can update an user role"}]})}
-         (client/post (str meuse-url "/api/v1/meuse/user/integration2")
-                      {:headers {"Authorization" integration2-token}
-                       :content-type :json
-                       :body (js {:role "admin"})
-                       :throw-exceptions false})))
-      (testing "update user: cannot update active if not admin"
-        (test-http
-         {:status 403
-          :body (js {:errors [{:detail "only admins can enable or disable an user"}]})}
-         (client/post (str meuse-url "/api/v1/meuse/user/integration2")
-                      {:headers {"Authorization" integration2-token}
-                       :content-type :json
-                       :body (js {:active false})
-                       :throw-exceptions false})))
-      (testing "update user: cannot update another user"
-        (test-http
-         {:status 403
-          :body (js {:errors [{:detail "bad permissions"}]})}
-         (client/post (str meuse-url "/api/v1/meuse/user/integration")
-                      {:headers {"Authorization" integration2-token}
-                       :body (js {:description "foo"})
+    (testing "deleting user: invalid token"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "invalid token"}]})}
+       (client/delete (str meuse-url "/api/v1/meuse/user/integration_deleted")
+                      {:headers {"Authorization" (str integration-token "A")}
                        :content-type :json
                        :throw-exceptions false})))
-      ;; create token
-      (testing "creating token: success"
-        (test-http
-         {:status 200}
-         (client/post (str meuse-url "/api/v1/meuse/token/")
+    ;; update user
+    (testing "update user by admin: success"
+      (test-http
+       {:status 200
+        :body (js {:ok true})}
+       (client/post (str meuse-url "/api/v1/meuse/user/integration2")
+                    {:headers {"Authorization" token}
+                     :content-type :json
+                     :body (js {:description "integration test user"
+                                :password "new_password"
+                                :active true
+                                :role "admin"})
+                     :throw-exceptions false})))
+    (testing "update user by admin: success"
+      (test-http
+       {:status 200
+        :body (js {:ok true})}
+       (client/post (str meuse-url "/api/v1/meuse/user/integration2")
+                    {:headers {"Authorization" token}
+                     :content-type :json
+                     :body (js {:description "integration test user update"
+                                :password "new_password"
+                                :active true
+                                :role "tech"})
+                     :throw-exceptions false})))
+    (testing "update user by itself (not admin): success"
+      (test-http
+       {:status 200
+        :body (js {:ok true})}
+       (client/post (str meuse-url "/api/v1/meuse/user/integration2")
+                    {:headers {"Authorization" integration2-token}
+                     :content-type :json
+                     :body (js {:description "integration test user update2"
+                                :password "new_password2"})
+                     :throw-exceptions false})))
+    (testing "update user: invalid token"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "invalid token"}]})}
+       (client/post (str meuse-url "/api/v1/meuse/user/integration2")
+                    {:headers {"Authorization" (str integration2-token "A")}
+                     :content-type :json
+                     :throw-exceptions false})))
+    (testing "update user: cannot update a role if not admin"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "only admins can update an user role"}]})}
+       (client/post (str meuse-url "/api/v1/meuse/user/integration2")
+                    {:headers {"Authorization" integration2-token}
+                     :content-type :json
+                     :body (js {:role "admin"})
+                     :throw-exceptions false})))
+    (testing "update user: cannot update active if not admin"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "only admins can enable or disable an user"}]})}
+       (client/post (str meuse-url "/api/v1/meuse/user/integration2")
+                    {:headers {"Authorization" integration2-token}
+                     :content-type :json
+                     :body (js {:active false})
+                     :throw-exceptions false})))
+    (testing "update user: cannot update another user"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "bad permissions"}]})}
+       (client/post (str meuse-url "/api/v1/meuse/user/integration")
+                    {:headers {"Authorization" integration2-token}
+                     :body (js {:description "foo"})
+                     :content-type :json
+                     :throw-exceptions false})))
+    ;; create token
+    (testing "creating token: success"
+      (test-http
+       {:status 200}
+       (client/post (str meuse-url "/api/v1/meuse/token/")
+                    {:content-type :json
+                     :throw-exceptions false
+                     :body (js {:name "new token integration"
+                                :user "integration"
+                                :password "azertyui"
+                                :validity 10})})))
+    (testing "creating token: token already exists"
+      (test-http
+       {:status 400
+        :body (js {:errors [{:detail "a token named new token integration already exists for user integration"}]})}
+       (client/post (str meuse-url "/api/v1/meuse/token/")
+                    {:content-type :json
+                     :throw-exceptions false
+                     :body (js {:name "new token integration"
+                                :user "integration"
+                                :password "azertyui"
+                                :validity 10})})))
+    (testing "creating token: user does not exist"
+      (test-http
+       {:status 400
+        :body (js {:errors [{:detail "the user foofoofoo does not exist"}]})}
+       (client/post (str meuse-url "/api/v1/meuse/token/")
+                    {:content-type :json
+                     :throw-exceptions false
+                     :body (js {:name "new token integration"
+                                :user "foofoofoo"
+                                :password "azertyui"
+                                :validity 10})})))
+    (testing "creating token: invalid password"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "invalid password"}]})}
+       (client/post (str meuse-url "/api/v1/meuse/token/")
+                    {:content-type :json
+                     :throw-exceptions false
+                     :body (js {:name "new token integration"
+                                :user "integration"
+                                :password "invalidpassword"
+                                :validity 10})})))
+    (testing "creating token: user is not active"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "user is not active"}]})}
+       (client/post (str meuse-url "/api/v1/meuse/token/")
+                    {:content-type :json
+                     :throw-exceptions false
+                     :body (js {:name "new token integration"
+                                :user "integration_not_active"
+                                :password "azertyui"
+                                :validity 10})})))
+    ;; delete token
+    (testing "delete token: success"
+      (test-http
+       {:status 200}
+       (client/delete (str meuse-url "/api/v1/meuse/token/")
                       {:content-type :json
+                       :headers {"Authorization" integration-token}
                        :throw-exceptions false
                        :body (js {:name "new token integration"
-                                  :user "integration"
-                                  :password "azertyui"
-                                  :validity 10})})))
-      (testing "creating token: token already exists"
-        (test-http
-         {:status 400
-          :body (js {:errors [{:detail "a token named new token integration already exists for user integration"}]})}
-         (client/post (str meuse-url "/api/v1/meuse/token/")
+                                  :user "integration"})})))
+    (testing "delete token: an admin can delete a token for another account"
+      ;; first, recreate the token
+      (test-http
+       {:status 200}
+       (client/post (str meuse-url "/api/v1/meuse/token/")
+                    {:content-type :json
+                     :throw-exceptions false
+                     :body (js {:name "new token integration"
+                                :user "integration"
+                                :password "azertyui"
+                                :validity 10})}))
+      (test-http
+       {:status 200}
+       (client/delete (str meuse-url "/api/v1/meuse/token/")
                       {:content-type :json
+                       :headers {"Authorization" token}
                        :throw-exceptions false
                        :body (js {:name "new token integration"
-                                  :user "integration"
-                                  :password "azertyui"
-                                  :validity 10})})))
-      (testing "creating token: user does not exist"
-        (test-http
-         {:status 400
-          :body (js {:errors [{:detail "the user foofoofoo does not exist"}]})}
-         (client/post (str meuse-url "/api/v1/meuse/token/")
+                                  :user "integration"})})))
+    (testing "delete token: unauthorize"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "user integration cannot delete token for integration_not_active"}]})}
+       (client/delete (str meuse-url "/api/v1/meuse/token/")
                       {:content-type :json
+                       :headers {"Authorization" integration-token}
                        :throw-exceptions false
-                       :body (js {:name "new token integration"
-                                  :user "foofoofoo"
-                                  :password "azertyui"
-                                  :validity 10})})))
-      (testing "creating token: invalid password"
-        (test-http
-         {:status 403
-          :body (js {:errors [{:detail "invalid password"}]})}
-         (client/post (str meuse-url "/api/v1/meuse/token/")
-                      {:content-type :json
-                       :throw-exceptions false
-                       :body (js {:name "new token integration"
-                                  :user "integration"
-                                  :password "invalidpassword"
-                                  :validity 10})})))
-      (testing "creating token: user is not active"
-        (test-http
-         {:status 403
-          :body (js {:errors [{:detail "user is not active"}]})}
-         (client/post (str meuse-url "/api/v1/meuse/token/")
-                      {:content-type :json
-                       :throw-exceptions false
-                       :body (js {:name "new token integration"
+                       :body (js {:name "integration_token_na"
                                   :user "integration_not_active"
-                                  :password "azertyui"
-                                  :validity 10})})))
-      ;; delete token
-      (testing "delete token: success"
-        (test-http
-         {:status 200}
-         (client/delete (str meuse-url "/api/v1/meuse/token/")
-                        {:content-type :json
-                         :headers {"Authorization" integration-token}
-                         :throw-exceptions false
-                         :body (js {:name "new token integration"
-                                    :user "integration"})})))
-      (testing "delete token: an admin can delete a token for another account"
-        ;; first, recreate the token
-        (test-http
-         {:status 200}
-         (client/post (str meuse-url "/api/v1/meuse/token/")
+                                  })})))
+    (testing "delete token: the token does not exist"
+      (test-http
+       {:status 404
+        :body (js {:errors [{:detail "the token notfound does not exist for the user integration_not_active"}]})}
+       (client/delete (str meuse-url "/api/v1/meuse/token/")
                       {:content-type :json
+                       :headers {"Authorization" token}
                        :throw-exceptions false
-                       :body (js {:name "new token integration"
-                                  :user "integration"
-                                  :password "azertyui"
-                                  :validity 10})}))
+                       :body (js {:name "notfound"
+                                  :user "integration_not_active"
+                                  })})))
+    (testing "delete token: the user does not exist"
+      (test-http
+       {:status 404
+        :body (js {:errors [{:detail "the user notfound does not exist"}]})}
+       (client/delete (str meuse-url "/api/v1/meuse/token/")
+                      {:content-type :json
+                       :headers {"Authorization" token}
+                       :throw-exceptions false
+                       :body (js {:name "notfound"
+                                  :user "notfound"})})))
+    ;; list token
+    (testing "list tokens for the integration user"
+      (let [response (client/get (str meuse-url "/api/v1/meuse/token/")
+                                 {:content-type :json
+                                  :headers {"Authorization" integration-token}
+                                  :throw-exceptions false})
+            tokens (-> (:body response)
+                       (json/parse-string true)
+                       :tokens)]
         (test-http
          {:status 200}
-         (client/delete (str meuse-url "/api/v1/meuse/token/")
-                        {:content-type :json
-                         :headers {"Authorization" token}
-                         :throw-exceptions false
-                         :body (js {:name "new token integration"
-                                    :user "integration"})})))
-      (testing "delete token: unauthorize"
+         response)
+        (is (= 1 (count tokens)))
+        (is (string? (:id (first tokens))))
+        (is (= "integration_token_user" (:name (first tokens))))
+        (is (string? (:created-at (first tokens))))
+        (is (string? (:expired-at (first tokens))))
+        (is (= 4 (count (keys (first tokens)))))))
+    (testing "list tokens: admin can list tokens for another user"
+      (let [response (client/get (str meuse-url "/api/v1/meuse/token?user=integration")
+                                 {:content-type :json
+                                  :headers {"Authorization" token}
+                                  :throw-exceptions false})
+            tokens (-> (:body response)
+                       (json/parse-string true)
+                       :tokens)]
         (test-http
-         {:status 403
-          :body (js {:errors [{:detail "user integration cannot delete token for integration_not_active"}]})}
-         (client/delete (str meuse-url "/api/v1/meuse/token/")
-                        {:content-type :json
-                         :headers {"Authorization" integration-token}
-                         :throw-exceptions false
-                         :body (js {:name "integration_token_na"
-                                    :user "integration_not_active"
-                                    })})))
-      (testing "delete token: the token does not exist"
-        (test-http
-         {:status 404
-          :body (js {:errors [{:detail "the token notfound does not exist for the user integration_not_active"}]})}
-         (client/delete (str meuse-url "/api/v1/meuse/token/")
-                        {:content-type :json
-                         :headers {"Authorization" token}
-                         :throw-exceptions false
-                         :body (js {:name "notfound"
-                                    :user "integration_not_active"
-                                    })})))
-      (testing "delete token: the user does not exist"
-        (test-http
-         {:status 404
-          :body (js {:errors [{:detail "the user notfound does not exist"}]})}
-         (client/delete (str meuse-url "/api/v1/meuse/token/")
-                        {:content-type :json
-                         :headers {"Authorization" token}
-                         :throw-exceptions false
-                         :body (js {:name "notfound"
-                                    :user "notfound"})})))
-      ;; list token
-      (testing "list tokens for the integration user"
-        (let [response (client/get (str meuse-url "/api/v1/meuse/token/")
-                                   {:content-type :json
-                                    :headers {"Authorization" integration-token}
-                                    :throw-exceptions false})
-              tokens (-> (:body response)
-                         (json/parse-string true)
-                         :tokens)]
-          (test-http
-           {:status 200}
-           response)
-          (is (= 1 (count tokens)))
-          (is (string? (:id (first tokens))))
-          (is (= "integration_token_user" (:name (first tokens))))
-          (is (string? (:created-at (first tokens))))
-          (is (string? (:expired-at (first tokens))))
-          (is (= 4 (count (keys (first tokens)))))))
-      (testing "list tokens: admin can list tokens for another user"
-        (let [response (client/get (str meuse-url "/api/v1/meuse/token?user=integration")
-                                   {:content-type :json
-                                    :headers {"Authorization" token}
-                                    :throw-exceptions false})
-              tokens (-> (:body response)
-                         (json/parse-string true)
-                         :tokens)]
-          (test-http
-           {:status 200}
-           response)
-          (is (= 1 (count tokens)))
-          (is (string? (:id (first tokens))))
-          (is (= "integration_token_user" (:name (first tokens))))
-          (is (string? (:created-at (first tokens))))
-          (is (string? (:expired-at (first tokens))))
-          (is (= 4 (count (keys (first tokens)))))))
-      (testing "list tokens: no auth"
+         {:status 200}
+         response)
+        (is (= 1 (count tokens)))
+        (is (string? (:id (first tokens))))
+        (is (= "integration_token_user" (:name (first tokens))))
+        (is (string? (:created-at (first tokens))))
+        (is (string? (:expired-at (first tokens))))
+        (is (= 4 (count (keys (first tokens)))))))
+    (testing "list tokens: no auth"
       (test-http
        {:status 403
         :body (js {:errors [{:detail "token missing in the header"}]})}
        (client/get (str meuse-url "/api/v1/meuse/token")
                    {:content-type :json
                     :throw-exceptions false})))
-      (testing "list tokens: cannot list tokens for another user if non admin"
+    (testing "list tokens: cannot list tokens for another user if non admin"
       (test-http
        {:status 403
         :body (js {:errors [{:detail "bad permissions"}]})}
@@ -467,79 +467,29 @@
                    {:content-type :json
                     :headers {"Authorization" integration-token}
                     :throw-exceptions false})))
-      ;; categories
-      (testing "create categories: success"
-        (test-http
-         {:status 200
-          :body (js {:ok true})}
-         (client/post (str meuse-url "/api/v1/meuse/category/")
-                      {:content-type :json
-                       :headers {"Authorization" token}
-                       :throw-exceptions false
-                       :body (js {:name "new_category"
-                                  :description "category_description"})})))
-      (testing "create categories: error already exists"
-        (test-http
-         {:status 400
-          :body (js {:errors [{:detail "the category new_category already exists"}]})}
-         (client/post (str meuse-url "/api/v1/meuse/category/")
-                      {:content-type :json
-                       :headers {"Authorization" token}
-                       :throw-exceptions false
-                       :body (js {:name "new_category"
-                                  :description "category_description"})})))
-      (testing "create categories: not admin"
-        (test-http
-         {:status 403
-          :body (js {:errors [{:detail "bad permissions"}]})}
-         (client/post (str meuse-url "/api/v1/meuse/category/")
-                      {:content-type :json
-                       :headers {"Authorization" integration-token}
-                       :throw-exceptions false
-                       :body (js {:name "new_category"
-                                  :description "category_description"})}))))))
-
-(deftest ^:integration crate-api-integration-test
-  ;; create a token for an admin user
-  (let [token (token-db/create database {:user "user1"
-                                         :validity 10
-                                         :name "integration_token"})
-        _ (testing "creating user: success"
-            (test-http
-             {:status 200
-              :body (js {:ok true})}
-             (client/post (str meuse-url "/api/v1/meuse/user")
-                          {:headers {"Authorization" token}
-                           :content-type :json
-                           :body (js {:description "integration test user"
-                                      :password "azertyui"
-                                      :name "integration"
-                                      :active true
-                                      :role "tech"})
-                           :throw-exceptions false})))
-        _ (testing "creating user: not active"
-            (test-http
-             {:status 200
-              :body (js {:ok true})}
-             (client/post (str meuse-url "/api/v1/meuse/user")
-                          {:headers {"Authorization" token}
-                           :content-type :json
-                           :body (js {:description "integration test user not active"
-                                      :password "azertyui"
-                                      :name "integration_not_active"
-                                      :active false
-                                      :role "tech"})
-                           :throw-exceptions false})))
-        integration-token (token-db/create database
-                                           {:user "integration"
-                                            :validity 10
-                                            :name "integration_token_user"})
-        integration-na-token (token-db/create database
-                                              {:user "integration_not_active"
-                                               :validity 10
-                                               :name "integration_token_na"})]
-    ;; create crate
-    (testing "create a web category"
+    ;; list categories
+    (testing "list categories: success"
+      (let [response (client/get (str meuse-url "/api/v1/meuse/category")
+                                 {:content-type :json
+                                  :headers {"Authorization" token}
+                                  :throw-exceptions false})
+            categories (:categories (json/parse-string (:body response) true))
+            email (-> (filter #(= "email" (:name %)) categories)
+                    first)
+            system (-> (filter #(= "system" (:name %)) categories)
+                       first)]
+        (is (= 200 (:status response)))
+        (is (= 2 (count categories)))
+        (is (string? (:id system)))
+        (is (= (dissoc system :id)
+               {:name "system"
+                :description "the system category"}))
+        (is (string? (:id email)))
+        (is (= (dissoc email :id)
+               {:name "email"
+                :description "the email category"}))))
+    ;; create categories
+    (testing "create categories: success"
       (test-http
        {:status 200
         :body (js {:ok true})}
@@ -547,258 +497,329 @@
                     {:content-type :json
                      :headers {"Authorization" token}
                      :throw-exceptions false
-                     :body (js {:name "web"
+                     :body (js {:name "new_category"
                                 :description "category_description"})})))
-    (testing "publish a crate: success"
+    (testing "create categories: error already exists"
       (test-http
-       {:status 200
-        :body (js {:warning {:invalid_categories []
-                             :invalid_badges []
-                             :other []}})}
-       (client/put (str meuse-url "/api/v1/crates/new/")
-                   {:content-type :json
-                    :headers {"Authorization" token}
-                    :throw-exceptions false
-                    :body (:body (crate-test/create-publish-request
-                                  {:name "foo" :vers "1.10.2" :yanked false}
-                                  "crate file content"))})))
-    (testing "publish a crate: invalid semver"
+       {:status 400
+        :body (js {:errors [{:detail "the category new_category already exists"}]})}
+       (client/post (str meuse-url "/api/v1/meuse/category/")
+                    {:content-type :json
+                     :headers {"Authorization" token}
+                     :throw-exceptions false
+                     :body (js {:name "new_category"
+                                :description "category_description"})})))
+    (testing "create categories: not admin"
       (test-http
-       {:status 200
-        :body (js {:errors [{:detail "Wrong input parameters:\n - field vers: the value should be a valid semver string\n"}]})}
-       (client/put (str meuse-url "/api/v1/crates/new/")
-                   {:content-type :json
-                    :headers {"Authorization" token}
-                    :throw-exceptions false
-                    :body (:body (crate-test/create-publish-request
-                                  {:name "foo" :vers "1.10" :yanked false}
-                                  "crate file content"))})))
-    (testing "publish a crate: new version with category"
-      (test-http
-       {:status 200
-        :body (js {:warning {:invalid_categories []
-                             :invalid_badges []
-                             :other []}})}
-       (client/put (str meuse-url "/api/v1/crates/new/")
-                   {:content-type :json
-                    :headers {"Authorization" token}
-                    :throw-exceptions false
-                    :body (:body (crate-test/create-publish-request
-                                  {:name "foo"
-                                   :vers "1.10.3"
-                                   :yanked false
-                                   :categories ["web"]}
-                                  "crate file content"))})))
-    (testing "publish a crate: error: version already exists"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "release 1.10.3 for crate foo already exists"}]})}
-       (client/put (str meuse-url "/api/v1/crates/new/")
-                   {:content-type :json
-                    :headers {"Authorization" token}
-                    :throw-exceptions false
-                    :body (:body (crate-test/create-publish-request
-                                  {:name "foo"
-                                   :vers "1.10.3"
-                                   :yanked false
-                                   :categories ["web"]}
-                                  "crate file content"))})))
-    (testing "publish a crate: error: the user does not own the crate"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "the user does not own the crate"}]})}
-       (client/put (str meuse-url "/api/v1/crates/new/")
-                   {:content-type :json
-                    :headers {"Authorization" integration-token}
-                    :throw-exceptions false
-                    :body (:body (crate-test/create-publish-request
-                                  {:name "foo"
-                                   :vers "1.10.4"
-                                   :yanked false
-                                   :categories ["web"]}
-                                  "crate file content"))})))
-    ;; yank/unyank
-    (testing "yank a crate: success"
-      (test-http
-       {:status 200
-        :body (js {:ok true})}
-       (client/delete (str meuse-url "/api/v1/crates/foo/1.10.3/yank")
-                      {:content-type :json
-                       :headers {"Authorization" token}
-                       :throw-exceptions false})))
-    (testing "yank: error: already yank"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "cannot yank the crate: crate state is already yank"}]})}
-       (client/delete (str meuse-url "/api/v1/crates/foo/1.10.3/yank")
-                      {:content-type :json
-                       :headers {"Authorization" token}
-                       :throw-exceptions false})))
-    (testing "yank: error: does not own the crate"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "user does not own the crate foo"}]})}
-       (client/delete (str meuse-url "/api/v1/crates/foo/1.10.3/yank")
-                      {:content-type :json
-                       :headers {"Authorization" integration-token}
-                       :throw-exceptions false})))
-    (testing "yank: error: crate does not exist"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "cannot yank the crate: the crate does not exist"}]})}
-       (client/delete (str meuse-url "/api/v1/crates/bar/1.10.3/yank")
-                      {:content-type :json
-                       :headers {"Authorization" token}
-                       :throw-exceptions false})))
-    (testing "yank: error: version does not exist"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "cannot yank the crate: the version does not exist"}]})}
-       (client/delete (str meuse-url "/api/v1/crates/foo/3.10.3/yank")
-                      {:content-type :json
-                       :headers {"Authorization" token}
-                       :throw-exceptions false})))
-    (testing "unyank a crate: success"
-      (test-http
-       {:status 200
-        :body (js {:ok true})}
-       (client/put (str meuse-url "/api/v1/crates/foo/1.10.3/unyank")
-                   {:content-type :json
-                    :headers {"Authorization" token}
-                    :throw-exceptions false})))
-    ;; add/remove owner
-    (testing "add owner"
-      (test-http
-       {:status 200
-        :body (js {:ok true
-                   :msg "added user(s) integration as owner(s) of crate foo"})}
-       (client/put (str meuse-url "/api/v1/crates/foo/owners")
-                   {:content-type :json
-                    :headers {"Authorization" token}
-                    :throw-exceptions false
-                    :body (js {:users ["integration"]})})))
-    (testing "add owner: error: already owns the crate"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "the user integration already owns the crate foo"}]})}
-       (client/put (str meuse-url "/api/v1/crates/foo/owners")
-                   {:content-type :json
-                    :headers {"Authorization" token}
-                    :throw-exceptions false
-                    :body (js {:users ["integration"]})})))
-    (testing "remove owner"
-      (test-http
-       {:status 200
-        :body (js {:ok true
-                   :msg "removed user(s) integration as owner(s) of crate foo"})}
-       (client/delete (str meuse-url "/api/v1/crates/foo/owners")
+       {:status 403
+        :body (js {:errors [{:detail "bad permissions"}]})}
+       (client/post (str meuse-url "/api/v1/meuse/category/")
+                    {:content-type :json
+                     :headers {"Authorization" integration-token}
+                     :throw-exceptions false
+                     :body (js {:name "new_category"
+                                :description "category_description"})}))))
+
+  (deftest ^:integration crate-api-integration-test
+    ;; create a token for an admin user
+    (let [token (token-db/create database {:user "user1"
+                                           :validity 10
+                                           :name "integration_token"})
+          _ (testing "creating user: success"
+              (test-http
+               {:status 200
+                :body (js {:ok true})}
+               (client/post (str meuse-url "/api/v1/meuse/user")
+                            {:headers {"Authorization" token}
+                             :content-type :json
+                             :body (js {:description "integration test user"
+                                        :password "azertyui"
+                                        :name "integration"
+                                        :active true
+                                        :role "tech"})
+                             :throw-exceptions false})))
+          _ (testing "creating user: not active"
+              (test-http
+               {:status 200
+                :body (js {:ok true})}
+               (client/post (str meuse-url "/api/v1/meuse/user")
+                            {:headers {"Authorization" token}
+                             :content-type :json
+                             :body (js {:description "integration test user not active"
+                                        :password "azertyui"
+                                        :name "integration_not_active"
+                                        :active false
+                                        :role "tech"})
+                             :throw-exceptions false})))
+          integration-token (token-db/create database
+                                             {:user "integration"
+                                              :validity 10
+                                              :name "integration_token_user"})
+          integration-na-token (token-db/create database
+                                                {:user "integration_not_active"
+                                                 :validity 10
+                                                 :name "integration_token_na"})]
+      ;; create crate
+      (testing "create a web category"
+        (test-http
+         {:status 200
+          :body (js {:ok true})}
+         (client/post (str meuse-url "/api/v1/meuse/category/")
                       {:content-type :json
                        :headers {"Authorization" token}
                        :throw-exceptions false
-                       :body (js {:users ["integration"]})})))
-    (testing "remove owner: error: does not own the crate"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "the user integration does not own the crate foo"}]})}
-       (client/delete (str meuse-url "/api/v1/crates/foo/owners")
-                      {:content-type :json
-                       :headers {"Authorization" token}
-                       :throw-exceptions false
-                       :body (js {:users ["integration"]})})))
-    (testing "add owner: error: does not own the crate"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "user does not own the crate foo"}]})}
-       (client/put (str meuse-url "/api/v1/crates/foo/owners")
-                   {:content-type :json
-                    :headers {"Authorization" integration-token}
-                    :throw-exceptions false
-                    :body (js {:users ["integration"]})})))
-    (testing "add owner: error: the crate does not exist"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "the crate bar does not exist"}]})}
-       (client/put (str meuse-url "/api/v1/crates/bar/owners")
-                   {:content-type :json
-                    :headers {"Authorization" integration-token}
-                    :throw-exceptions false
-                    :body (js {:users ["integration"]})})))
-    (testing "add owner: error: the user does not exist"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "user does not own the crate foo"}]})}
-       (client/put (str meuse-url "/api/v1/crates/foo/owners")
-                   {:content-type :json
-                    :headers {"Authorization" integration-token}
-                    :throw-exceptions false
-                    :body (js {:users ["does not exist"]})})))
-    (testing "remove owner: error: does not own the crate"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "user does not own the crate foo"}]})}
-       (client/delete (str meuse-url "/api/v1/crates/foo/owners")
-                      {:content-type :json
-                       :headers {"Authorization" integration-token}
-                       :throw-exceptions false
-                       :body (js {:users ["integration"]})})))
-    (testing "remove owner: error: the crate does not exist"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "the crate bar does not exist"}]})}
-       (client/delete (str meuse-url "/api/v1/crates/bar/owners")
-                      {:content-type :json
-                       :headers {"Authorization" integration-token}
-                       :throw-exceptions false
-                       :body (js {:users ["integration"]})})))
-    (testing "remove owner: error: the user does not exist"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "user does not own the crate foo"}]})}
-       (client/delete (str meuse-url "/api/v1/crates/foo/owners")
-                      {:content-type :json
-                       :headers {"Authorization" integration-token}
-                       :throw-exceptions false
-                       :body (js {:users ["does not exist"]})})))
-    ;; search
-    (testing "search: success"
-      (test-http
-       {:status 200
-        :body (js {:crates [{:name "foo"
-                             :max_version "1.10.3"
-                             :description ""}]
-                   :meta {:total 1}})}
-       (client/get (str meuse-url "/api/v1/crates?q=foo")
-                      {:content-type :json
-                       :headers {"Authorization" integration-token}
-                       :throw-exceptions false})))
-    (testing "search: no query"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "Wrong input parameters:\n - field q missing in params\n"}]})}
-       (client/get (str meuse-url "/api/v1/crates")
-                      {:content-type :json
-                       :headers {"Authorization" integration-token}
-                       :throw-exceptions false})))
-    (testing "search: no auth"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "token missing in the header"}]})}
-       (client/get (str meuse-url "/api/v1/crates")
-                      {:content-type :json
-                       :throw-exceptions false})))
-    ;; download
-    (testing "download crate file"
-      (test-http
-       {:status 200
-        :body "crate file content"}
-       (client/get (str meuse-url "/api/v1/crates/foo/1.10.3/download")
-                   {:content-type :json
-                    :headers {"Authorization" integration-token}
-                    :throw-exceptions false})))
-    (testing "download crate file: no auth"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "token missing in the header"}]})}
-       (client/get (str meuse-url "/api/v1/crates/foo/1.10.3/download")
-                   {:content-type :json
-                    :throw-exceptions false})))))
+                       :body (js {:name "web"
+                                  :description "category_description"})})))
+      (testing "publish a crate: success"
+        (test-http
+         {:status 200
+          :body (js {:warning {:invalid_categories []
+                               :invalid_badges []
+                               :other []}})}
+         (client/put (str meuse-url "/api/v1/crates/new/")
+                     {:content-type :json
+                      :headers {"Authorization" token}
+                      :throw-exceptions false
+                      :body (:body (crate-test/create-publish-request
+                                    {:name "foo" :vers "1.10.2" :yanked false}
+                                    "crate file content"))})))
+      (testing "publish a crate: invalid semver"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "Wrong input parameters:\n - field vers: the value should be a valid semver string\n"}]})}
+         (client/put (str meuse-url "/api/v1/crates/new/")
+                     {:content-type :json
+                      :headers {"Authorization" token}
+                      :throw-exceptions false
+                      :body (:body (crate-test/create-publish-request
+                                    {:name "foo" :vers "1.10" :yanked false}
+                                    "crate file content"))})))
+      (testing "publish a crate: new version with category"
+        (test-http
+         {:status 200
+          :body (js {:warning {:invalid_categories []
+                               :invalid_badges []
+                               :other []}})}
+         (client/put (str meuse-url "/api/v1/crates/new/")
+                     {:content-type :json
+                      :headers {"Authorization" token}
+                      :throw-exceptions false
+                      :body (:body (crate-test/create-publish-request
+                                    {:name "foo"
+                                     :vers "1.10.3"
+                                     :yanked false
+                                     :categories ["web"]}
+                                    "crate file content"))})))
+      (testing "publish a crate: error: version already exists"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "release 1.10.3 for crate foo already exists"}]})}
+         (client/put (str meuse-url "/api/v1/crates/new/")
+                     {:content-type :json
+                      :headers {"Authorization" token}
+                      :throw-exceptions false
+                      :body (:body (crate-test/create-publish-request
+                                    {:name "foo"
+                                     :vers "1.10.3"
+                                     :yanked false
+                                     :categories ["web"]}
+                                    "crate file content"))})))
+      (testing "publish a crate: error: the user does not own the crate"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "the user does not own the crate"}]})}
+         (client/put (str meuse-url "/api/v1/crates/new/")
+                     {:content-type :json
+                      :headers {"Authorization" integration-token}
+                      :throw-exceptions false
+                      :body (:body (crate-test/create-publish-request
+                                    {:name "foo"
+                                     :vers "1.10.4"
+                                     :yanked false
+                                     :categories ["web"]}
+                                    "crate file content"))})))
+      ;; yank/unyank
+      (testing "yank a crate: success"
+        (test-http
+         {:status 200
+          :body (js {:ok true})}
+         (client/delete (str meuse-url "/api/v1/crates/foo/1.10.3/yank")
+                        {:content-type :json
+                         :headers {"Authorization" token}
+                         :throw-exceptions false})))
+      (testing "yank: error: already yank"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "cannot yank the crate: crate state is already yank"}]})}
+         (client/delete (str meuse-url "/api/v1/crates/foo/1.10.3/yank")
+                        {:content-type :json
+                         :headers {"Authorization" token}
+                         :throw-exceptions false})))
+      (testing "yank: error: does not own the crate"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "user does not own the crate foo"}]})}
+         (client/delete (str meuse-url "/api/v1/crates/foo/1.10.3/yank")
+                        {:content-type :json
+                         :headers {"Authorization" integration-token}
+                         :throw-exceptions false})))
+      (testing "yank: error: crate does not exist"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "cannot yank the crate: the crate does not exist"}]})}
+         (client/delete (str meuse-url "/api/v1/crates/bar/1.10.3/yank")
+                        {:content-type :json
+                         :headers {"Authorization" token}
+                         :throw-exceptions false})))
+      (testing "yank: error: version does not exist"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "cannot yank the crate: the version does not exist"}]})}
+         (client/delete (str meuse-url "/api/v1/crates/foo/3.10.3/yank")
+                        {:content-type :json
+                         :headers {"Authorization" token}
+                         :throw-exceptions false})))
+      (testing "unyank a crate: success"
+        (test-http
+         {:status 200
+          :body (js {:ok true})}
+         (client/put (str meuse-url "/api/v1/crates/foo/1.10.3/unyank")
+                     {:content-type :json
+                      :headers {"Authorization" token}
+                      :throw-exceptions false})))
+      ;; add/remove owner
+      (testing "add owner"
+        (test-http
+         {:status 200
+          :body (js {:ok true
+                     :msg "added user(s) integration as owner(s) of crate foo"})}
+         (client/put (str meuse-url "/api/v1/crates/foo/owners")
+                     {:content-type :json
+                      :headers {"Authorization" token}
+                      :throw-exceptions false
+                      :body (js {:users ["integration"]})})))
+      (testing "add owner: error: already owns the crate"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "the user integration already owns the crate foo"}]})}
+         (client/put (str meuse-url "/api/v1/crates/foo/owners")
+                     {:content-type :json
+                      :headers {"Authorization" token}
+                      :throw-exceptions false
+                      :body (js {:users ["integration"]})})))
+      (testing "remove owner"
+        (test-http
+         {:status 200
+          :body (js {:ok true
+                     :msg "removed user(s) integration as owner(s) of crate foo"})}
+         (client/delete (str meuse-url "/api/v1/crates/foo/owners")
+                        {:content-type :json
+                         :headers {"Authorization" token}
+                         :throw-exceptions false
+                         :body (js {:users ["integration"]})})))
+      (testing "remove owner: error: does not own the crate"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "the user integration does not own the crate foo"}]})}
+         (client/delete (str meuse-url "/api/v1/crates/foo/owners")
+                        {:content-type :json
+                         :headers {"Authorization" token}
+                         :throw-exceptions false
+                         :body (js {:users ["integration"]})})))
+      (testing "add owner: error: does not own the crate"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "user does not own the crate foo"}]})}
+         (client/put (str meuse-url "/api/v1/crates/foo/owners")
+                     {:content-type :json
+                      :headers {"Authorization" integration-token}
+                      :throw-exceptions false
+                      :body (js {:users ["integration"]})})))
+      (testing "add owner: error: the crate does not exist"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "the crate bar does not exist"}]})}
+         (client/put (str meuse-url "/api/v1/crates/bar/owners")
+                     {:content-type :json
+                      :headers {"Authorization" integration-token}
+                      :throw-exceptions false
+                      :body (js {:users ["integration"]})})))
+      (testing "add owner: error: the user does not exist"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "user does not own the crate foo"}]})}
+         (client/put (str meuse-url "/api/v1/crates/foo/owners")
+                     {:content-type :json
+                      :headers {"Authorization" integration-token}
+                      :throw-exceptions false
+                      :body (js {:users ["does not exist"]})})))
+      (testing "remove owner: error: does not own the crate"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "user does not own the crate foo"}]})}
+         (client/delete (str meuse-url "/api/v1/crates/foo/owners")
+                        {:content-type :json
+                         :headers {"Authorization" integration-token}
+                         :throw-exceptions false
+                         :body (js {:users ["integration"]})})))
+      (testing "remove owner: error: the crate does not exist"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "the crate bar does not exist"}]})}
+         (client/delete (str meuse-url "/api/v1/crates/bar/owners")
+                        {:content-type :json
+                         :headers {"Authorization" integration-token}
+                         :throw-exceptions false
+                         :body (js {:users ["integration"]})})))
+      (testing "remove owner: error: the user does not exist"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "user does not own the crate foo"}]})}
+         (client/delete (str meuse-url "/api/v1/crates/foo/owners")
+                        {:content-type :json
+                         :headers {"Authorization" integration-token}
+                         :throw-exceptions false
+                         :body (js {:users ["does not exist"]})})))
+      ;; search
+      (testing "search: success"
+        (test-http
+         {:status 200
+          :body (js {:crates [{:name "foo"
+                               :max_version "1.10.3"
+                               :description ""}]
+                     :meta {:total 1}})}
+         (client/get (str meuse-url "/api/v1/crates?q=foo")
+                     {:content-type :json
+                      :headers {"Authorization" integration-token}
+                      :throw-exceptions false})))
+      (testing "search: no query"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "Wrong input parameters:\n - field q missing in params\n"}]})}
+         (client/get (str meuse-url "/api/v1/crates")
+                     {:content-type :json
+                      :headers {"Authorization" integration-token}
+                      :throw-exceptions false})))
+      (testing "search: no auth"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "token missing in the header"}]})}
+         (client/get (str meuse-url "/api/v1/crates")
+                     {:content-type :json
+                      :throw-exceptions false})))
+      ;; download
+      (testing "download crate file"
+        (test-http
+         {:status 200
+          :body "crate file content"}
+         (client/get (str meuse-url "/api/v1/crates/foo/1.10.3/download")
+                     {:content-type :json
+                      :headers {"Authorization" integration-token}
+                      :throw-exceptions false})))
+      (testing "download crate file: no auth"
+        (test-http
+         {:status 200
+          :body (js {:errors [{:detail "token missing in the header"}]})}
+         (client/get (str meuse-url "/api/v1/crates/foo/1.10.3/download")
+                     {:content-type :json
+                      :throw-exceptions false}))))))

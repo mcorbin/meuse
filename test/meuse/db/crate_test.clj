@@ -16,7 +16,7 @@
   (let [crate {:name "test1"
                :vers "0.1.3"
                :yanked false}
-        {:keys [user-id]} (user-db/by-name database "user2")]
+        {:keys [^UUID user-id]} (user-db/by-name database "user2")]
     (create database crate user-id)
     (is (thrown-with-msg? ExceptionInfo
                           #"already exists$"
