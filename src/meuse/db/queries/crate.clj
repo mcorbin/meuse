@@ -43,3 +43,34 @@
       (h/values [[crate-id
                   (:name metadata)]])
       sql/format))
+
+(defn get-crates-and-versions
+  []
+  (-> (h/select [:c.id "crate_id"]
+                [:c.name "crate_name"]
+                [:v.id "version_id"]
+                [:v.version "version_version"]
+                [:v.description "version_description"]
+                [:v.yanked "version_yanked"]
+                [:v.created_at "version_created_at"]
+                [:v.updated_at "version_updated_at"])
+      (h/from [:crates :c])
+      (h/join [:crates_versions :v]
+              [:= :c.id :v.crate_id])
+      sql/format))
+
+(defn get-crate-and-versions
+  [crate-name]
+  (-> (h/select [:c.id "crate_id"]
+                [:c.name "crate_name"]
+                [:v.id "version_id"]
+                [:v.version "version_version"]
+                [:v.description "version_description"]
+                [:v.yanked "version_yanked"]
+                [:v.created_at "version_created_at"]
+                [:v.updated_at "version_updated_at"])
+      (h/from [:crates :c])
+      (h/join [:crates_versions :v]
+              [:= :c.id :v.crate_id])
+      (h/where [:= :c.name crate-name])
+      sql/format))

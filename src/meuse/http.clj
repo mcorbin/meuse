@@ -9,6 +9,7 @@
             [meuse.api.default :refer [default-api! not-found]]
             [meuse.api.meuse.http :as meuse-http]
             meuse.api.meuse.category
+            meuse.api.meuse.crate
             meuse.api.meuse.token
             meuse.api.meuse.user
             [meuse.auth.token :as auth-token]

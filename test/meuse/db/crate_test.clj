@@ -64,3 +64,38 @@
     (is (thrown-with-msg? ExceptionInfo
                             #"the category cat1 does not exist"
                             (create database crate user-id)))))
+
+(deftest get-crates-and-versions-test
+  (let [result (get-crates-and-versions database)
+        crate1 (first (filter #(and (= (:crate-name %) "crate1")
+                                    (= (:version-version %) "1.1.0"))
+                              result))]
+    (is (= 5 (count result)))
+    (is (uuid? (:crate-id crate1)))
+    (is (= (:crate-name crate1) "crate1"))
+    (is (uuid? (:version-id crate1)))
+    (is (= (:version-version crate1) "1.1.0"))
+    (is (= (:version-description crate1) "the crate1 description, this crate is for foobar"))
+    (is (not (:version-yanked crate1)))
+    (is (inst? (:version-created-at crate1)))
+    (is (inst? (:version-updated-at crate1)))))
+
+(deftest get-crate-and-versions-test
+  (testing "success"
+    (let [result (get-crate-and-versions database "crate1")
+          version1 (first (filter #(= (:version-version %) "1.1.0")
+                                  result))]
+      (is (= 3 (count result)))
+      (is (uuid? (:crate-id version1)))
+      (is (= (:crate-name version1) "crate1"))
+      (is (uuid? (:version-id version1)))
+      (is (= (:version-version version1) "1.1.0"))
+      (is (= (:version-description version1) "the crate1 description, this crate is for foobar"))
+      (is (not (:version-yanked version1)))
+      (is (inst? (:version-created-at version1)))
+      (is (inst? (:version-updated-at version1)))))
+  (testing "the crate does not exist"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"the crate doesnotexist does not exist"
+         (get-crate-and-versions database "doesnotexist")))))

@@ -9,13 +9,24 @@
             [clojure.tools.logging :refer [debug info error]])
   (:import java.util.UUID))
 
+(def db-renaming
+  {:crate_id :crate-id
+   :crate_name :crate-name
+   :version_id :version-id
+   :version_version :version-version
+   :version_description :version-description
+   :version_yanked :version-yanked
+   :version_created_at :version-created-at
+   :version_updated_at :version-updated-at
+   :version_document_vectors :version-document-vectors
+   :version_crate_id :version-crate-id})
+
 (defn by-name
   "Takes a crate name and returns the crate if it exists."
   [db-tx crate-name]
   (-> (jdbc/query db-tx (crate-queries/by-name crate-name))
       first
-      (clojure.set/rename-keys {:crate_id :crate-id
-                                :crate_name :crate-name})))
+      (clojure.set/rename-keys db-renaming)))
 
 (defn by-name-and-version
   "Takes a crate name and version and returns the crate version if it exists."
@@ -24,16 +35,24 @@
                          crate-name
                          crate-version))
       first
-      (clojure.set/rename-keys {:crate_id :crate-id
-                                :crate_name :crate-name
-                                :version_id :version-id
-                                :version_version :version-version
-                                :version_description :version-description
-                                :version_yanked :version-yanked
-                                :version_created_at :version-created-at
-                                :version_updated_at :version-updated-at
-                                :version_document_vectors :version-document-vectors
-                                :version_crate_id :version-crate-id})))
+      (clojure.set/rename-keys db-renaming)))
+
+(defn get-crates-and-versions
+  "Returns all crates with their versions."
+  [database]
+  (->> (jdbc/query database (crate-queries/get-crates-and-versions))
+       (map #(clojure.set/rename-keys % db-renaming))))
+
+(defn get-crate-and-versions
+  "Returns a crate with its versions"
+  [database crate-name]
+  (let [result (->> (jdbc/query database (crate-queries/get-crate-and-versions
+                                          crate-name))
+                    (map #(clojure.set/rename-keys % db-renaming)))]
+    (if (seq result)
+      result
+      (throw (ex-info (format "the crate %s does not exist" crate-name)
+                      {:status 403})))))
 
 (defn create
   "Creates a crate in the database."

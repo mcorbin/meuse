@@ -277,3 +277,11 @@
 
 (s/def :meuse.api.meuse.token/list
   (s/keys :opt-un [:meuse.api.meuse.token-list/params]))
+
+;; crate
+
+(s/def :meuse.api.meuse.crate/route-params
+  (s/keys :req-un [:crate/name]))
+
+(s/def :meuse.api.meuse.crate/get
+  (s/keys :req-un [:meuse.api.meuse.crate/route-params]))

@@ -9,14 +9,15 @@
 (def meuse-routes
   {#"/category/?" {:post ::new-category}
    #"/category/?" {:get ::list-categories}
-   [#"/category/?" :crate-name] {:delete ::delete-category}
    #"/user/?" {:post ::new-user}
    #"/user/?" {:get ::list-users}
    [#"/user/?" :name] {:delete ::delete-user}
    [#"/user/?" :name] {:post ::update-user}
    #"/token/?" {:post ::create-token}
    #"/token/?" {:get ::list-token}
-   [#"/token/?"] {:delete ::delete-token}})
+   [#"/token/?"] {:delete ::delete-token}
+   #"/crate/?" {:get ::list-crates}
+   [#"/crate/?" :name] {:get ::get-crate}})
 
 (defmulti meuse-api!
   "Handle meuse API calls"

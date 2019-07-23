@@ -5,6 +5,7 @@
             meuse.api.crate.search
             meuse.api.crate.yank
             meuse.api.meuse.category
+            meuse.api.meuse.crate
             meuse.api.meuse.token
             meuse.api.meuse.user
             [meuse.auth.token :as auth-token]
@@ -86,6 +87,50 @@
                                               {:user "integration_not_active"
                                                :validity 10
                                                :name "integration_token_na"})]
+    ;; list crates
+    (testing "list crates: success"
+      (let [response (client/get (str meuse-url "/api/v1/meuse/crate")
+                                 {:headers {"Authorization" integration-token}
+                                  :content-type :json
+                                  :throw-exceptions false})
+            crates (:crates (json/parse-string (:body response) true))
+            crate1 (first (filter #(= (:name %) "crate1") crates))
+            crate2 (first (filter #(= (:name %) "crate2") crates))
+            crate2 (first (filter #(= (:name %) "crate3") crates))]
+        (is (= 200 (:status response)))
+        (is (= (count crates) 3))
+        (is (= 3 (count (:versions crate1))))
+        (is (= 1 (count (:versions crate2))))
+        (is (= 1 (count (:versions crate2))))))
+    (testing "list crates: invalid token"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "invalid token"}]})}
+       (client/get (str meuse-url "/api/v1/meuse/crate")
+                   {:headers {"Authorization" (str token "A")}
+                    :content-type :json
+                    :throw-exceptions false})))
+    ;; get crate
+    (testing "get crate: success"
+      (let [response (client/get (str meuse-url "/api/v1/meuse/crate/crate1")
+                                 {:headers {"Authorization" integration-token}
+                                  :content-type :json
+                                  :throw-exceptions false})
+            crate (json/parse-string (:body response) true)]
+        (is (= 200 (:status response)))
+        (is (= (count (:versions crate)) 3))
+        (is (= #{"email" "system"} (set (map :category-name (:categories crate)))))
+        (is (= #{"the email category" "the system category"}
+               (set (map :category-description (:categories crate)))))
+        (mapv #(is (string? (:category-id %))) (:categories crate))))
+    (testing "get crate: invalid token"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "invalid token"}]})}
+       (client/get (str meuse-url "/api/v1/meuse/crate/crate1")
+                   {:headers {"Authorization" (str integration-token "B")}
+                    :content-type :json
+                    :throw-exceptions false})))
     ;; list users
     (testing "list users: success"
       (let [response (client/get (str meuse-url "/api/v1/meuse/user")
