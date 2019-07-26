@@ -99,3 +99,23 @@
          ExceptionInfo
          #"the crate doesnotexist does not exist"
          (get-crate-and-versions database "doesnotexist")))))
+
+(deftest get-crates-for-category-test
+  (testing "success"
+    (let [result (get-crates-for-category database "email")
+          version1 (first (filter #(= (:version-version %) "1.1.0")
+                                  result))]
+      (is (= 3 (count result)))
+      (is (uuid? (:crate-id version1)))
+      (is (= (:crate-name version1) "crate1"))
+      (is (uuid? (:version-id version1)))
+      (is (= (:version-version version1) "1.1.0"))
+      (is (= (:version-description version1) "the crate1 description, this crate is for foobar"))
+      (is (not (:version-yanked version1)))
+      (is (inst? (:version-created-at version1)))
+      (is (inst? (:version-updated-at version1)))))
+  (testing "the category does not exist"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"the category doesnotexist does not exist"
+         (get-crates-for-category database "doesnotexist")))))

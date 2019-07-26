@@ -158,18 +158,37 @@
           crates (:crates body)
           crate1 (first (filter #(= (:name %) "crate1") crates))
           crate2 (first (filter #(= (:name %) "crate2") crates))
-          crate2 (first (filter #(= (:name %) "crate3") crates))]
+          crate3 (first (filter #(= (:name %) "crate3") crates))]
       (is (= 200 status))
       (is (= (count crates) 3))
       (is (= 3 (count (:versions crate1))))
       (is (= 1 (count (:versions crate2))))
-      (is (= 1 (count (:versions crate2))))))
+      (is (= 1 (count (:versions crate3))))))
+  (testing "list for a category"
+    (let [{:keys [status body]} (meuse-api! (add-auth {:database database
+                                                       :params {:category "email"}
+                                                       :action :list-crates}
+                                                      "user1"
+                                                      "tech"))
+          crates (:crates body)
+          crate1 (first crates)]
+      (is (= 200 status))
+      (is (= "crate1" (:name crate1)))
+      (is (uuid? (:id crate1)))
+      (is (= 1 (count crates)))
+      (is (= 3 (count (:versions crate1))))))
   (testing "bad permissions"
     (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
          (meuse-api! {:action :list-crates
-                      :params {:user 1}
+                      :database database}))))
+  (testing "bad parameters"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"Wrong input parameters:\n - field category: the value should be a non empty string\n"
+         (meuse-api! {:action :list-crates
+                      :params {:category 1}
                       :database database})))))
 
 (deftest get-crate-test
@@ -186,9 +205,17 @@
       (is (= #{"the email category" "the system category"}
              (set (map :category-description (:categories body)))))
       (mapv #(is (uuid? (:category-id %))) (:categories body))))
+  (testing "bad parameters"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"Wrong input parameters:\n - field name: the value should be a non empty string\n"
+         (meuse-api! {:action :get-crate
+                      :route-params {:name 1}
+                      :database database}))))
   (testing "bad permissions"
     (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
          (meuse-api! {:action :get-crate
+                      :route-params {:name "crate1"}
                       :database database})))))

@@ -32,16 +32,20 @@
 
 (defmethod meuse-api! :list-crates
   [request]
+  (params/validate-params request ::list)
   (auth-request/admin-or-tech?-throw request)
   (info "list crates")
-  (let [crates (crate-db/get-crates-and-versions (:database request))]
+  (let [crates (if-let [category (get-in request [:params :category])]
+                 (crate-db/get-crates-for-category (:database request)
+                                                   category)
+                 (crate-db/get-crates-and-versions (:database request)))]
     {:status 200
      :body {:crates (format-crates crates)}}))
 
 (defmethod meuse-api! :get-crate
   [request]
-  (auth-request/admin-or-tech?-throw request)
   (params/validate-params request ::get)
+  (auth-request/admin-or-tech?-throw request)
   (let [crate-name (get-in request [:route-params :name])
         _ (info "get crate" crate-name)
         database (:database request)

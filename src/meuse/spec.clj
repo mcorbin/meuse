@@ -44,6 +44,7 @@
 ;; category
 
 (s/def :category/name ::non-empty-string)
+(s/def :category/category :category/name)
 (s/def :category/description ::non-empty-string)
 
 ;; config
@@ -285,3 +286,9 @@
 
 (s/def :meuse.api.meuse.crate/get
   (s/keys :req-un [:meuse.api.meuse.crate/route-params]))
+
+(s/def :meuse.api.meuse.crate/params
+  (s/keys :opt-un [:category/category]))
+
+(s/def :meuse.api.meuse.crate/list
+  (s/keys :opt-un [:meuse.api.meuse.crate/params]))

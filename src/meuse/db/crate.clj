@@ -1,6 +1,6 @@
 (ns meuse.db.crate
   "Manages crates in the database."
-  (:require [meuse.db.category :as category]
+  (:require [meuse.db.category :as category-db]
             [meuse.db.crate-category :as crate-category]
             [meuse.db.queries.crate :as crate-queries]
             [meuse.db.queries.crate-user :as crate-user-queries]
@@ -53,6 +53,17 @@
       result
       (throw (ex-info (format "the crate %s does not exist" crate-name)
                       {:status 403})))))
+
+(defn get-crates-for-category
+  "Returns crates from a category."
+  [database category-name]
+  (jdbc/with-db-transaction [db-tx database]
+    (if-let [category (category-db/by-name db-tx category-name)]
+      (->> (jdbc/query database (crate-queries/get-crates-for-category
+                                 (:category-id category)))
+           (map #(clojure.set/rename-keys % db-renaming)))
+      (throw (ex-info (format "the category %s does not exist" category-name)
+                      {})))))
 
 (defn create
   "Creates a crate in the database."

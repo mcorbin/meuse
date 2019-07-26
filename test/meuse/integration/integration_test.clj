@@ -102,6 +102,18 @@
         (is (= 3 (count (:versions crate1))))
         (is (= 1 (count (:versions crate2))))
         (is (= 1 (count (:versions crate2))))))
+    (testing "list crates: category"
+      (let [response (client/get (str meuse-url "/api/v1/meuse/crate?category=email")
+                                 {:headers {"Authorization" integration-token}
+                                  :content-type :json
+                                  :throw-exceptions false})
+            crates (:crates (json/parse-string (:body response) true))
+            crate1 (first crates)]
+        (is (= 200 (:status response)))
+        (is (= 1 (count crates)))
+        (is (string? (:id crate1)))
+        (is (= "crate1" (:name crate1)))
+        (is (= 3 (count (:versions crate1))))))
     (testing "list crates: invalid token"
       (test-http
        {:status 403

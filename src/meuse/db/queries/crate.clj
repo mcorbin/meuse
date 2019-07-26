@@ -74,3 +74,22 @@
               [:= :c.id :v.crate_id])
       (h/where [:= :c.name crate-name])
       sql/format))
+
+(defn get-crates-for-category
+  [category-id]
+  (-> (h/select [:c.id "crate_id"]
+                [:c.name "crate_name"]
+                [:v.id "version_id"]
+                [:v.version "version_version"]
+                [:v.description "version_description"]
+                [:v.yanked "version_yanked"]
+                [:v.created_at "version_created_at"]
+                [:v.updated_at "version_updated_at"])
+      (h/from [:crates :c])
+      (h/join [:crates_versions :v]
+              [:= :c.id :v.crate_id]
+              [:crates_categories :cat]
+              [:= :cat.crate_id :c.id])
+      (h/where [:= :cat.category_id category-id])
+      sql/format))
+
