@@ -41,3 +41,14 @@
        (map #(clojure.set/rename-keys % {:category_id :category-id
                                          :category_name :category-name
                                          :category_description :category-description}))))
+
+(defn update-category
+  "update a category"
+  [database category-name fields]
+  (jdbc/with-db-transaction [db-tx database]
+    (if-let [category (by-name db-tx category-name)]
+      (jdbc/execute! db-tx (queries/update-category (:category-id category)
+                                                    fields))
+      (throw (ex-info (format "the category %s does not exist"
+                              category-name)
+                      {:status 404})))))

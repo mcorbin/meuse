@@ -224,6 +224,17 @@
 (s/def :meuse.api.meuse.category/new
   (s/keys :req-un [:meuse.api.meuse.category/body]))
 
+(s/def :meuse.api.meuse.category-update/route-params
+  (s/keys :req-un [:category/name]))
+
+(s/def :meuse.api.meuse.category-update/body
+  (s/keys :opt-un [:category/name
+                   :category/description]))
+
+(s/def :meuse.api.meuse.category/update
+  (s/keys :req-un [:meuse.api.meuse.category-update/route-params
+                   :meuse.api.meuse.category-update/body]))
+
 ;; user
 
 (s/def :meuse.api.meuse.user-new/body

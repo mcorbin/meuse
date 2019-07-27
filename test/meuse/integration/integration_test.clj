@@ -575,8 +575,36 @@
                      :headers {"Authorization" integration-token}
                      :throw-exceptions false
                      :body (js {:name "new_category"
-                                :description "category_description"})}))))
-
+                                :description "category_description"})})))
+    ;; update category
+    (testing "update category: success"
+      (test-http
+       {:status 200
+        :body (js {:ok true})}
+       (client/post (str meuse-url "/api/v1/meuse/category/new_category")
+                    {:content-type :json
+                     :headers {"Authorization" token}
+                     :throw-exceptions false
+                     :body (js {:name "new_name"
+                                :description "new_description"})})))
+    (testing "update category: not admin"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "bad permissions"}]})}
+       (client/post (str meuse-url "/api/v1/meuse/category/new_name")
+                    {:content-type :json
+                     :headers {"Authorization" integration-token}
+                     :throw-exceptions false
+                     :body (js {:name "new_category"
+                                :description "category_description"})})))
+    (testing "update category: invalid parameters"
+      (test-http
+       {:status 400
+        :body (js {:errors [{:detail "Wrong input parameters:\n - field body is incorrect\n"}]})}
+       (client/post (str meuse-url "/api/v1/meuse/category/new_name")
+                    {:content-type :json
+                     :headers {"Authorization" token}
+                     :throw-exceptions false}))))
   (deftest ^:integration crate-api-integration-test
     ;; create a token for an admin user
     (let [token (token-db/create database {:user "user1"

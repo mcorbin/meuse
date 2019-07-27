@@ -9,6 +9,7 @@
 (def meuse-routes
   {#"/category/?" {:post ::new-category}
    #"/category/?" {:get ::list-categories}
+   [#"/category/?" :name] {:post ::update-category}
    #"/user/?" {:post ::new-user}
    #"/user/?" {:get ::list-users}
    [#"/user/?" :name] {:delete ::delete-user}
@@ -17,6 +18,7 @@
    #"/token/?" {:get ::list-token}
    [#"/token/?"] {:delete ::delete-token}
    #"/crate/?" {:get ::list-crates}
+   #"/crate/check/?" {:get ::check-crates}
    [#"/crate/?" :name] {:get ::get-crate}})
 
 (defmulti meuse-api!

@@ -47,3 +47,9 @@
                   description]])
       sql/format))
 
+(defn update-category
+  [category-id fields]
+  (-> (h/update :categories)
+      (h/sset fields)
+      (h/where [:= :id category-id])
+      sql/format))

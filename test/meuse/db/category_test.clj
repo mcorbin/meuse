@@ -38,3 +38,20 @@
     (is (= (dissoc email :category-id)
            {:category-name "email"
             :category-description "the email category"}))))
+
+(deftest update-category-test
+  (testing "success"
+    (update-category database "email" {:name "music"
+                                       :description "music description"})
+    (let [categories (get-categories database)
+          music (-> (filter #(= "music" (:category-name %)) categories)
+                    first)]
+      (is (= "music description" (:category-description music)))
+      (is (nil? (-> (filter #(= "email" (:category-name %)) categories)
+                    first)))))
+  (testing "the category does not exist"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"the category foo does not exist"
+         (update-category database "foo" {:name "music"
+                                          :description "music description"})))))

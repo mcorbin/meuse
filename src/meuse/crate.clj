@@ -70,3 +70,5 @@
                        (assoc :cksum sha256sum)
                        raw-metadata->metadata)
      :crate-file crate-file}))
+
+

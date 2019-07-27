@@ -76,3 +76,45 @@
                       :body {:name "foo"
                              :description "the description"}})))))
 
+(deftest update-category-test
+  (testing "success"
+    (let [request (add-auth {:database database
+                             :route-params {:name "email"}
+                             :body {:name "music"
+                                    :description "music description"}
+                             :action :update-category}
+                            "user1"
+                            "admin")]
+      (is {:status 200 :body {:ok true}}) (meuse-api! request)
+      (let [categories (get-categories database)
+            music (-> (filter #(= "music" (:category-name %)) categories)
+                      first)]
+        (is (= "music description" (:category-description music)))
+        (is (nil? (-> (filter #(= "email" (:category-name %)) categories)
+                      first))))))
+  (testing "invalid parameters"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"Wrong input parameters:\n - field route-params is missing\n"
+         (meuse-api! (add-auth {:action :update-category
+                                :body {:description "the description"}}
+                               "user1"
+                               "admin")))))
+  (testing "bad permissions"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"bad permissions"
+         (meuse-api! {:database database
+                        :route-params {:name "email"}
+                        :body {:name "music"
+                               :description "music description"}
+                        :action :update-category})))
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"bad permissions"
+         (meuse-api! (add-auth
+                      {:database database
+                       :action :update-category}
+                      "user1"
+                      "tech"))))))
+

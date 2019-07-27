@@ -27,4 +27,14 @@
                                      :category-name :name
                                      :category-description :description})))}})
 
+(defmethod meuse-api! :update-category
+  [request]
+  (auth-request/admin?-throw request)
+  (params/validate-params request ::update)
+  (let [category-name (get-in request [:route-params :name])]
+    (db-category/update-category (:database request)
+                                 category-name
+                                 (:body request))
+    {:status 200
+     :body {:ok true}}))
 
