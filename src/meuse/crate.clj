@@ -128,8 +128,8 @@
   (locking (get-in request [:git :lock])
     (let [crates-versions (->> (crate-db/get-crates-and-versions (:database request))
                                (group-by :crate-name))]
-      (->> (reduce (verify-versions (get-in request [:config :crate :path])
-                                    (get-in request [:config :metadata :path]))
+      (->> (reduce (verify-versions (get-in request [:config :metadata :path])
+                                    (get-in request [:config :crate :path]))
                    []
                    crates-versions)
            (filter #(seq (:errors %)))))))
