@@ -21,3 +21,21 @@
     (write-crate-file tmp-dir crate)
     (test-crate-file (str tmp-dir "/test1/2.3.2/download")
                      (:crate-file crate))))
+
+(deftest versions-test
+
+  (write-crate-file tmp-dir {:raw-metadata {:name "test1"
+                                            :vers "2.3.2"}
+                             :crate-file (.getBytes "roflmap")})
+  (is (= {"2.3.2" true}
+         (versions tmp-dir "test1")))
+  (write-crate-file tmp-dir {:raw-metadata {:name "test1"
+                                            :vers "2.3.4"}
+                             :crate-file (.getBytes "roflmap")})
+  (is (= {"2.3.2" true
+          "2.3.4" true}
+         (versions tmp-dir "test1")))
+  (clojure.java.io/delete-file (str tmp-dir "/test1/2.3.4/download"))
+  (is (= {"2.3.2" true
+          "2.3.4" false}
+         (versions tmp-dir "test1"))))

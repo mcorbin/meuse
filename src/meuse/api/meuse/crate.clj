@@ -5,6 +5,7 @@
             [meuse.auth.request :as auth-request]
             [meuse.db.category :as category-db]
             [meuse.db.crate :as crate-db]
+            [meuse.crate :refer [check]]
             [clojure.set :as set]
             [clojure.tools.logging :refer [debug info error]]))
 
@@ -57,5 +58,8 @@
     {:status 200
      :body (assoc crate :categories categories)}))
 
-
-
+(defmethod meuse-api! :check-crates
+  [request]
+  (auth-request/admin-or-tech?-throw request)
+  {:status 200
+   :body (check request)})

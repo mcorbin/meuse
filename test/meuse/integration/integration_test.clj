@@ -87,6 +87,24 @@
                                               {:user "integration_not_active"
                                                :validity 10
                                                :name "integration_token_na"})]
+    ;; check crates
+    (testing "check crates: success"
+      (let [{:keys [status body]} (client/get
+                                   (str meuse-url "/api/v1/meuse/check")
+                                   {:headers {"Authorization" integration-token}
+                                    :content-type :json
+                                    :throw-exceptions false})
+                    body (json/parse-string body true)]
+        (is (= 200 status))
+        (is (= 3 (count body)))))
+    (testing "check crates: invalid token"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "invalid token"}]})}
+       (client/get (str meuse-url "/api/v1/meuse/check")
+                   {:headers {"Authorization" (str integration-token "a")}
+                    :content-type :json
+                    :throw-exceptions false})))
     ;; list crates
     (testing "list crates: success"
       (let [response (client/get (str meuse-url "/api/v1/meuse/crate")

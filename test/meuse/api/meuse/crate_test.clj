@@ -219,3 +219,19 @@
          (meuse-api! {:action :get-crate
                       :route-params {:name "crate1"}
                       :database database})))))
+
+(deftest check-crates-test
+  (testing "success"
+    (let [result (meuse-api! (add-auth {:action :check-crates
+                                        :git {:lock "foo"}
+                                        :database database}
+                                       "user1"
+                                       "admin"))]
+      (is (= 3 (count (:body result))))
+      (is (= 200 (:status result)))))
+  (testing "bad permissions"
+    (is (thrown-with-msg?
+         ExceptionInfo
+         #"bad permissions"
+         (meuse-api! {:action :check-crates
+                      :database database})))))

@@ -3,6 +3,9 @@
   (:require [byte-streams :as bs]
             [cheshire.core :as json]
             [digest :as digest]
+            [meuse.crate-file :as craate-file]
+            [meuse.db.crate :as crate-db]
+            [meuse.metadata :as metadata]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]
             [clojure.set :as set]
@@ -13,8 +16,9 @@
   "Takes a request, a byte array and a size.
   Throws an exception if the byte array size is lower than the size."
   [byte-array size]
-  (when (< (alength byte-array) size)
-    (throw (ex-info (format "invalid request size %d" (alength byte-array))
+  (when (< (alength #^bytes byte-array) size)
+    (throw (ex-info (format "invalid request size %d"
+                            (alength #^bytes byte-array))
                     {:status 400}))))
 
 
@@ -71,4 +75,61 @@
                        raw-metadata->metadata)
      :crate-file crate-file}))
 
+(defn verify-versions
+  [metadata-path crate-files-path]
+  (fn [state [crate-name versions]]
+    (let [crate-versions (set (map :version-version versions))
+          metadata-versions (set (metadata/versions
+                                  metadata-path
+                                  crate-name))
+          files-versions (craate-file/versions
+                          crate-files-path
+                          crate-name)
+          files-missing (remove (fn [[k v]] v) files-versions)
+          files-versions-set (set (map first files-versions))
 
+          diff-crate-meta (set/difference crate-versions metadata-versions)
+          diff-meta-crate (set/difference metadata-versions crate-versions)
+
+          diff-crate-file (set/difference crate-versions files-versions-set)
+          diff-file-crate (set/difference files-versions-set crate-versions)]
+      (conj state
+            {:crate crate-name
+             :errors (cond-> []
+                       (seq files-missing)
+                       (concat (map #(str "missing crate binary file for version "
+                                          (first %))
+                                    files-missing))
+
+                       (seq diff-crate-meta)
+                       (concat (map #(str "metadata does not exist for version "
+                                          %)
+                                    diff-crate-meta))
+
+                       (seq diff-meta-crate)
+                       (concat (map #(str "metata exists but don't in the database for version "
+                                          %)
+                                    diff-meta-crate))
+
+                       (seq diff-crate-file)
+                       (concat (map #(str "crate binary file does not exist for version "
+                                          %)
+                                    diff-crate-file))
+
+                       (seq diff-file-crate)
+                       (concat (map #(str "crate binary file exists but don't in the db for version "
+                                          %)
+                                    diff-file-crate)))}))))
+
+(defn check
+  "Verifies if the database, the crate files and the metadata are not out of sync.
+  Returns the list of crates and versions which are out of sync."
+  [request]
+  (locking (get-in request [:git :lock])
+    (let [crates-versions (->> (crate-db/get-crates-and-versions (:database request))
+                               (group-by :crate-name))]
+      (->> (reduce (verify-versions (get-in request [:config :crate :path])
+                                    (get-in request [:config :metadata :path]))
+                   []
+                   crates-versions)
+           (filter #(seq (:errors %)))))))

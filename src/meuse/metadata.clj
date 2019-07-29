@@ -66,3 +66,14 @@
     (->> (slurp metadata-path)
          ((partial replace-yank crate-version yanked?))
          (spit metadata-path))))
+
+(defn versions
+  "Returns a list of the versions which exists on the metadata file.
+  If the file does not exist, returns an empty vector."
+  [base-path crate-name]
+  (let [[_ metadata-path] (metadata-file-path base-path crate-name)]
+    (if (.exists (io/file metadata-path))
+      (->> (string/split (slurp metadata-path) #"\n")
+          (map #(json/parse-string % true))
+          (map :vers))
+      [])))

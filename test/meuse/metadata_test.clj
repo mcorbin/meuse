@@ -64,3 +64,20 @@
     (update-yank tmp-dir "test1" "2.3.2" false)
     (test-metadata-file path [crate])))
 
+(deftest versions-test
+  (is (= [] (versions tmp-dir "doesnotexist")))
+  (write-metadata tmp-dir {:name "test1"
+                           :vers "2.3.2"
+                           :yanked false})
+  (is (= ["2.3.2"]
+         (versions tmp-dir "test1")))
+  (write-metadata tmp-dir {:name "test1"
+                           :vers "2.5.3"
+                           :yanked false})
+  (write-metadata tmp-dir {:name "test1"
+                           :vers "2.5.9"
+                           :yanked false})
+  (is (= ["2.3.2"
+          "2.5.3"
+          "2.5.9"]
+         (versions tmp-dir "test1"))))
