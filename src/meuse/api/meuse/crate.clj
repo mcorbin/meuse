@@ -54,7 +54,12 @@
                                                    crate-name)
                   format-crates
                   first)
-        categories (category-db/by-crate-id database (:id crate))]
+        categories (->> (category-db/by-crate-id database (:id crate))
+                        (map #(clojure.set/rename-keys
+                               %
+                               {:category-id :id
+                                :category-name :name
+                                :category-description :description})))]
     {:status 200
      :body (assoc crate :categories categories)}))
 

@@ -107,7 +107,7 @@
                                     diff-crate-meta))
 
                        (seq diff-meta-crate)
-                       (concat (map #(str "metata exists but don't in the database for version "
+                       (concat (map #(str "metata exists but not in the database for version "
                                           %)
                                     diff-meta-crate))
 
@@ -117,7 +117,7 @@
                                     diff-crate-file))
 
                        (seq diff-file-crate)
-                       (concat (map #(str "crate binary file exists but don't in the db for version "
+                       (concat (map #(str "crate binary file exists but not in the db for version "
                                           %)
                                     diff-file-crate)))}))))
 

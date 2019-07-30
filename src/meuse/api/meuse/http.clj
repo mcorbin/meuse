@@ -18,8 +18,8 @@
    #"/token/?" {:get ::list-token}
    [#"/token/?"] {:delete ::delete-token}
    #"/crate/?" {:get ::list-crates}
-   #"/check/?" {:get ::check-crates}
-   [#"/crate/?" :name] {:get ::get-crate}})
+   [#"/crate/?" :name] {:get ::get-crate}
+   #"/check/?" {:get ::check-crates}})
 
 (defmulti meuse-api!
   "Handle meuse API calls"

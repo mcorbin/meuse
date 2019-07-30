@@ -201,10 +201,10 @@
       (is (= 200 status))
       (is (= (count (:versions body)) 3))
       (is (= 3 (count (:versions body))))
-      (is (= #{"email" "system"} (set (map :category-name (:categories body)))))
+      (is (= #{"email" "system"} (set (map :name (:categories body)))))
       (is (= #{"the email category" "the system category"}
-             (set (map :category-description (:categories body)))))
-      (mapv #(is (uuid? (:category-id %))) (:categories body))))
+             (set (map :description (:categories body)))))
+      (mapv #(is (uuid? (:id %))) (:categories body))))
   (testing "bad parameters"
     (is (thrown-with-msg?
          ExceptionInfo

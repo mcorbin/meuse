@@ -149,10 +149,10 @@
             crate (json/parse-string (:body response) true)]
         (is (= 200 (:status response)))
         (is (= (count (:versions crate)) 3))
-        (is (= #{"email" "system"} (set (map :category-name (:categories crate)))))
+        (is (= #{"email" "system"} (set (map :name (:categories crate)))))
         (is (= #{"the email category" "the system category"}
-               (set (map :category-description (:categories crate)))))
-        (mapv #(is (string? (:category-id %))) (:categories crate))))
+               (set (map :description (:categories crate)))))
+        (mapv #(is (string? (:id %))) (:categories crate))))
     (testing "get crate: invalid token"
       (test-http
        {:status 403

@@ -87,15 +87,15 @@
       (metadata/write-metadata tmp-dir {:name "foo"
                                         :vers "1.1.3"})
       (is (= [{:crate "foo"
-               :errors ["metata exists but don't in the database for version 1.1.3"]}]
+               :errors ["metata exists but not in the database for version 1.1.3"]}]
              (f [] ["foo" [{:version-version "1.1.0"}]]))))
     (testing "crate-file exists but should not"
       (crate-file/write-crate-file tmp-dir {:raw-metadata {:name "foo"
                                                            :vers "1.1.3"}
                                             :crate-file (.getBytes "lol")})
       (is (= [{:crate "foo"
-               :errors ["metata exists but don't in the database for version 1.1.3"
-                        "crate binary file exists but don't in the db for version 1.1.3"]}]
+               :errors ["metata exists but not in the database for version 1.1.3"
+                        "crate binary file exists but not in the db for version 1.1.3"]}]
              (f [] ["foo" [{:version-version "1.1.0"}]]))))
     (testing "success: pass multiple versions"
       (is (= [{:crate "foo"
@@ -140,7 +140,7 @@
                     (spy/stub [{:crate-name "foo"
                                 :version-version "1.1.0"}])]
         (is (= [{:crate "foo"
-                 :errors ["metata exists but don't in the database for version 1.1.3"]}]
+                 :errors ["metata exists but not in the database for version 1.1.3"]}]
                (check request)))))
     (testing "crate-file exists but should not"
       (crate-file/write-crate-file tmp-dir {:raw-metadata {:name "foo"
@@ -150,8 +150,8 @@
                     (spy/stub [{:crate-name "foo"
                                 :version-version "1.1.0"}])]
         (is (= [{:crate "foo"
-                 :errors ["metata exists but don't in the database for version 1.1.3"
-                          "crate binary file exists but don't in the db for version 1.1.3"]}]
+                 :errors ["metata exists but not in the database for version 1.1.3"
+                          "crate binary file exists but not in the db for version 1.1.3"]}]
                (check request)))))
     (testing "success: pass multiple versions"
       (with-redefs [crate-db/get-crates-and-versions
