@@ -66,5 +66,6 @@
 (defmethod meuse-api! :check-crates
   [request]
   (auth-request/admin-or-tech?-throw request)
+  (info "check crates")
   {:status 200
    :body (check request)})
