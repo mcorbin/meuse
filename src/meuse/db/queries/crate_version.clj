@@ -8,7 +8,8 @@
 (defn update-yanked
   [version-id yanked?]
   (-> (h/update :crates_versions)
-      (h/sset {:yanked yanked?})
+      (h/sset {:yanked yanked?
+               :updated_at (new Timestamp (.getTime (new Date)))})
       (h/where [:= :id version-id])
       sql/format))
 
