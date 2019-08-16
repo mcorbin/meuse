@@ -1,7 +1,9 @@
 database:
   user: "meuse"
   password: "meuse"
-  subname: "//127.0.0.1:5432/meuse"
+  host: "127.0.0.1"
+  port: 5432
+  name: "meuse"
 http:
   address: 127.0.0.1
   port: 8855
@@ -9,7 +11,8 @@ logging:
   level: debug
   console: true
   overrides:
-    com.mchange.v2.c3p0: error
+    org.apache.http: error
+    io.netty.buffer.PoolThreadCache: error
 metadata:
   path: "/home/mathieu/prog/rust/testregistry"
   target: "origin/master"

@@ -11,7 +11,7 @@
                  [bidi "2.1.5"]
                  [cheshire "5.8.1"]
                  [clj-time "0.15.1"]
-                 [com.mchange/c3p0 "0.9.5.2"]
+                 [com.zaxxer/HikariCP "3.3.1"]
                  [crypto-password "0.2.0"]
                  [crypto-random "1.2.0"]
                  [environ "1.1.0"]

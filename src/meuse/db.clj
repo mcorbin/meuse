@@ -5,25 +5,37 @@
             [mount.core :refer [defstate]]
             [clojure.java.jdbc :as j]
             [clojure.tools.logging :refer [debug info error]])
-  (:import (com.mchange.v2.c3p0 ComboPooledDataSource)))
+  (:import com.zaxxer.hikari.HikariConfig
+           com.zaxxer.hikari.HikariDataSource))
+
+(def default-pool-size 2)
+(def default-ssl-mode "verify-full")
 
 (defn pool
-  [spec]
+  [{:keys [user password host port name max-pool-size key cert cacert ssl-password ssl-mode]}]
   (debug "starting database thread pool")
-  (let [cpds (doto (ComboPooledDataSource.)
-               (.setDriverClass (:classname spec))
-               (.setJdbcUrl (str "jdbc:" (:subprotocol spec) ":" (:subname spec)))
-               (.setUser (:user spec))
-               (.setPassword (:password spec))
-               ;; expire excess connections after 30 minutes of inactivity:
-               (.setMaxIdleTimeExcessConnections (* 30 60))
-               ;; expire connections after 3 hours of inactivity:
-               (.setMaxIdleTime (* 3 60 60)))]
-    {:datasource cpds}))
+  (let [url (format "jdbc:postgresql://%s:%d/%s"
+                    host port name)
+        config (doto (HikariConfig.)
+                 (.setJdbcUrl url)
+                 (.addDataSourceProperty "user" user)
+                 (.addDataSourceProperty "password" password)
+                 (.setMaximumPoolSize (or max-pool-size default-pool-size)))]
+    (when key
+      (debug "ssl enabled for the databsae")
+      (.addDataSourceProperty config "ssl" true)
+      (.addDataSourceProperty config "sslfactory"
+                              "org.postgresql.ssl.jdbc4.LibPQFactory")
+      (.addDataSourceProperty config "sslcert" cert)
+      (.addDataSourceProperty config "sslkey" key)
+      (.addDataSourceProperty config "sslrootcert" cacert)
+      (.addDataSourceProperty config "sslmode" (or ssl-mode
+                                                   default-ssl-mode)))
+    {:datasource (HikariDataSource. config)}))
 
 (defstate database
   :start (pool (:database config))
   :stop (do (debug "stopping db pool")
-            (.close (:datasource database))
+            (.close ^HikariDataSource (:datasource database))
             (debug "db pool stopped")))
 

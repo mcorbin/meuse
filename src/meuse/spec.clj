@@ -53,12 +53,28 @@
 
 ;; config
 
-(s/def :db/subname ::non-empty-string)
 (s/def :db/user ::non-empty-string)
 (s/def :db/password ::non-empty-string)
-(s/def :db/database (s/keys :req-un [:db/subname
-                                     :db/user
-                                     :db/password]))
+(s/def :db/host ::non-empty-string)
+(s/def :db/port pos-int?)
+(s/def :db/name ::non-empty-string)
+(s/def :db/max-pool-size pos-int?)
+(s/def :db/key ::file)
+(s/def :db/cert ::file)
+(s/def :db/cacert ::file)
+(s/def :db/ssl-mode ::non-empty-string)
+
+(s/def :db/database (s/keys :req-un [:db/user
+                                     :db/password
+                                     :db/host
+                                     :db/port
+                                     :db/name]
+                            :opt-un [:db/max-pool-size
+                                     :db/key
+                                     :db/cert
+                                     :db/cacert
+                                     :db/ssl-mode]
+                            ))
 
 (s/def :http/port ::pos-int)
 (s/def :http/address ::non-empty-string)

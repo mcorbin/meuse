@@ -8,10 +8,6 @@
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]))
 
-(def default-db-config
-  {:classname "org.postgresql.Driver"
-   :subprotocol "postgresql"})
-
 (defn stop!
   "Stop the application."
   []
@@ -20,20 +16,19 @@
 (defn load-config
   "Takes a path and loads the configuration."
   [path]
-  (let [config (-> (yummy/load-config
-                    {:program-name :meuse
-                     :path path
-                     :spec ::spec/config
-                     :die-fn
-                     (fn [e msg]
-                       (let [error-msg (str "fail to load config: "
-                                            msg
-                                            "\n"
-                                            "config path = "
-                                            path)]
-                         (error e error-msg)
-                         (stop!)))})
-                   (update :database #(merge default-db-config %)))]
+  (let [config (yummy/load-config
+                {:program-name :meuse
+                 :path path
+                 :spec ::spec/config
+                 :die-fn
+                 (fn [e msg]
+                   (let [error-msg (str "fail to load config: "
+                                        msg
+                                        "\n"
+                                        "config path = "
+                                        path)]
+                     (error e error-msg)
+                     (stop!)))})]
     (let [metadata-dir (io/file (get-in config [:metadata :path]))
           crate-dir (io/file (get-in config [:crate :path]))]
       (when-not (and metadata-dir
