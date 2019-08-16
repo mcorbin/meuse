@@ -23,7 +23,8 @@
                  [spootnik/signal "0.2.2"]
                  [spootnik/unilog "0.7.24"]
                  [metosin/spec-tools "0.9.2"]
-                 [digest "1.4.9"]]
+                 [digest "1.4.9"]
+                 [less-awful-ssl "1.0.4"]]
   :main ^:skip-aot meuse.core
   :target-path "target/%s"
   :source-paths ["src"]

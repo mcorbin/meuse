@@ -18,7 +18,8 @@
    :user/password "the password should have at least 8 characters"
    :user/role "the role should be 'admin' or 'tech'"
 
-   })
+   :http/tls "invalid tls options"
+   :meuse.spec/file "the file does not exist"})
 
 (defn last-keyword
   [coll]

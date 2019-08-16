@@ -23,13 +23,17 @@
             [aleph.http :as http]
             [aleph.netty :as netty]
             [bidi.bidi :refer [match-route*]]
+            [less.awful.ssl :as less-ssl]
             [mount.core :refer [defstate]]
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.params :refer [wrap-params]]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]])
-  (:import java.io.Closeable
+  (:import io.netty.handler.ssl.ClientAuth
+           io.netty.handler.ssl.JdkSslContext
+           java.io.Closeable
+           java.net.InetSocketAddress
            java.util.UUID))
 
 (def default-error-msg "internal error.")
@@ -101,7 +105,7 @@
                              :subsystem (-> request :handler namespace keyword)
                              :action (-> request :handler name keyword)
                             :registry-config registry-config)]
-          (debug "request " (:request-id request)
+          (debug "request" (:request-id request)
                  "with subsystem" (:subsystem request)
                  "with action" (:action request))
           (try (route! request)
@@ -114,14 +118,24 @@
 (defn start-server
   [http-config crate-config metadata-config database git]
   (debug "starting http server")
-  (http/start-server (-> (get-handler crate-config
-                                      metadata-config
-                                      database
-                                      git)
-                         wrap-json
-                         wrap-keyword-params
-                         wrap-params)
-                     http-config))
+  (let [ssl-context (when (:cacert http-config)
+                      (JdkSslContext. (less-ssl/ssl-context (:key http-config)
+                                                            (:cert http-config)
+                                                            (:cacert http-config))
+                                      false
+                                      ClientAuth/REQUIRE))
+        config (cond-> {:socket-address (InetSocketAddress.
+                                         ^String (:address http-config)
+                                         ^Integer (:port http-config))}
+                 ssl-context (assoc :ssl-context ssl-context))]
+    (http/start-server (-> (get-handler crate-config
+                                        metadata-config
+                                        database
+                                        git)
+                           wrap-json
+                           wrap-keyword-params
+                           wrap-params)
+                       config)))
 
 (defstate http-server
   :start (start-server (:http config)

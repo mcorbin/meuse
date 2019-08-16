@@ -39,5 +39,4 @@
   (helpers/load-test-db! database)
   (f)
   (core/stop!)
-  (Thread/sleep 2)
-  )
+  (Thread/sleep 2))

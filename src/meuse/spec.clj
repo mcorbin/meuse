@@ -2,6 +2,7 @@
   "Specs of the project"
   (:require [meuse.semver :as semver]
             [spec-tools.swagger.core :as swagger]
+            [clojure.java.io :as io]
             [clojure.spec.alpha :as s]))
 
 (s/def ::non-empty-string (s/and string? not-empty))
@@ -12,7 +13,10 @@
 (s/def ::uuid uuid?)
 (s/def ::pos-int pos-int?)
 (s/def ::inst inst?)
-
+(s/def ::file (fn [path]
+                (let [file (io/file path)]
+                  (and (.exists file)
+                       (.isFile file)))))
 ;; crate
 
 (s/def :crate/name ::non-empty-string)
@@ -58,8 +62,22 @@
 
 (s/def :http/port ::pos-int)
 (s/def :http/address ::non-empty-string)
+
+(s/def :http/key ::file)
+(s/def :http/cert ::file)
+(s/def :http/cacert ::file)
+
+(s/def :http/tls (fn [config]
+                   (or (and (:key config) (:cert config) (:cacert config))
+                       (and (not (:key config))
+                            (not (:cert config))
+                            (not (:cacert config))))))
+
 (s/def :http/http (s/keys :req-un [:http/port
-                                   :http/address]))
+                                   :http/address]
+                          :opt-un [:http/key
+                                   :http/cert
+                                   :http/cacert]))
 
 (s/def :metadata/path ::non-empty-string)
 (s/def :metadata/target ::non-empty-string)
