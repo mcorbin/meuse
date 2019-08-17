@@ -27,5 +27,4 @@
 
 (defmethod meuse-api! :default
   [request]
-  (info "meuse uri not found:" (:request-method request) (:uri request))
-  default/not-found)
+  (default/not-found request))

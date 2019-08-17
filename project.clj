@@ -7,6 +7,7 @@
   :dependencies [[org.clojure/clojure "1.10.1-beta2"]
                  [org.clojure/java.jdbc "0.7.9"]
                  [org.clojure/tools.logging "0.4.1"]
+                 [io.micrometer/micrometer-registry-prometheus "1.2.0"]
                  [aleph "0.4.7-alpha5"]
                  [bidi "2.1.5"]
                  [cheshire "5.8.1"]
@@ -34,8 +35,7 @@
                                   [clj-http "3.10.0"]
                                   [ring/ring-mock "0.3.0"]
                                   [commons-io/commons-io 2.6]]
-                   :global-vars    {*warn-on-reflection* true
-                                    *assert* true}
+                   :global-vars    {*assert* true}
                    :cloverage {:test-ns-regex [#"^((?!meuse.integration).)*$"]
                                :ns-exclude-regex [#"meuse.core"
                                                   #"user"]}

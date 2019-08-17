@@ -1,17 +1,11 @@
-(ns meuse.api.default)
+(ns meuse.api.default
+  (:require [meuse.metric :as metric]
+            [clojure.tools.logging :refer [info warn error]]))
 
-(def not-found {:status 404
-                :body {:errors
-                       [{:detail "not found"}]}})
-
-(defmulti default-api!
-  :action)
-
-(defmethod default-api! :not-found
-  [_]
-  not-found)
-
-(defmethod default-api! :me
-  [_]
-  {:status 200
-   :body "Please consult the documentation to find how to generate a token."})
+(defn not-found
+  [request]
+  (info "public uri not found:" (:request-method request) (:uri request))
+  (metric/http-errors request 404)
+  {:status 404
+   :body {:errors
+          [{:detail "not found"}]}})

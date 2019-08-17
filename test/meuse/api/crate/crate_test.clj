@@ -263,5 +263,5 @@
                        :action :yank})))))
 
 (deftest default-not-found-test
-  (is (= meuse.api.default/not-found
+  (is (= (meuse.api.default/not-found {})
          (crates-api! {:action :random}))))

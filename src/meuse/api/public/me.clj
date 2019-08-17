@@ -1,0 +1,9 @@
+(ns meuse.api.public.me
+  (:require [meuse.api.public.http :refer [public-api!]]))
+
+(def me-msg "Please consult the documentation to find how to generate a token.")
+
+(defmethod public-api! :me
+  [request]
+  {:status 200
+   :body me-msg})

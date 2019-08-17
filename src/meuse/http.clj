@@ -6,17 +6,22 @@
             meuse.api.crate.owner
             meuse.api.crate.search
             meuse.api.crate.yank
-            [meuse.api.default :refer [default-api! not-found]]
+            [meuse.api.default :refer [not-found]]
             [meuse.api.meuse.http :as meuse-http]
             meuse.api.meuse.category
             meuse.api.meuse.crate
             meuse.api.meuse.token
             meuse.api.meuse.user
+            [meuse.api.public.http :as public-http]
+            meuse.api.public.healthz
+            meuse.api.public.me
+            meuse.api.public.metric
             [meuse.auth.token :as auth-token]
             [meuse.auth.request :as auth-request]
             [meuse.config :refer [config]]
             [meuse.db :refer [database]]
             [meuse.git :refer [git]]
+            [meuse.metric :as metric]
             [meuse.middleware :refer [wrap-json]]
             [meuse.registry :as registry]
             [meuse.request :refer [convert-body-edn]]
@@ -42,14 +47,22 @@
   ["/"
    [["api/v1/crates" crates-routes]
     ["api/v1/meuse" meuse-http/meuse-routes]
-    [#"me/?" :meuse.api.default/me]
-    [true :meuse.api.default/not-found]]])
+    [#"me/?" :meuse.api.public.http/me]
+    [#"metrics/?" :meuse.api.public.http/metrics]
+    [#"healthz/?" :meuse.api.public.http/healthz]
+    [#"health/?" :meuse.api.public.http/healthz]
+    [#"status/?" :meuse.api.public.http/healthz]
+    [true :meuse.api.public.http/default]]])
 
 (defmulti route! :subsystem)
 
 (defmethod route! :meuse.api.crate.http
   [request]
   (crates-api! (auth-request/check-user request)))
+
+(defmethod route! :meuse.api.public.http
+  [request]
+  (public-http/public-api! request))
 
 (defmethod route! :meuse.api.meuse.http
   [request]
@@ -58,14 +71,9 @@
                   (auth-request/check-user request))]
     (meuse-http/meuse-api! (-> (convert-body-edn request)))))
 
-(defmethod route! :meuse.api.default
-  [request]
-  (default-api! request))
-
 (defmethod route! :default
   [request]
-  (info "uri not found:" (:request-method request) (:uri request))
-  not-found)
+  (not-found request))
 
 (defn handle-req-errors
   "Handles HTTP exceptions."
@@ -80,6 +88,7 @@
                  (:status data))
         request-id (:request-id request)]
     (error request-id e "http error" (pr-str data))
+    (metric/http-errors request (or status 500))
     {:status (or status 500)
      :body {:errors [{:detail message}]}}))
 
@@ -96,6 +105,7 @@
               ;; add a request id
               request (->> (assoc request :request-id (str (UUID/randomUUID)))
                            (match-route* routes uri))
+              _ (info "handler is " (:handler request))
               ;; todo: clean this mess
               request (assoc request
                              :database database
@@ -108,10 +118,15 @@
           (debug "request" (:request-id request)
                  "with subsystem" (:subsystem request)
                  "with action" (:action request))
-          (try (route! request)
-               (catch Exception e
-                 (handle-req-errors request e))))
+          (metric/with-time :http.requests ["uri" (:uri request)
+                                            "method" (-> request
+                                                         :request-method
+                                                         name)]
+            (try (route! request)
+                 (catch Exception e
+                   (handle-req-errors request e)))))
         (catch Exception e
+          (error e "internal error")
           {:status 500
            :body {:errors [{:detail default-error-msg}]}})))))
 
