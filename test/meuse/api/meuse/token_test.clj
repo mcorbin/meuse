@@ -151,7 +151,7 @@
                              :password "azertyui"
                              :validity "foo"}})))))
 
-(deftest list-token-test
+(deftest list-tokens-test
   (let [token1 (token-db/create database {:user "user2"
                                          :validity 10
                                           :name "token1"})
@@ -161,12 +161,12 @@
         token3 (token-db/create database {:user "user1"
                                           :validity 10
                                           :name "token3"})
-        tokens (get-in (meuse-api! (add-auth {:action :list-token
+        tokens (get-in (meuse-api! (add-auth {:action :list-tokens
                                               :database database}
                                              "user2"
                                              "tech"))
                        [:body :tokens])
-        tokens-admin (get-in (meuse-api! (add-auth {:action :list-token
+        tokens-admin (get-in (meuse-api! (add-auth {:action :list-tokens
                                                     :params {:user "user2"}
                                                     :database database}
                                                    "user1"
@@ -200,7 +200,7 @@
       (is (thrown-with-msg?
            ExceptionInfo
            #"bad permissions"
-           (meuse-api! (add-auth {:action :list-token
+           (meuse-api! (add-auth {:action :list-tokens
                                   :params {:user "user1"}
                                   :database database}
                                  "user2"
@@ -209,7 +209,7 @@
       (is (thrown-with-msg?
            ExceptionInfo
            #"Wrong input parameters:\n - field user: the value should be a non empty string\n"
-           (meuse-api! (add-auth {:action :list-token
+           (meuse-api! (add-auth {:action :list-tokens
                                   :params {:user 1}
                                   :database database}
                                  "user2"

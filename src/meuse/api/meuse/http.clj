@@ -15,7 +15,7 @@
    [#"/user/?" :name] {:delete ::delete-user}
    [#"/user/?" :name] {:post ::update-user}
    #"/token/?" {:post ::create-token}
-   #"/token/?" {:get ::list-token}
+   #"/token/?" {:get ::list-tokens}
    [#"/token/?"] {:delete ::delete-token}
    #"/crate/?" {:get ::list-crates}
    [#"/crate/?" :name] {:get ::get-crate}

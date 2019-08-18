@@ -45,7 +45,7 @@
                                            [:name :user :validity]))}})
       (throw (ex-info (format "the user %s does not exist" user) {:status 400})))))
 
-(defmethod meuse-api! :list-token
+(defmethod meuse-api! :list-tokens
   [request]
   (params/validate-params request ::list)
   (let [request-user (get-in request [:params :user])]
