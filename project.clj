@@ -1,10 +1,10 @@
-(defproject meuse "0.1.0-SNAPSHOT"
-  :description "A Rust registry"
+(defproject meuse "0.1.0"
+  :description "A free private Rust registry"
   :url "https://github.com/mcorbin/meuse"
   :license {:name "Eclipse Public License 1.0"}
   :maintainer {:name "Mathieu Corbin"
-               :website "https://mcorbin.fr"}
-  :dependencies [[org.clojure/clojure "1.10.1-beta2"]
+               :website "https://meuse.mcorbin.fr"}
+  :dependencies [[org.clojure/clojure "1.10.1"]
                  [org.clojure/java.jdbc "0.7.9"]
                  [org.clojure/tools.logging "0.4.1"]
                  [io.micrometer/micrometer-registry-prometheus "1.2.0"]
