@@ -41,6 +41,7 @@
               {:name "crate3"
                :vers "1.4.0"
                :yanked false
+               :keywords ["keyword1"]
                :description "blablabla"}]
      :crates-users [{:crate "crate1"
                      :users ["user2" "user3"]}]})

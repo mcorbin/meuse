@@ -18,6 +18,11 @@
     (is (= 3 (count result)))
     (map #(is (= "crate1" (:crate-name %)) result)))
   (let [result (search database "barbaz")]
-    (is (= 1 (count result)))
-    (map (= "crate2" (:crate-name (first result)))))
-  (is (empty? (search database "arandomstring"))))
+    (is (= 1 (count result))))
+  (is (empty? (search database "arandomstring")))
+  (testing "search by category"
+    (let [result (search database "system")]
+      (is (= 3 (count result)))))
+  (testing "search by keyword"
+    (let [result (search database "keyword1")]
+    (is (= 1 (count result))))))
