@@ -27,7 +27,7 @@
                             (:category-id category))))
     (throw (ex-info (format "the category %s does not exist"
                             category-name)
-                    {:status 404}))))
+                    {:type :meuse.error/not-found}))))
 
 (defn create-categories
   "Creates categories for a crate."

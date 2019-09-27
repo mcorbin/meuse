@@ -26,7 +26,7 @@
                                   :token_user_id :token-user-id}))
     (throw (ex-info (format "the user %s does not exist"
                             user-name)
-                    {:status 404}))))
+                    {:type :meuse.error/not-found}))))
 
 (defn create
   "Creates a new token for an user. `validity` is the number of days before the
@@ -40,7 +40,7 @@
           (throw (ex-info (format "a token named %s already exists for user %s"
                                   (:name token)
                                   (:user token))
-                          {:status 400})))
+                          {:type :meuse.error/incorrect})))
         (let [generated-token (auth-token/generate-token)]
           (jdbc/execute! db-tx (token-queries/create
                                 (auth-token/extract-identifier generated-token)
@@ -51,7 +51,7 @@
           generated-token))
       (throw (ex-info (format "the user %s does not exist"
                               (:user token))
-                      {:status 400})))))
+                      {:type :meuse.error/not-found})))))
 
 (defn get-token-user-role
   "Get a token by value.
@@ -88,7 +88,7 @@
                                              :token_user_id :token-user-id})))
       (throw (ex-info (format "the user %s does not exist"
                               user-name)
-                      {:status 404})))))
+                      {:type :meuse.error/not-found})))))
 
 (defn delete
   "Deletes a token for an user."
@@ -100,4 +100,4 @@
       (throw (ex-info (format "the token %s does not exist for the user %s"
                               token-name
                               user-name)
-                      {:status 404})))))
+                      {:type :meuse.error/not-found})))))

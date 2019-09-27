@@ -23,10 +23,10 @@
                                               :user-name
                                               :token-user-id])
                        (rename-keys {:token-user-id :user-id}))))
-          (throw (ex-info "invalid token" {:status 403})))
-        (throw (ex-info "user is not active" {:status 403})))
-      (throw (ex-info "token not found" {:status 403})))
-    (throw (ex-info "token missing in the header" {:status 403}))))
+          (throw (ex-info "invalid token" {:type :meuse.error/forbidden})))
+        (throw (ex-info "user is not active" {:type :meuse.error/forbidden})))
+      (throw (ex-info "token not found" {:type :meuse.error/forbidden})))
+    (throw (ex-info "token missing in the header" {:type :meuse.error/forbidden}))))
 
 (defn user-id
   [request]
@@ -48,14 +48,16 @@
   "Takes a request, verifies is the user is admin."
   [request]
   (when-not (admin? request)
-    (throw (ex-info "bad permissions" {:status 403})))
+    (throw (ex-info "bad permissions"
+                    {:type :meuse.error/forbidden})))
   true)
 
 (defn tech?-throw
   "Takes a request, verifies is the user is tech."
   [request]
   (when-not (tech? request)
-    (throw (ex-info "bad permissions" {:status 403})))
+    (throw (ex-info "bad permissions"
+                    {:type :meuse.error/forbidden})))
   true)
 
 (defn admin-or-tech?-throw
@@ -63,5 +65,6 @@
   [request]
   (when-not (or (admin? request)
                 (tech? request))
-    (throw (ex-info "bad permissions" {:status 403})))
+    (throw (ex-info "bad permissions"
+                    {:type :meuse.error/forbidden})))
   true)

@@ -402,7 +402,7 @@
                                 :validity 10})})))
     (testing "creating token: user does not exist"
       (test-http
-       {:status 400
+       {:status 404
         :body (js {:errors [{:detail "the user foofoofoo does not exist"}]})}
        (client/post (str meuse-url "/api/v1/meuse/token/")
                     {:content-type :json

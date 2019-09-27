@@ -34,16 +34,16 @@
     (when (and (not (auth-request/admin? request))
                (contains? fields :role))
       (throw (ex-info "only admins can update an user role"
-                      {:status 403})))
+                      {:type :meuse.error/forbidden})))
     (when (and (not (auth-request/admin? request))
                (contains? fields :active))
       (throw (ex-info "only admins can enable or disable an user"
-                      {:status 403})))
+                      {:type :meuse.error/forbidden})))
     (when (and (not (auth-request/admin? request))
                (not= (auth-request/user-name request)
                      user-name))
       (throw (ex-info "bad permissions"
-                      {:status 403})))
+                      {:type :meuse.error/forbidden})))
     (info "update user" user-name)
     (db-user/update-user (:database request)
                          user-name

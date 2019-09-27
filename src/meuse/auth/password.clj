@@ -10,5 +10,6 @@
   "Verifies is a password is valid."
   [password encrypted]
   (when-not (bcrypt/check password encrypted)
-    (throw (ex-info "invalid password" {:status 403})))
+    (throw (ex-info "invalid password"
+                    {:type :meuse.error/forbidden})))
   true)

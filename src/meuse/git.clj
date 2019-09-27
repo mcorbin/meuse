@@ -27,7 +27,7 @@
              "err="(:err result))
       (when-not (= 0 (:exit result))
         (throw (ex-info "error executing git command"
-                        {:status 500
+                        {:type :meuse.error/fault
                          :exit-code (:exit result)
                          :stdout (:out result)
                          :stderr (:err result)

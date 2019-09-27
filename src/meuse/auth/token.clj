@@ -26,7 +26,7 @@
   [token]
   (if (> (count token) identifier-size)
     (subs token 0 identifier-size)
-    (throw (ex-info "invalid token" {:status 403}))))
+    (throw (ex-info "invalid token" {:type :meuse.error/forbidden}))))
 
 (defn valid?
   "Takes a token and a token encrypted with bcrypt.

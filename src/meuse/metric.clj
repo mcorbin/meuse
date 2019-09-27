@@ -29,7 +29,7 @@
 
 (defn stop-sample!
   "takes a sample, its name and a list of tags.
-  Sop the sample."
+  Stop the sample."
   [sample n tags]
   (when (started?)
     (.stop sample

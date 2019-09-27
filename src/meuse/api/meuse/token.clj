@@ -19,7 +19,7 @@
                   (auth-request/admin? request))
       (throw (ex-info
               (format "user %s cannot delete token for %s" auth-user-name user-name)
-              {:status 403})))
+              {:type :meuse.error/forbidden})))
     (info (format "deleting token %s for user %s" token-name user-name))
     (token-db/delete (:database request)
                      user-name
@@ -33,7 +33,8 @@
   (let [{:keys [name user password] :as body} (:body request)]
     (if-let [db-user (user-db/by-name (:database request) user)]
       (do (when-not (:user-active db-user)
-            (throw (ex-info "user is not active" {:status 403})))
+            (throw (ex-info "user is not active"
+                            {:type :meuse.error/forbidden})))
           (auth-password/check password (:user-password db-user))
           (info (format "creating token %s for user %s"
                         name
@@ -43,7 +44,8 @@
                                           (select-keys
                                            (:body request)
                                            [:name :user :validity]))}})
-      (throw (ex-info (format "the user %s does not exist" user) {:status 400})))))
+      (throw (ex-info (format "the user %s does not exist" user)
+                      {:type :meuse.error/not-found})))))
 
 (defmethod meuse-api! :list-tokens
   [request]

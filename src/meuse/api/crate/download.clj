@@ -19,10 +19,10 @@
         file (io/file path)]
     (when-not (.exists file)
       (throw (ex-info (format "the file %s does not exist" path)
-                      {:status 400})))
+                      {:type :meuse.error/incorrect})))
     (when (.isDirectory file)
       (throw (ex-info (format "the file %s is a directory" path)
-                      {:status 400})))
+                      {:type :meuse.error/incorrect})))
     (info "serving crate file" path)
     {:status 200
      :body file}))

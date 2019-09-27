@@ -19,7 +19,7 @@
   (when (< (alength #^bytes byte-array) size)
     (throw (ex-info (format "invalid request size %d"
                             (alength #^bytes byte-array))
-                    {:status 400}))))
+                    {:type :meuse.error/incorrect}))))
 
 
 (def git-metadata-keys [:name :vers :deps :cksum :features :yanked :links])

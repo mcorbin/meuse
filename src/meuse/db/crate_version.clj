@@ -18,7 +18,7 @@
            (ex-info
             (format "cannot %s the crate: the version does not exist"
                     (yanked?->msg yanked?))
-            {:status 404
+            {:type :meuse.error/not-found
              :crate-name crate-name
              :crate-version crate-version})))
         (when (= yanked? (:version-yanked crate))
@@ -27,12 +27,12 @@
             (format "cannot %s the crate: crate state is already %s"
                     (yanked?->msg yanked?)
                     (yanked?->msg yanked?))
-            {:status 404
+            {:type :meuse.error/incorrect
              :crate-name crate-name
              :crate-version crate-version})))
         (jdbc/execute! db-tx (crate-version-queries/update-yanked (:version-id crate) yanked?)))
       (throw (ex-info (format "cannot %s the crate: the crate does not exist"
                               (yanked?->msg yanked?))
-                      {:status 400
+                      {:type :meuse.error/not-found
                        :crate-name crate-name
                        :crate-version crate-version})))))

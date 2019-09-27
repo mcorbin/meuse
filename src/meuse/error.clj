@@ -1,7 +1,10 @@
 (ns meuse.error
-  (:require meuse.spec
+  (:require [meuse.metric :as metric]
+            meuse.spec
             [cheshire.core :as json]
-            [clojure.spec.alpha :as s]))
+            [qbits.ex :as ex]
+            [clojure.spec.alpha :as s]
+            [clojure.tools.logging :refer [error]]))
 
 (def default-msg
   "Internal error. Please checks the logs.")
@@ -99,3 +102,52 @@
   ([explain problem-map]
    (when-let [problems (get explain ::s/problems)]
      (problems->message problems problem-map))))
+
+(ex/derive ::unavailable ::user)
+(ex/derive ::interrupted ::user)
+(ex/derive ::incorrect ::user)
+(ex/derive ::forbidden ::user)
+(ex/derive ::unsupported ::user)
+(ex/derive ::not-found ::user)
+(ex/derive ::conflict ::user)
+(ex/derive ::fault ::user)
+(ex/derive ::busy ::user)
+(ex/derive ::unauthorized ::user)
+
+(def ex-type->status
+  {::unavailable 500
+   ::interrupted 500
+   ::incorrect 400
+   ::forbidden 403
+   ::unauthorized 401
+   ::unsupported 400
+   ::not-found 404
+   ::conflict 500
+   ::fault 500
+   ::busy 500})
+
+(defn handle-user-error
+  [request data]
+  (let [exception (-> data meta ::ex/exception)
+        message (.getMessage exception)
+        ;; cargo expects a status 200 OK even for errors x_x
+        status (if (= (:subsystem request) :meuse.api.crate.http)
+                 200
+                 (get ex-type->status (:type data) 500))]
+    (when (= 500 status)
+      (error "unknown error " (pr-str data)))
+    (error (:request-id request)
+           exception
+           "http error"
+           (pr-str (ex-data exception))
+           status)
+    (metric/http-errors request status)
+    {:status status
+     :body {:errors [{:detail message}]}}))
+
+(defn handle-unexpected-error
+  [request ^Exception e]
+  (error (:request-id request) e "http error")
+  (metric/http-errors request 500)
+  {:status 500
+   :body {:errors [{:detail default-msg}]}})

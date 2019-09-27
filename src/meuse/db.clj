@@ -22,7 +22,7 @@
                  (.addDataSourceProperty "password" password)
                  (.setMaximumPoolSize (or max-pool-size default-pool-size)))]
     (when key
-      (debug "ssl enabled for the databsae")
+      (debug "ssl enabled for the database")
       (.addDataSourceProperty config "ssl" true)
       (.addDataSourceProperty config "sslfactory"
                               "org.postgresql.ssl.jdbc4.LibPQFactory")

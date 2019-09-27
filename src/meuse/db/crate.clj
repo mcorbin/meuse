@@ -52,7 +52,7 @@
     (if (seq result)
       result
       (throw (ex-info (format "the crate %s does not exist" crate-name)
-                      {:status 403})))))
+                      {:type :meuse.error/not-found})))))
 
 (defn get-crates-for-category
   "Returns crates from a category."
@@ -63,7 +63,7 @@
                                  (:category-id category)))
            (map #(clojure.set/rename-keys % db-renaming)))
       (throw (ex-info (format "the category %s does not exist" category-name)
-                      {})))))
+                      {:type :meuse.error/not-found})))))
 
 (defn create
   "Creates a crate in the database."
@@ -78,13 +78,14 @@
           (throw (ex-info (format "release %s for crate %s already exists"
                                   (:vers metadata)
                                   (:name metadata))
-                          {:status 200})))
+                          {:type :meuse.error/incorrect})))
         ;; the user should own the crate
         (when-not (-> (jdbc/query db-tx (crate-user-queries/by-crate-and-user
                                          (:crate-id crate)
                                          user-id))
                       first)
-          (throw (ex-info "the user does not own the crate" {:status 403})))
+          (throw (ex-info "the user does not own the crate"
+                          {:type :meuse.error/forbidden})))
         ;; insert the new version
         (jdbc/execute! db-tx (crate-version-queries/create
                               metadata

@@ -20,6 +20,7 @@
             [meuse.auth.request :as auth-request]
             [meuse.config :refer [config]]
             [meuse.db :refer [database]]
+            [meuse.error :as err]
             [meuse.git :refer [git]]
             [meuse.metric :as metric]
             [meuse.middleware :refer [wrap-json]]
@@ -30,6 +31,7 @@
             [bidi.bidi :refer [match-route*]]
             [less.awful.ssl :as less-ssl]
             [mount.core :refer [defstate]]
+            [qbits.ex :as ex]
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.params :refer [wrap-params]]
@@ -40,8 +42,6 @@
            java.io.Closeable
            java.net.InetSocketAddress
            java.util.UUID))
-
-(def default-error-msg "internal error.")
 
 (def routes
   ["/"
@@ -75,23 +75,6 @@
   [request]
   (not-found request))
 
-(defn handle-req-errors
-  "Handles HTTP exceptions."
-  [request ^Exception e]
-  (let [data (ex-data e)
-        message (if (:status data)
-                  (.getMessage e)
-                  default-error-msg)
-        ;; cargo expects a status 200 OK even for errors x_x
-        status (if (= (:subsystem request) :meuse.api.crate.http)
-                 200
-                 (:status data))
-        request-id (:request-id request)]
-    (error request-id e "http error" (pr-str data))
-    (metric/http-errors request (or status 500))
-    {:status (or status 500)
-     :body {:errors [{:detail message}]}}))
-
 (defn get-handler
   "Returns the main handler for the HTTP server."
   [crate-config metadata-config database git]
@@ -122,13 +105,18 @@
                                             "method" (-> request
                                                          :request-method
                                                          name)]
-            (try (route! request)
-                 (catch Exception e
-                   (handle-req-errors request e)))))
+            (ex/try+
+                (route! request)
+                (catch-data
+                 :meuse.error/user
+                 data
+                 (err/handle-user-error request data))
+                (catch Exception e
+                  (err/handle-unexpected-error request e)))))
         (catch Exception e
           (error e "internal error")
           {:status 500
-           :body {:errors [{:detail default-error-msg}]}})))))
+           :body {:errors [{:detail err/default-msg}]}})))))
 
 (defn start-server
   [http-config crate-config metadata-config database git]

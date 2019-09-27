@@ -26,16 +26,16 @@
           (throw (ex-info (format "the user %s already owns the crate %s"
                                   user-name
                                   crate-name)
-                          {:status 400})))
+                          {:type :meuse.error/incorrect})))
         (jdbc/execute! db-tx (crate-user-queries/create
                               (:crate-id crate)
                               (:user-id user))))
       (throw (ex-info (format "the crate %s does not exist"
                               crate-name)
-                      {:status 404})))
+                      {:type :meuse.error/not-found})))
     (throw (ex-info (format "the user %s does not exist"
                             user-name)
-                    {:status 404}))))
+                    {:type :meuse.error/not-found}))))
 
 (defn create-crate-users
   "Add multiple users as owner of a crate"
@@ -55,10 +55,10 @@
       true
       (throw (ex-info (format "user does not own the crate %s"
                               crate-name)
-                    {:status 403})))
+                      {:type :meuse.error/forbidden})))
     (throw (ex-info (format "the crate %s does not exist"
                             crate-name)
-                    {:status 404}))))
+                    {:type :meuse.error/not-found}))))
 
 (defn delete
   "Remove an user as a owner of a crate"
@@ -71,16 +71,16 @@
             (throw (ex-info (format "the user %s does not own the crate %s"
                                     user-name
                                     crate-name)
-                            {:status 400})))
+                            {:type :meuse.error/incorrect})))
           (jdbc/execute! db-tx (crate-user-queries/delete
                                 (:crate-id crate)
                                 (:user-id user))))
         (throw (ex-info (format "the crate %s does not exist"
                                 crate-name)
-                        {:status 404})))
+                        {:type :meuse.error/not-found})))
       (throw (ex-info (format "the user %s does not exist"
                               user-name)
-                      {:status 404})))))
+                      {:type :meuse.error/not-found})))))
 
 (defn delete-crate-users
   "Remove multiple users as owner of a crate"

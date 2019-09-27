@@ -18,7 +18,7 @@
                                            :role_name :role-name}))]
     (when-not role
       (throw (ex-info (format "the role %s does not exist" role-name)
-                      {:status 400})))
+                      {:type :meuse.error/not-found})))
     role))
 
 (defn get-admin-role

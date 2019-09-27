@@ -16,7 +16,7 @@
   [user]
   (when-not (:active user)
     (throw (ex-info (format "the user %s is inactive" (:name user))
-                    {:status 400})))
+                    {:type :meuse.error/incorrect})))
   true)
 
 (defn by-name
@@ -39,11 +39,11 @@
       (if-let [user (by-name db-tx (:name user))]
         (throw (ex-info (format "the user %s already exists"
                                 (:name user))
-                        {:status 400}))
+                        {:type :meuse.error/incorrect}))
         (jdbc/execute! db-tx (user-queries/create user (:role-id role))))
       (throw (ex-info (format "the role %s does not exist"
                               (:role user))
-                      {:status 400})))))
+                      {:type :meuse.error/incorrect})))))
 
 (defn delete
   "Deletes an user."
@@ -55,7 +55,7 @@
         (jdbc/execute! db-tx (user-queries/delete (:user-id user))))
       (throw (ex-info (format "the user %s does not exist"
                               user-name)
-                      {:status 400})))))
+                      {:type :meuse.error/incorrect})))))
 
 (defn crate-owners
   "Get the owners of a crate, by crate name"
@@ -70,7 +70,7 @@
                                      :user_name :user-name})))
       (throw (ex-info (format "the crate %s does not exist"
                               crate-name)
-                      {:status 404})))))
+                      {:type :meuse.error/not-found})))))
 
 (defn update-user
   "Updates an user."
@@ -91,7 +91,7 @@
         (jdbc/execute! db-tx (user-queries/update-user (:user-id user) fields)))
       (throw (ex-info (format "the user %s does not exist"
                               user-name)
-                      {:status 400})))))
+                      {:type :meuse.error/not-found})))))
 
 (defn get-users
   "get all existing users"

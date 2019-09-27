@@ -23,7 +23,7 @@
     (if-let [category (by-name db-tx category-name)]
       (throw (ex-info (format "the category %s already exists"
                               category-name)
-                      {:status 400}))
+                      {:type :meuse.error/incorrect}))
       (jdbc/execute! db-tx (queries/create category-name description)))))
 
 (defn by-crate-id
@@ -51,4 +51,4 @@
                                                     fields))
       (throw (ex-info (format "the category %s does not exist"
                               category-name)
-                      {:status 404})))))
+                      {:type :meuse.error/not-found})))))
