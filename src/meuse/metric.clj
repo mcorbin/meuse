@@ -48,13 +48,13 @@
 
 (defn increment!
   "increments a counter"
-  ([counter tags]
-   (increment! counter tags 1))
-  ([counter tags n]
+  ([counter config]
+   (increment! counter config 1))
+  ([counter {:keys [tags unit description]} n]
    (when (started?)
-     (let [builder (doto (Counter/builder "http.errors")
-                     (.baseUnit "errors")
-                     (.description "http errors")
+     (let [builder (doto (Counter/builder (name counter))
+                     (.baseUnit unit)
+                     (.description description)
                      (.tags (into-array tags)))
            counter (.register builder registry)]
        (.increment counter n)))))
@@ -64,8 +64,10 @@
   [request status]
   (when (started?)
     (increment! :http.errors
-                ["uri" (str (:uri request))
-                 "method"  (str (some-> request
-                                        :request-method
-                                        name))
-                 "status" (str status)])))
+                {:unit "errors"
+                 :description "http errors"
+                 :tags ["uri" (str (:uri request))
+                        "method"  (str (some-> request
+                                               :request-method
+                                               name))
+                        "status" (str status)]})))
