@@ -1,7 +1,7 @@
-(ns meuse.db.crate
+(ns meuse.db.actions.crate
   "Manages crates in the database."
-  (:require [meuse.db.category :as category-db]
-            [meuse.db.crate-category :as crate-category]
+  (:require [meuse.db.actions.category :as category-db]
+            [meuse.db.actions.crate-category :as crate-category]
             [meuse.db.queries.crate :as crate-queries]
             [meuse.db.queries.crate-user :as crate-user-queries]
             [meuse.db.queries.crate-version :as crate-version-queries]

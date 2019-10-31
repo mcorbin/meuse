@@ -1,5 +1,5 @@
-(ns meuse.db.crate-version-test
-  (:require [meuse.db.crate-version :refer :all]
+(ns meuse.db.actions.crate-version-test
+  (:require [meuse.db.actions.crate-version :refer :all]
             [meuse.helpers.db-state :as db-state]
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all]
@@ -8,7 +8,7 @@
            java.util.UUID))
 
 (use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest update-yank-test
   (testing "success"

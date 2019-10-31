@@ -2,41 +2,43 @@
   (:require [meuse.api.crate.http :refer (crates-api!)]
             [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
-            [meuse.db.crate-user :as crate-user-db]
-            [meuse.db.crate-version :as crate-version-db]
+            [meuse.db.public.crate-user :as public-crate-user]
+            [meuse.db.public.crate-version :as public-crate-version]
             [meuse.git :as git]
             [meuse.metadata :as metadata]
             [meuse.message :as msg]
             [clojure.tools.logging :refer [debug info error]]))
 
 (defn update-yank
-  [request yanked?]
+  [crate-user-db crate-version-db git-object request yanked?]
   (params/validate-params request ::yank)
   (let [{:keys [crate-name crate-version]} (:route-params request)]
     (when-not (auth-request/admin? request)
-      (crate-user-db/owned-by? (:database request)
-                               crate-name
-                               (auth-request/user-id request)))
+      (public-crate-user/owned-by? crate-user-db
+                                   crate-name
+                                   (auth-request/user-id request)))
     (info (msg/yanked?->msg yanked?) "crate" crate-name "version" crate-version)
-    (crate-version-db/update-yank (:database request) crate-name crate-version yanked?)
-    (locking (get-in request [:git :lock])
+    (public-crate-version/update-yank crate-version-db
+                                      crate-name
+                                      crate-version yanked?)
+    (locking (git/get-lock git-object))
       (metadata/update-yank (get-in request [:config :metadata :path])
                             crate-name
                             crate-version
                             yanked?)
-      (git/add (:git request))
-      (apply git/commit (:git request) (msg/yank-commit-msg
-                                        crate-name
-                                        crate-version
-                                        yanked?))
-      (git/push (:git request)))
+      (git/add git-object)
+      (apply git/commit git-object (msg/yank-commit-msg
+                                    crate-name
+                                    crate-version
+                                    yanked?))
+      (git/push git-object))
     {:status 200
-     :body {:ok true}}))
+     :body {:ok true}})
 
-(defmethod crates-api! :yank
-  [request]
-  (update-yank request true))
+(defn yank
+  [crate-user-db crate-version-db git-object request]
+  (update-yank crate-user-db crate-version-db git-object request true))
 
-(defmethod crates-api! :unyank
-  [request]
-  (update-yank request false))
+(defn unyank
+  [crate-user-db crate-version-db git-object request]
+  (update-yank crate-user-db crate-version-db git-object request false))

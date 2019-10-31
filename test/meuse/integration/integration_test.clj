@@ -13,7 +13,7 @@
             [meuse.auth.token :as auth-token]
             [meuse.crate-test :as crate-test]
             [meuse.db :refer [database]]
-            [meuse.db.token :as token-db]
+            [meuse.db.actions.token :as token-db]
             [meuse.helpers.fixtures :refer :all]
             [meuse.http :as http]
             [cheshire.core :as json]

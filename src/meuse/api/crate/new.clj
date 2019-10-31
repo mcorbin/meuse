@@ -4,7 +4,7 @@
             [meuse.auth.request :as auth-request]
             [meuse.crate :as crate]
             [meuse.crate-file :as crate-file]
-            [meuse.db.crate :as crate-db]
+            [meuse.db.public.crate :as public-crate]
             [meuse.git :as git]
             [meuse.metadata :as metadata]
             [meuse.message :as msg]
@@ -12,8 +12,8 @@
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]))
 
-(defmethod crates-api! :new
-  [request]
+(defn new
+  [crate-db git-object request]
   (params/validate-params request ::new)
   (let [{:keys [git-metadata raw-metadata crate-file] :as crate}
         (crate/request->crate request)]
@@ -27,21 +27,21 @@
                                         [:registry-config
                                          :allowed-registries]))
     ;; create the crate in the db
-    (locking (get-in request [:git :lock])
-      (crate-db/create (:database request)
-                       raw-metadata
-                       (auth-request/user-id request))
+    (locking (git/get-lock git-object)
+      (public-crate/create crate-db
+                           raw-metadata
+                           (auth-request/user-id request))
       ;; write the metadata file
       (metadata/write-metadata (get-in request [:config :metadata :path])
                                git-metadata)
       ;; write the crate binary file
       (crate-file/write-crate-file (get-in request [:config :crate :path]) crate)
       ;; git add
-      (git/add (:git request))
+      (git/add git-object)
       ;; git commit
-      (apply git/commit (:git request) (msg/publish-commit-msg raw-metadata))
+      (apply git/commit git-object (msg/publish-commit-msg raw-metadata))
       ;; git push
-      (git/push (:git request)))
+      (git/push git-object))
     {:status 200
      :body {:warning {:invalid_categories []
                       :invalid_badges []

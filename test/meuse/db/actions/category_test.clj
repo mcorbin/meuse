@@ -1,18 +1,18 @@
-(ns meuse.db.category-test
+(ns meuse.db.actions.category-test
   (:require [meuse.db :refer [database]]
-            [meuse.db.category :refer :all]
+            [meuse.db.actions.category :refer :all]
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 
 (use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :each db-clean-fixture)
 
 (deftest test-create-and-get-categories
   (create database "cat1" "category description")
   (is (thrown-with-msg? ExceptionInfo
                         #"already exists$"
-                        (create database "email" "category description")))
+                        (create database "cat1" "category description")))
   (let [category (by-name database "cat1")]
     (is (uuid? (:category-id category)))
     (is (= "cat1" (:category-name category)))
@@ -24,6 +24,8 @@
     (is (= "another category" (:category-description category)))))
 
 (deftest get-categories-test
+  (create database "email" "the email category")
+  (create database "system" "the system category")
   (let [result (get-categories database)
         email (-> (filter #(= "email" (:category-name %)) result)
                   first)
@@ -41,6 +43,7 @@
 
 (deftest update-category-test
   (testing "success"
+    (create database "email" "the email category")
     (update-category database "email" {:name "music"
                                        :description "music description"})
     (let [categories (get-categories database)

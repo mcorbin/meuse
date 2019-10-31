@@ -3,8 +3,8 @@
             [meuse.api.params :as params]
             [meuse.auth.password :as auth-password]
             [meuse.auth.request :as auth-request]
-            [meuse.db.category :as category-db]
-            [meuse.db.crate :as crate-db]
+            [meuse.db.public.category :as public-category]
+            [meuse.db.public.crate :as public-crate]
             [meuse.crate :refer [check]]
             [clojure.set :as set]
             [clojure.tools.logging :refer [debug info error]]))
@@ -31,30 +31,30 @@
   (->> (group-by :crate-id crates-versions)
        (map format-crate)))
 
-(defmethod meuse-api! :list-crates
-  [request]
+(defn list-crates
+  [crate-db request]
   (params/validate-params request ::list)
   (auth-request/admin-or-tech?-throw request)
   (info "list crates")
   (let [crates (if-let [category (get-in request [:params :category])]
-                 (crate-db/get-crates-for-category (:database request)
-                                                   category)
-                 (crate-db/get-crates-and-versions (:database request)))]
+                 (public-crate/get-crates-for-category crate-db
+                                                       category)
+                 (public-crate/get-crates-and-versions crate-db))]
     {:status 200
      :body {:crates (format-crates crates)}}))
 
-(defmethod meuse-api! :get-crate
-  [request]
+(defn get-crate
+  [category-db crate-db request]
   (params/validate-params request ::get)
   (auth-request/admin-or-tech?-throw request)
   (let [crate-name (get-in request [:route-params :name])
         _ (info "get crate" crate-name)
         database (:database request)
-        crate (-> (crate-db/get-crate-and-versions database
-                                                   crate-name)
+        crate (-> (public-crate/get-crate-and-versions crate-db
+                                                       crate-name)
                   format-crates
                   first)
-        categories (->> (category-db/by-crate-id database (:id crate))
+        categories (->> (public-category/by-crate-id category-db (:id crate))
                         (map #(clojure.set/rename-keys
                                %
                                {:category-id :id
@@ -63,9 +63,9 @@
     {:status 200
      :body (assoc crate :categories categories)}))
 
-(defmethod meuse-api! :check-crates
-  [request]
+(defn check-crates
+  [crate-db git-object request]
   (auth-request/admin-or-tech?-throw request)
   (info "check crates")
   {:status 200
-   :body (check request)})
+   :body (check crate-db git-object request)})

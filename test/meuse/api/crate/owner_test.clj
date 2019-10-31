@@ -2,17 +2,17 @@
   (:require [meuse.api.crate.owner :refer :all]
             [meuse.api.crate.http :refer [crates-api!]]
             [meuse.db :refer [database]]
-            [meuse.db.crate :as crate-db]
-            [meuse.db.user :as user-db]
-            [meuse.db.crate-user :as crate-user-db]
+            [meuse.db.actions.crate :as crate-db]
+            [meuse.db.actions.user :as user-db]
+            [meuse.db.actions.crate-user :as crate-user-db]
             [meuse.helpers.fixtures :refer :all]
             [cheshire.core :as json]
             [clojure.string :as string]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 
-(use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :once db-fixture inject-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest add-owner-test
   (let [user5-id (:user-id (user-db/by-name database "user5"))
@@ -24,7 +24,6 @@
                                   (string/join ", " ["user2" "user3"])
                                   "crate2")}}
              (crates-api! {:action :add-owner
-                           :database database
                            :route-params {:crate-name "crate2"}
                            :auth {:user-id user5-id
                                   :role-name "admin"}
@@ -61,7 +60,6 @@
                                   (string/join ", " ["user4"])
                                   "crate2")}}
              (crates-api! {:action :add-owner
-                           :database database
                            :route-params {:crate-name "crate2"}
                            :auth {:user-id user2-id
                                   :role-name "tech"}
@@ -85,7 +83,6 @@
            ExceptionInfo
            #"user does not own the crate crate3"
            (crates-api! {:action :add-owner
-                         :database database
                          :route-params {:crate-name "crate3"}
                          :auth {:user-id user2-id
                                 :role-name "tech"}
@@ -96,7 +93,6 @@
            ExceptionInfo
            #"Wrong input parameters:\n - field users is incorrect\n"
            (crates-api! {:action :add-owner
-                         :database database
                          :route-params {:crate-name "crate2"}
                          :body (json/generate-string
                                 {:users []})}))))
@@ -105,7 +101,6 @@
            ExceptionInfo
            #"Wrong input parameters:\n - field crate-name missing in route-params\n"
            (crates-api! {:action :add-owner
-                         :database database
                          :route-params {}
                          :body (json/generate-string
                                 {:users ["foo"]})}))))))
@@ -120,7 +115,6 @@
                                   (string/join ", " ["user2" "user3"])
                                   "crate1")}}
              (crates-api! {:action :remove-owner
-                           :database database
                            :auth {:user-id user5-id
                                   :role-name "admin"}
                            :route-params {:crate-name "crate1"}
@@ -151,7 +145,6 @@
                                   (string/join ", " ["user1"])
                                   "crate1")}}
              (crates-api! {:action :remove-owner
-                           :database database
                            :auth {:user-id user1-id
                                   :role-name "tech"}
                            :route-params {:crate-name "crate1"}
@@ -169,7 +162,6 @@
            ExceptionInfo
            #"user does not own the crate crate3"
            (crates-api! {:action :remove-owner
-                         :database database
                          :route-params {:crate-name "crate3"}
                          :auth {:user-id user5-id
                                 :role-name "tech"}
@@ -180,7 +172,6 @@
            ExceptionInfo
            #"Wrong input parameters:\n - field users is incorrect\n"
            (crates-api! {:action :remove-owner
-                         :database database
                          :route-params {:crate-name "crate2"}
                          :body (json/generate-string
                                 {:users []})}))))
@@ -189,7 +180,6 @@
            ExceptionInfo
            #"Wrong input parameters:\n - field crate-name missing in route-params\n"
            (crates-api! {:action :remove-owner
-                         :database database
                          :route-params {}
                          :body (json/generate-string
                                 {:users ["foo"]})}))))))
@@ -198,7 +188,6 @@
   (testing "success"
     (let [user5-id (:user-id (user-db/by-name database "user5"))
           crate-users (crates-api! {:action :list-owners
-                                    :database database
                                     :auth {:user-id user5-id
                                            :role-name "admin"}
                                     :route-params {:crate-name "crate1"}})]
@@ -217,5 +206,4 @@
          ExceptionInfo
          #"Wrong input parameters:\n - field crate-name missing in route-params\n"
          (crates-api! {:action :list-owners
-                       :database database
                        :route-params {}})))))

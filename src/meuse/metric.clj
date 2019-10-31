@@ -1,9 +1,16 @@
 (ns meuse.metric
   (:require [mount.core :refer [defstate]])
-  (:import io.micrometer.core.instrument.Metrics
+  (:import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics
+           io.micrometer.core.instrument.binder.jvm.JvmGcMetrics
+           io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics
+           io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics
+           io.micrometer.core.instrument.binder.system.FileDescriptorMetrics
+           io.micrometer.core.instrument.binder.system.UptimeMetrics
+           io.micrometer.core.instrument.binder.system.ProcessorMetrics
            io.micrometer.core.instrument.Counter
-           io.micrometer.core.instrument.Timer
            io.micrometer.core.instrument.MeterRegistry
+           io.micrometer.core.instrument.Metrics
+           io.micrometer.core.instrument.Timer
            io.micrometer.prometheus.PrometheusConfig
            io.micrometer.prometheus.PrometheusMeterRegistry))
 
@@ -11,6 +18,13 @@
   []
   (let [registry (PrometheusMeterRegistry. PrometheusConfig/DEFAULT)]
     (Metrics/addRegistry registry)
+    (.bindTo (ClassLoaderMetrics.) registry)
+    (.bindTo (JvmGcMetrics.) registry)
+    (.bindTo (JvmMemoryMetrics.) registry)
+    (.bindTo (JvmThreadMetrics.) registry)
+    (.bindTo (FileDescriptorMetrics.) registry)
+    (.bindTo (UptimeMetrics.) registry)
+    (.bindTo (ProcessorMetrics.) registry)
     registry))
 
 (defstate registry

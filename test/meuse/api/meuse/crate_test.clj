@@ -1,7 +1,7 @@
 (ns meuse.api.meuse.crate-test
   (:require [meuse.api.meuse.crate :refer :all]
             [meuse.api.meuse.http :refer :all]
-            [meuse.db.crate :as crate-db]
+            [meuse.db.actions.crate :as crate-db]
             [meuse.db :refer [database]]
             [meuse.helpers.fixtures :refer :all]
             [meuse.helpers.request :refer [add-auth]]
@@ -10,8 +10,8 @@
            java.util.Date
            java.util.UUID))
 
-(use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :once db-fixture inject-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (def crate-id-1 (UUID/randomUUID))
 (def crate-id-2 (UUID/randomUUID))
@@ -151,8 +151,7 @@
 
 (deftest list-crates-test
   (testing "success"
-    (let [{:keys [status body]} (meuse-api! (add-auth {:database database
-                                                       :action :list-crates}
+    (let [{:keys [status body]} (meuse-api! (add-auth {:action :list-crates}
                                                       "user1"
                                                       "tech"))
           crates (:crates body)
@@ -165,8 +164,7 @@
       (is (= 1 (count (:versions crate2))))
       (is (= 1 (count (:versions crate3))))))
   (testing "list for a category"
-    (let [{:keys [status body]} (meuse-api! (add-auth {:database database
-                                                       :params {:category "email"}
+    (let [{:keys [status body]} (meuse-api! (add-auth {:params {:category "email"}
                                                        :action :list-crates}
                                                       "user1"
                                                       "tech"))
@@ -181,20 +179,17 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
-         (meuse-api! {:action :list-crates
-                      :database database}))))
+         (meuse-api! {:action :list-crates}))))
   (testing "bad parameters"
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field category: the value should be a non empty string\n"
          (meuse-api! {:action :list-crates
-                      :params {:category 1}
-                      :database database})))))
+                      :params {:category 1}})))))
 
 (deftest get-crate-test
   (testing "success"
-    (let [{:keys [status body]} (meuse-api! (add-auth {:database database
-                                                       :route-params {:name "crate1"}
+    (let [{:keys [status body]} (meuse-api! (add-auth {:route-params {:name "crate1"}
                                                        :action :get-crate}
                                                       "user1"
                                                       "tech"))]
@@ -210,21 +205,18 @@
          ExceptionInfo
          #"Wrong input parameters:\n - field name: the value should be a non empty string\n"
          (meuse-api! {:action :get-crate
-                      :route-params {:name 1}
-                      :database database}))))
+                      :route-params {:name 1}}))))
   (testing "bad permissions"
     (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
          (meuse-api! {:action :get-crate
-                      :route-params {:name "crate1"}
-                      :database database})))))
+                      :route-params {:name "crate1"}})))))
 
 (deftest check-crates-test
   (testing "success"
     (let [result (meuse-api! (add-auth {:action :check-crates
-                                        :git {:lock "foo"}
-                                        :database database}
+                                        :git {:lock "foo"}}
                                        "user1"
                                        "admin"))]
       (is (= 3 (count (:body result))))
@@ -233,5 +225,4 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
-         (meuse-api! {:action :check-crates
-                      :database database})))))
+         (meuse-api! {:action :check-crates})))))

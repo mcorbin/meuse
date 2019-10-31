@@ -1,7 +1,7 @@
-(ns meuse.db.token-test
+(ns meuse.db.actions.token-test
   (:require [meuse.auth.token :as auth-token]
             [meuse.db :refer [database]]
-            [meuse.db.token :as token-db]
+            [meuse.db.actions.token :as token-db]
             [meuse.helpers.fixtures :refer :all]
             [clj-time.core :as t]
             [crypto.password.bcrypt :as bcrypt]
@@ -10,7 +10,7 @@
            clojure.lang.ExceptionInfo))
 
 (use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest create-get-token-test
   (testing "success"

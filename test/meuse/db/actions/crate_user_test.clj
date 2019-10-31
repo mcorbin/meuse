@@ -1,18 +1,18 @@
-(ns meuse.db.crate-user-test
+(ns meuse.db.actions.crate-user-test
   (:require [meuse.auth.password :as password]
             [meuse.db :refer [database]]
-            [meuse.db.user :as user-db]
-            [meuse.db.crate-user :as crate-user-db]
-            [meuse.db.crate :as crate-db]
-            [meuse.db.role :as role-db]
-            [meuse.db.token :as token-db]
+            [meuse.db.actions.user :as user-db]
+            [meuse.db.actions.crate-user :as crate-user-db]
+            [meuse.db.actions.crate :as crate-db]
+            [meuse.db.actions.role :as role-db]
+            [meuse.db.actions.token :as token-db]
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all]
-            [meuse.db.role :as role])
+            [meuse.db.actions.role :as role])
   (:import clojure.lang.ExceptionInfo))
 
 (use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest create-test
   (let [user {:name "mathieu"

@@ -1,8 +1,8 @@
-(ns meuse.db.crate-user
-  (:require [meuse.db.crate :as crate]
+(ns meuse.db.actions.crate-user
+  (:require [meuse.db.actions.crate :as crate]
+            [meuse.db.actions.role :as role]
+            [meuse.db.actions.user :as user-db]
             [meuse.db.queries.crate-user :as crate-user-queries]
-            [meuse.db.role :as role]
-            [meuse.db.user :as user-db]
             [clojure.java.jdbc :as jdbc]
             [clojure.set :as set]
             [clojure.tools.logging :refer [debug info error]])

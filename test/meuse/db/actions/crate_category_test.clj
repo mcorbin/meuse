@@ -1,15 +1,16 @@
-(ns meuse.db.crate-category-test
+(ns meuse.db.actions.crate-category-test
   (:require [meuse.db :refer [database]]
-            [meuse.db.crate :as crate-db]
-            [meuse.db.crate-category :refer :all]
-            [meuse.db.category :as category-db]
+            [meuse.db.actions.crate :as crate-db]
+            [meuse.db.actions.crate-category :refer :all]
+            [meuse.db.actions.category :as category-db]
+            [meuse.db.actions.user :as user-db]
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo
            java.util.UUID))
 
 (use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest create-crate-category-test
   (let [crate-db-id (:crate-id (crate-db/by-name

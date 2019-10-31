@@ -1,5 +1,5 @@
 (ns meuse.helpers.db-state
-  (:require [meuse.db.crate :as crate-db]
+  (:require [meuse.db.actions.crate :as crate-db]
             [clojure.test :refer :all]))
 
 (defn test-crate-version

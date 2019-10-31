@@ -3,12 +3,12 @@
             [meuse.api.params :as params]
             [meuse.auth.password :as auth-password]
             [meuse.auth.request :as auth-request]
-            [meuse.db.token :as token-db]
-            [meuse.db.user :as user-db]
+            [meuse.db.public.token :as public-token]
+            [meuse.db.public.user :as public-user]
             [clojure.tools.logging :refer [debug info error]]))
 
-(defmethod meuse-api! :delete-token
-  [request]
+(defn delete-token
+  [token-db request]
   (params/validate-params request ::delete)
   (let [token-name (get-in request [:body :name])
         user-name (get-in request [:body :user])
@@ -21,17 +21,17 @@
               (format "user %s cannot delete token for %s" auth-user-name user-name)
               {:type :meuse.error/forbidden})))
     (info (format "deleting token %s for user %s" token-name user-name))
-    (token-db/delete (:database request)
-                     user-name
-                     token-name)
+    (public-token/delete token-db
+                         user-name
+                         token-name)
     {:status 200
      :body {:ok true}}))
 
-(defmethod meuse-api! :create-token
-  [request]
+(defn create-token
+  [user-db token-db request]
   (params/validate-params request ::create)
   (let [{:keys [name user password] :as body} (:body request)]
-    (if-let [db-user (user-db/by-name (:database request) user)]
+    (if-let [db-user (public-user/by-name user-db user)]
       (do (when-not (:user-active db-user)
             (throw (ex-info "user is not active"
                             {:type :meuse.error/forbidden})))
@@ -40,22 +40,22 @@
                         name
                         user))
           {:status 200
-           :body {:token (token-db/create (:database request)
-                                          (select-keys
-                                           (:body request)
-                                           [:name :user :validity]))}})
+           :body {:token (public-token/create token-db
+                                              (select-keys
+                                               (:body request)
+                                               [:name :user :validity]))}})
       (throw (ex-info (format "the user %s does not exist" user)
                       {:type :meuse.error/not-found})))))
 
-(defmethod meuse-api! :list-tokens
-  [request]
+(defn list-tokens
+  [token-db request]
   (params/validate-params request ::list)
   (let [request-user (get-in request [:params :user])]
     (if request-user
       (auth-request/admin?-throw request)
       (auth-request/admin-or-tech?-throw request))
     (let [user-name (or request-user (get-in request [:auth :user-name]))
-          tokens (->> (token-db/by-user (:database request) user-name)
+          tokens (->> (public-token/by-user token-db user-name)
                       (map #(select-keys % [:token-id
                                             :token-name
                                             :token-created-at

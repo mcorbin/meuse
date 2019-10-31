@@ -1,4 +1,4 @@
-(ns meuse.db.category
+(ns meuse.db.actions.category
   "Manage categories in the database"
   (:require [meuse.db.queries.category :as queries]
             [clojure.java.jdbc :as jdbc]
@@ -28,8 +28,8 @@
 
 (defn by-crate-id
   "Get the crate/category relation for a crate and a category."
-  [db-tx crate-id]
-  (->> (jdbc/query db-tx (queries/by-crate-id crate-id))
+  [database crate-id]
+  (->> (jdbc/query database (queries/by-crate-id crate-id))
        (map #(clojure.set/rename-keys % {:category_id :category-id
                                          :category_name :category-name
                                          :category_description :category-description}))))

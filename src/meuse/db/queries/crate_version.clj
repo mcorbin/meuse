@@ -23,7 +23,6 @@
                    (seq keywords) (str "|| to_tsvector(?)")
                    (seq categories) (str "|| to_tsvector(?)")
                    true (str ")"))]
-    (clojure.tools.logging/info "tsvector" tsvector "keywords" keywords "categories" categories)
     (cond->
         (-> (h/insert-into :crates_versions)
             (h/columns :id
