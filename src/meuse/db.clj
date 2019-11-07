@@ -1,6 +1,7 @@
 (ns meuse.db
   "The database component"
   (:require [meuse.config :refer [config]]
+            [meuse.metric :as metric]
             [aleph.http :as http]
             [mount.core :refer [defstate]]
             [clojure.java.jdbc :as j]
@@ -17,6 +18,7 @@
   (let [url (format "jdbc:postgresql://%s:%d/%s"
                     host port name)
         config (doto (HikariConfig.)
+                 (.setMetricRegistry metric/registry)
                  (.setJdbcUrl url)
                  (.addDataSourceProperty "user" user)
                  (.addDataSourceProperty "password" password)
