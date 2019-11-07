@@ -1,5 +1,5 @@
-(ns meuse.db.crate-category
-  (:require [meuse.db.category :as category]
+(ns meuse.db.actions.crate-category
+  (:require [meuse.db.actions.category :as category]
             [meuse.db.queries.crate-category :as crate-category-queries]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]))

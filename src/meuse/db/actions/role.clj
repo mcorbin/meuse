@@ -1,4 +1,4 @@
-(ns meuse.db.role
+(ns meuse.db.actions.role
   "Manage roles in the database"
   (:require [meuse.db.queries.role :as role-queries]
             [meuse.message :refer [yanked?->msg]]

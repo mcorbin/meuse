@@ -1,5 +1,5 @@
-(ns meuse.db.crate-version
-  (:require [meuse.db.crate :as crate-db]
+(ns meuse.db.actions.crate-version
+  (:require [meuse.db.actions.crate :as crate-db]
             [meuse.db.queries.crate-version :as crate-version-queries]
             [meuse.message :refer [yanked?->msg]]
             [clojure.java.jdbc :as jdbc]

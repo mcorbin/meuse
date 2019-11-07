@@ -1,12 +1,12 @@
-(ns meuse.db.role-test
+(ns meuse.db.actions.role-test
   (:require [meuse.db :refer [database]]
-            [meuse.db.role :refer :all]
+            [meuse.db.actions.role :refer :all]
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 
 (use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest get-role-by-name-test
   (let [role (by-name database "admin")]

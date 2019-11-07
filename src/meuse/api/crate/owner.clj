@@ -3,62 +3,62 @@
   (:require [meuse.api.crate.http :refer (crates-api!)]
             [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
-            [meuse.db.crate-user :as crate-user-db]
-            [meuse.db.user :as user-db]
+            [meuse.db.public.crate-user :as public-crate-user]
+            [meuse.db.public.user :as public-user]
             [meuse.request :refer [convert-body-edn]]
             [clojure.tools.logging :refer [debug info error]]
             [clojure.string :as string]))
 
-(defmethod crates-api! :add-owner
-  [request]
+(defn add-owner
+  [crate-user-db request]
   (let [request (convert-body-edn request)
         _ (params/validate-params request ::add)
         crate-name (get-in request [:route-params
                                     :crate-name])
         users (get-in request [:body :users])]
     (when-not (auth-request/admin? request)
-      (crate-user-db/owned-by? (:database request)
-                         crate-name
-                         (auth-request/user-id request)))
+      (public-crate-user/owned-by? crate-user-db
+                                   crate-name
+                                   (auth-request/user-id request)))
     (info "add owners" (string/join ", " users) "to crate" crate-name)
-    (crate-user-db/create-crate-users (:database request)
-                                crate-name
-                                users)
+    (public-crate-user/create-crate-users crate-user-db
+                                          crate-name
+                                          users)
     {:status 200
      :body {:ok true
             :msg (format "added user(s) %s as owner(s) of crate %s"
                          (string/join ", " users)
                          crate-name)}}))
 
-(defmethod crates-api! :remove-owner
-  [request]
+(defn remove-owner
+  [crate-user-db request]
   (let [request (convert-body-edn request)
         _ (params/validate-params request ::remove)
         crate-name (get-in request [:route-params
                                     :crate-name])
         users (get-in request [:body :users])]
     (when-not (auth-request/admin? request)
-      (crate-user-db/owned-by? (:database request)
-                         crate-name
-                         (auth-request/user-id request)))
+      (public-crate-user/owned-by? crate-user-db
+                                   crate-name
+                                   (auth-request/user-id request)))
     (info "remove owners" (string/join ", " users) "to crate" crate-name)
-    (crate-user-db/delete-crate-users (:database request)
-                                crate-name
-                                users)
+    (public-crate-user/delete-crate-users crate-user-db
+                                          crate-name
+                                          users)
     {:status 200
      :body {:ok true
             :msg (format "removed user(s) %s as owner(s) of crate %s"
                          (string/join ", " users)
                          crate-name)}}))
 
-(defmethod crates-api! :list-owners
-  [request]
+(defn list-owners
+  [user-db request]
   (params/validate-params request ::list)
   (auth-request/admin-or-tech?-throw request)
   (let [crate-name (get-in request [:route-params
                                     :crate-name])
-        users (user-db/crate-owners
-               (:database request)
+        users (public-user/crate-owners
+               user-db
                crate-name)]
     (info "list owners for crate" crate-name)
     {:status 200

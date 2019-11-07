@@ -1,27 +1,26 @@
 (ns meuse.api.meuse.category-test
   (:require [meuse.api.meuse.category :refer :all]
             [meuse.api.meuse.http :refer :all]
-            [meuse.db.category :refer :all]
-            [meuse.db.crate :as crate-db]
+            [meuse.db.actions.category :as category-db]
+            [meuse.db.actions.crate :as crate-db]
             [meuse.db :refer [database]]
             [meuse.helpers.fixtures :refer :all]
             [meuse.helpers.request :refer [add-auth]]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 
-(use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :once db-fixture inject-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest new-category-test
-  (let [request (add-auth {:database database
-                           :action :new-category
+  (let [request (add-auth {:action :new-category
                            :body {:name "foo"
                                   :description "the description"}}
                           "user1"
                           "admin")]
     (is (= {:status 200
             :body {:ok true}} (meuse-api! request)))
-    (let [category (by-name database "foo")]
+    (let [category (category-db/by-name database "foo")]
       (is (uuid? (:category-id category)))
       (is (= "foo" (:category-name category)))
       (is (= "the description" (:category-description category))))
@@ -38,8 +37,7 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
-         (meuse-api! (add-auth {:database database
-                                :action :new-category
+         (meuse-api! (add-auth {:action :new-category
                                 :body {:name "foo"
                                        :description "the description"}}
                                "user2"
@@ -47,8 +45,7 @@
 
 (deftest get-categories-test
   (testing "success"
-    (let [request (add-auth {:database database
-                             :action :list-categories}
+    (let [request (add-auth {:action :list-categories}
                             "user1"
                             "tech")
           {:keys [status body]} (meuse-api! request)
@@ -71,22 +68,20 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
-         (meuse-api! {:database database
-                      :action :list-categories
+         (meuse-api! {:action :list-categories
                       :body {:name "foo"
                              :description "the description"}})))))
 
 (deftest update-category-test
   (testing "success"
-    (let [request (add-auth {:database database
-                             :route-params {:name "email"}
+    (let [request (add-auth {:route-params {:name "email"}
                              :body {:name "music"
                                     :description "music description"}
                              :action :update-category}
                             "user1"
                             "admin")]
       (is {:status 200 :body {:ok true}}) (meuse-api! request)
-      (let [categories (get-categories database)
+      (let [categories (category-db/get-categories database)
             music (-> (filter #(= "music" (:category-name %)) categories)
                       first)]
         (is (= "music description" (:category-description music)))
@@ -104,17 +99,15 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
-         (meuse-api! {:database database
-                        :route-params {:name "email"}
-                        :body {:name "music"
-                               :description "music description"}
-                        :action :update-category})))
+         (meuse-api! {:route-params {:name "email"}
+                      :body {:name "music"
+                             :description "music description"}
+                      :action :update-category})))
     (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
          (meuse-api! (add-auth
-                      {:database database
-                       :action :update-category}
+                      {:action :update-category}
                       "user1"
                       "tech"))))))
 

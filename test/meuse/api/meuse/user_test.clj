@@ -3,15 +3,15 @@
             [meuse.api.meuse.user :refer :all]
             [meuse.auth.password :as password]
             [meuse.db :refer [database]]
-            [meuse.db.user :as user-db]
-            [meuse.db.role :as role-db]
+            [meuse.db.actions.user :as user-db]
+            [meuse.db.actions.role :as role-db]
             [meuse.helpers.fixtures :refer :all]
             [meuse.helpers.request :refer [add-auth]]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 
-(use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :once db-fixture inject-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest new-user-test
   (let [user {:name "mathieu"
@@ -19,8 +19,7 @@
               :active true
               :description "it's me mathieu"
               :role "admin"}
-        request (add-auth {:database database
-                           :action :new-user
+        request (add-auth {:action :new-user
                            :body user}
                           "user1"
                           "admin")]
@@ -74,8 +73,7 @@
                 :active true
                 :description "it's me mathieu"
                 :role "admin"}
-        request (add-auth {:database database
-                           :action :new-user
+        request (add-auth {:action :new-user
                            :body user}
                           "user1"
                           "tech")]
@@ -89,9 +87,8 @@
               :active true
               :description "it's me mathieu"
               :role "admin"}
-          request {:database database
-                     :action :new-user
-                     :body user}]
+          request {:action :new-user
+                   :body user}]
       (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
@@ -99,8 +96,7 @@
 
 (deftest delete-user-test
   (let [username "user2"
-        request (add-auth {:database database
-                           :action :delete-user
+        request (add-auth {:action :delete-user
                            :route-params {:name username}}
                           "user1"
                           "admin")]
@@ -122,8 +118,7 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
-         (meuse-api! (add-auth {:database database
-                                :action :delete-user
+         (meuse-api! (add-auth {:action :delete-user
                                 :route-params {:name "user2"}}
                                "user1"
                                "tech"))))))
@@ -132,8 +127,7 @@
   (testing "success: update by admin"
     (is (= {:status 200
             :body {:ok true}}
-           (meuse-api! (add-auth {:database database
-                                  :action :update-user
+           (meuse-api! (add-auth {:action :update-user
                                   :route-params {:name "user3"}
                                   :body {:description "foo"
                                          :active false
@@ -150,8 +144,7 @@
       (is (= (:role-id admin-role) (:user-role-id user-db))))
     (is (nil? (user-db/by-name database "new_name"))))
   (testing "success: update by himself"
-    (meuse-api! (add-auth {:database database
-                           :action :update-user
+    (meuse-api! (add-auth {:action :update-user
                            :route-params {:name "user2"}
                            :body {:description "foobar"
                                   :password "new_password_2"}}
@@ -167,8 +160,7 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"only admins can update an user role"
-         (meuse-api! (add-auth {:database database
-                                :action :update-user
+         (meuse-api! (add-auth {:action :update-user
                                 :route-params {:name "user2"}
                                 :body {:role "admin"}}
                                "user2"
@@ -177,8 +169,7 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"only admins can enable or disable an user"
-         (meuse-api! (add-auth {:database database
-                                :action :update-user
+         (meuse-api! (add-auth {:action :update-user
                                 :route-params {:name "user2"}
                                 :body {:active false}}
                                "user2"
@@ -186,8 +177,7 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
-         (meuse-api! (add-auth {:database database
-                                :action :update-user
+         (meuse-api! (add-auth {:action :update-user
                                 :route-params {:name "user2"}
                                 :body {:description "foo"}}
                                "user3"
@@ -196,8 +186,7 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field name missing in route-params\n"
-         (meuse-api! (add-auth {:database database
-                                :action :update-user
+         (meuse-api! (add-auth {:action :update-user
                                 :route-params {}
                                 :body {:description "foo"}}
                                "user2"
@@ -205,8 +194,7 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"Wrong input parameters:\n - field active: the value should be a boolean\n"
-         (meuse-api! (add-auth {:database database
-                                :action :update-user
+         (meuse-api! (add-auth {:action :update-user
                                 :route-params {:name "user2"}
                                 :body {:active "lol"}}
                                "user2"
@@ -214,8 +202,7 @@
 
 (deftest list-users-test
   (testing "list users: success"
-    (let [result (meuse-api! (add-auth {:database database
-                                        :action :list-users}
+    (let [result (meuse-api! (add-auth {:action :list-users}
                                        "user1"
                                        "admin"))
           users (get-in result [:body :users])
@@ -233,7 +220,6 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"bad permissions"
-         (meuse-api! (add-auth {:database database
-                                :action :list-users}
+         (meuse-api! (add-auth {:action :list-users}
                                "user1"
                                "tech"))))))

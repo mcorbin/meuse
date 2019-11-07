@@ -8,7 +8,7 @@
   (:import java.util.UUID
            clojure.lang.ExceptionInfo))
 
-(use-fixtures :once db-fixture)
+(use-fixtures :once db-fixture inject-fixture)
 (use-fixtures :each table-fixture)
 
 (deftest get-crate-max-version-test
@@ -107,7 +107,6 @@
 (deftest crate-api-search-test
   (testing "success"
     (let [request (add-auth {:action :search
-                             :database database
                              :params {:q "foobar"}})
           result (crates-api! request)]
       (is (= {:status 200
@@ -117,7 +116,6 @@
                                :description "the crate1 description, this crate is for foobar"}]}}
              result)))
     (let [request (add-auth {:action :search
-                             :database database
                              :params {:q "description"}})
           result (crates-api! request)]
       (is (= {:status 200
@@ -130,7 +128,6 @@
                                :description "the crate2 description, this crate is for barbaz"}]}}
              result)))
     (let [request (add-auth {:action :search
-                             :database database
                              :params {:q "description" :per_page "1"}})
           result (crates-api! request)]
       (is (= {:status 200

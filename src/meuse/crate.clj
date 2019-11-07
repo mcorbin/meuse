@@ -4,7 +4,8 @@
             [cheshire.core :as json]
             [digest :as digest]
             [meuse.crate-file :as craate-file]
-            [meuse.db.crate :as crate-db]
+            [meuse.db.public.crate :as public-crate]
+            [meuse.git :as git]
             [meuse.metadata :as metadata]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]
@@ -124,9 +125,10 @@
 (defn check
   "Verifies if the database, the crate files and the metadata are not out of sync.
   Returns the list of crates and versions which are out of sync."
-  [request]
-  (locking (get-in request [:git :lock])
-    (let [crates-versions (->> (crate-db/get-crates-and-versions (:database request))
+  [crate-db git-object request]
+  (locking (git/get-lock git-object)
+    (let [crates-versions (->> (public-crate/get-crates-and-versions
+                                crate-db)
                                (group-by :crate-name))]
       (->> (reduce (verify-versions (get-in request [:config :metadata :path])
                                     (get-in request [:config :crate :path]))

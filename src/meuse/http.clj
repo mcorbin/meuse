@@ -2,16 +2,8 @@
   "HTTP server and handlers"
   (:require meuse.api.crate.download
             [meuse.api.crate.http :refer [crates-routes crates-api!]]
-            meuse.api.crate.new
-            meuse.api.crate.owner
-            meuse.api.crate.search
-            meuse.api.crate.yank
             [meuse.api.default :refer [not-found]]
             [meuse.api.meuse.http :as meuse-http]
-            meuse.api.meuse.category
-            meuse.api.meuse.crate
-            meuse.api.meuse.token
-            meuse.api.meuse.user
             [meuse.api.public.http :as public-http]
             meuse.api.public.healthz
             meuse.api.public.me
@@ -19,9 +11,9 @@
             [meuse.auth.token :as auth-token]
             [meuse.auth.request :as auth-request]
             [meuse.config :refer [config]]
-            [meuse.db :refer [database]]
+            [meuse.db.public.token :refer [token-db]]
             [meuse.error :as err]
-            [meuse.git :refer [git]]
+            ;[meuse.inject :as inject]
             [meuse.metric :as metric]
             [meuse.middleware :refer [wrap-json]]
             [meuse.registry :as registry]
@@ -58,7 +50,7 @@
 
 (defmethod route! :meuse.api.crate.http
   [request]
-  (crates-api! (auth-request/check-user request)))
+  (crates-api! (auth-request/check-user token-db request)))
 
 (defmethod route! :meuse.api.public.http
   [request]
@@ -68,7 +60,7 @@
   [request]
   (let [request (if (meuse-http/skip-auth (:action request))
                   request
-                  (auth-request/check-user request))]
+                  (auth-request/check-user token-db request))]
     (meuse-http/meuse-api! (-> (convert-body-edn request)))))
 
 (defmethod route! :default
@@ -77,7 +69,7 @@
 
 (defn get-handler
   "Returns the main handler for the HTTP server."
-  [crate-config metadata-config database git]
+  [crate-config metadata-config]
   (let [registry-config (registry/read-registry-config
                          (:path metadata-config)
                          (:url metadata-config))]
@@ -91,8 +83,6 @@
               _ (info "handler is " (:handler request))
               ;; todo: clean this mess
               request (assoc request
-                             :database database
-                             :git git
                              :config {:crate crate-config
                                       :metadata metadata-config}
                              :subsystem (-> request :handler namespace keyword)
@@ -119,7 +109,7 @@
            :body {:errors [{:detail err/default-msg}]}})))))
 
 (defn start-server
-  [http-config crate-config metadata-config database git]
+  [http-config crate-config metadata-config]
   (debug "starting http server")
   (let [ssl-context (when (:cacert http-config)
                       (JdkSslContext. (less-ssl/ssl-context (:key http-config)
@@ -131,10 +121,9 @@
                                          ^String (:address http-config)
                                          ^Integer (:port http-config))}
                  ssl-context (assoc :ssl-context ssl-context))]
+    ;(inject/inject!)
     (http/start-server (-> (get-handler crate-config
-                                        metadata-config
-                                        database
-                                        git)
+                                        metadata-config)
                            wrap-json
                            wrap-keyword-params
                            wrap-params)
@@ -143,9 +132,7 @@
 (defstate http-server
   :start (start-server (:http config)
                        (:crate config)
-                       (:metadata config)
-                       database
-                       git)
+                       (:metadata config))
   :stop (do (debug "stopping http server")
             (.close ^Closeable http-server)
             (Thread/sleep 4)

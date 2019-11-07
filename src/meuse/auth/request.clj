@@ -1,8 +1,7 @@
 (ns meuse.auth.request
   (:require [meuse.auth.header :as header]
             [meuse.auth.token :as auth-token]
-            [meuse.db.token :as token-db]
-            [meuse.db.user :as user-db]
+            [meuse.db.public.token :as public-token]
             [clojure.set :refer [rename-keys]]
             [clojure.tools.logging :refer [debug info error]]))
 
@@ -10,9 +9,9 @@
 (defn check-user
   "Takes a request. Verifies if the token is valid and populates the
   request with the user informations."
-  [request]
+  [token-db request]
   (if-let [token (header/extract-token request)]
-    (if-let [db-token (token-db/get-token-user-role (:database request) token)]
+    (if-let [db-token (public-token/get-token-user-role token-db token)]
       (if (:user-active db-token)
         (if (auth-token/valid? token db-token)
           (do

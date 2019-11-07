@@ -1,10 +1,10 @@
-(ns meuse.db.user
+(ns meuse.db.actions.user
   "Manage users in the database."
   (:require [meuse.auth.password :as password]
-            [meuse.db.crate :as crate]
+            [meuse.db.actions.crate :as crate]
+            [meuse.db.actions.role :as role]
             [meuse.db.queries.crate-user :as crate-user-queries]
             [meuse.db.queries.user :as user-queries]
-            [meuse.db.role :as role]
             [meuse.message :refer [yanked?->msg]]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]
@@ -21,8 +21,8 @@
 
 (defn by-name
   "Get an user by username."
-  [db-tx user-name]
-  (-> (jdbc/query db-tx (user-queries/by-name user-name))
+  [database user-name]
+  (-> (jdbc/query database (user-queries/by-name user-name))
       first
       (clojure.set/rename-keys {:user_id :user-id
                                 :user_name :user-name

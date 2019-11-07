@@ -5,6 +5,8 @@ docker run -p 5432:5432 -e POSTGRES_DB=meuse -e POSTGRES_USER=meuse \
        -v $(pwd)/dev/resources/sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql \
        postgres:11.4
 
+# psql -h localhost -d meuse -p 5432 -U meuse
+
 # to test ssl:
 
 #       -v /home/mathieu/Documents/meuse/ssl/server.cer:/var/lib/postgresql/server.crt \

@@ -1,5 +1,5 @@
 (ns meuse.db
-  "The database content"
+  "The database component"
   (:require [meuse.config :refer [config]]
             [aleph.http :as http]
             [mount.core :refer [defstate]]
@@ -13,7 +13,7 @@
 
 (defn pool
   [{:keys [user password host port name max-pool-size key cert cacert ssl-password ssl-mode]}]
-  (debug "starting database thread pool")
+  (debug "starting database connection pool")
   (let [url (format "jdbc:postgresql://%s:%d/%s"
                     host port name)
         config (doto (HikariConfig.)
@@ -22,9 +22,10 @@
                  (.addDataSourceProperty "password" password)
                  (.setMaximumPoolSize (or max-pool-size default-pool-size)))]
     (when key
-      (debug "ssl enabled for the database")
+      (info "ssl enabled for the database")
       (.addDataSourceProperty config "ssl" true)
-      (.addDataSourceProperty config "sslfactory"
+      (.addDataSourceProperty config
+                              "sslfactory"
                               "org.postgresql.ssl.jdbc4.LibPQFactory")
       (.addDataSourceProperty config "sslcert" cert)
       (.addDataSourceProperty config "sslkey" key)
@@ -38,4 +39,3 @@
   :stop (do (debug "stopping db pool")
             (.close ^HikariDataSource (:datasource database))
             (debug "db pool stopped")))
-

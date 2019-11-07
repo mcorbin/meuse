@@ -2,31 +2,31 @@
   (:require [meuse.api.meuse.http :refer [meuse-api!]]
             [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
-            [meuse.db.user :as db-user]
+            [meuse.db.public.user :as public-user]
             [clojure.tools.logging :refer [debug info error]]))
 
-(defmethod meuse-api! :new-user
-  [request]
+(defn new-user
+  [user-db request]
   (params/validate-params request ::new)
   (auth-request/admin?-throw request)
   (info "create user" (get-in request [:body :name]))
-  (db-user/create (:database request)
-                       (:body request))
+  (public-user/create user-db
+                  (:body request))
   {:status 200
    :body {:ok true}})
 
-(defmethod meuse-api! :delete-user
-  [request]
+(defn delete-user
+  [user-db request]
   (params/validate-params request ::delete)
   (auth-request/admin?-throw request)
   (info "delete user" (get-in request [:route-params :name]))
-  (db-user/delete (:database request)
-                  (get-in request [:route-params :name]))
+  (public-user/delete user-db
+                      (get-in request [:route-params :name]))
   {:status 200
    :body {:ok true}})
 
-(defmethod meuse-api! :update-user
-  [request]
+(defn update-user
+  [user-db request]
   (params/validate-params request ::update)
   (auth-request/admin-or-tech?-throw request)
   (let [user-name (get-in request [:route-params :name])
@@ -45,14 +45,14 @@
       (throw (ex-info "bad permissions"
                       {:type :meuse.error/forbidden})))
     (info "update user" user-name)
-    (db-user/update-user (:database request)
-                         user-name
-                         fields)
+    (public-user/update-user user-db
+                             user-name
+                             fields)
     {:status 200
      :body {:ok true}}))
 
-(defmethod meuse-api! :list-users
-  [request]
+(defn list-users
+  [user-db request]
   (auth-request/admin?-throw request)
   {:status 200
-   :body {:users (db-user/get-users (:database request))}})
+   :body {:users (public-user/get-users user-db)}})

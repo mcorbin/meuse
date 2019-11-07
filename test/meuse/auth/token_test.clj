@@ -1,6 +1,6 @@
 (ns meuse.auth.token-test
   (:require [meuse.auth.token :refer :all]
-            [meuse.db.token :as token-db]
+            [meuse.db.actions.token :as token-db]
             [meuse.db :refer [database]]
             [meuse.helpers.fixtures :refer :all]
             [clj-time.core :as t]
@@ -9,7 +9,7 @@
   (:import clojure.lang.ExceptionInfo))
 
 (use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest expiration-date-test
   (let [n (t/now)

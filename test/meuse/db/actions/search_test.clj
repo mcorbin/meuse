@@ -1,11 +1,11 @@
-(ns meuse.db.search-test
+(ns meuse.db.actions.search-test
   (:require [meuse.db :refer [database]]
-            [meuse.db.search :refer :all]
+            [meuse.db.actions.search :refer :all]
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all]))
 
 (use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest format-query-string-test
   (is (= (format-query-string "foo bar baz")

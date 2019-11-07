@@ -3,7 +3,7 @@
   (:require [meuse.api.crate.http :refer (crates-api!)]
             [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
-            [meuse.db.search :as search-db]
+            [meuse.db.public.search :as public-search]
             [meuse.semver :as semver]
             [clojure.tools.logging :refer [debug info error]]))
 
@@ -33,12 +33,12 @@
        (map get-crate-max-version)
        (map format-version)))
 
-(defmethod crates-api! :search
-  [request]
+(defn search
+  [search-db request]
   (params/validate-params request ::search)
   (auth-request/admin-or-tech?-throw request)
   (let [{query :q nb-results :per_page} (:params request)
-        search-result (->> (search-db/search (:database request) query)
+        search-result (->> (public-search/search search-db query)
                            format-search-result
                            (take (Integer/parseInt
                                   (or nb-results default-nb-results))))]

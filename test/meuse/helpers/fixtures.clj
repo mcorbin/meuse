@@ -1,8 +1,17 @@
 (ns meuse.helpers.fixtures
   (:require [meuse.core :as core]
             [meuse.db :refer [database]]
+            meuse.db.public.category
+            meuse.db.public.crate
+            meuse.db.public.crate-user
+            meuse.db.public.crate-version
+            meuse.db.public.role
+            meuse.db.public.search
+            meuse.db.public.token
+            meuse.db.public.user
             [meuse.helpers.db :as helpers]
             meuse.helpers.git
+            [meuse.inject :as inject]
             [mount.core :as mount]
             [clojure.java.io :as io]
             [clojure.test :refer :all])
@@ -26,9 +35,33 @@
   (f)
   (comment (mount/stop #'meuse.config/config #'meuse.db/database)))
 
-(defn table-fixture
+(defn inject
+  []
+  (-> (mount/only #{#'meuse.db.public.category/category-db
+                    #'meuse.db.public.crate/crate-db
+                    #'meuse.db.public.crate-user/crate-user-db
+                    #'meuse.db.public.crate-version/crate-version-db
+                    #'meuse.db.public.search/search-db
+                    #'meuse.db.public.token/token-db
+                    #'meuse.db.public.user/user-db
+                    #'meuse.git/git})
+      (mount/swap-states {#'meuse.git/git {:start #(GitMock. (atom [])
+                                                             (java.lang.Object.))}})
+      mount/start)
+  (inject/inject!))
+
+(defn inject-fixture
+  [f]
+  (inject)
+  (f))
+
+(defn db-clean-fixture
   [f]
   (meuse.helpers.db/clean! database)
+  (f))
+
+(defn table-fixture
+  [f]
   (helpers/load-test-db! database)
   (f))
 
@@ -37,6 +70,7 @@
   (mount/start-with-states {#'meuse.git/git {:start #(GitMock. (atom []) (java.lang.Object.))}})
   (meuse.helpers.db/clean! database)
   (helpers/load-test-db! database)
+  (inject/inject!)
   (f)
   (core/stop!)
   (Thread/sleep 2))

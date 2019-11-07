@@ -1,14 +1,14 @@
 (ns meuse.api.meuse.token-test
   (:require [meuse.api.meuse.http :refer :all]
             [meuse.db :refer [database]]
-            [meuse.db.token :as token-db]
+            [meuse.db.actions.token :as token-db]
             [meuse.helpers.fixtures :refer :all]
             [meuse.helpers.request :refer [add-auth]]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 
-(use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :once db-fixture inject-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest delete-token-test
   (testing "success"
@@ -16,8 +16,7 @@
                                :validity 10
                                :name "mytoken"})
     (is (= 1 (count (token-db/by-user database "user2"))))
-    (= {:status 200} (meuse-api! (add-auth {:database database
-                                            :action :delete-token
+    (= {:status 200} (meuse-api! (add-auth {:action :delete-token
                                             :body {:name "mytoken"
                                                    :user "user2"}}
                                            "user2"
@@ -32,16 +31,14 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"user user3 cannot delete token for user2"
-         (meuse-api! (add-auth {:database database
-                                :action :delete-token
+         (meuse-api! (add-auth {:action :delete-token
                                 :body {:name "mytoken"
                                        :user "user2"}}
                                "user3"
                                "tech"))))
     (is (= {:status 200
             :body {:ok true}}
-           (meuse-api! (add-auth {:database database
-                                  :action :delete-token
+           (meuse-api! (add-auth {:action :delete-token
                                   :body {:name "mytoken"
                                          :user "user2"}}
                                  "user1"
@@ -51,8 +48,7 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"the token doesnotexist does not exist for the user user2"
-         (meuse-api! (add-auth {:database database
-                                :action :delete-token
+         (meuse-api! (add-auth {:action :delete-token
                                 :body {:name "doesnotexist"
                                        :user "user2"}}
                                "user2"
@@ -83,8 +79,7 @@
 
 (deftest create-token-test
   (testing "success"
-    (let [result (meuse-api! {:database database
-                              :action :create-token
+    (let [result (meuse-api! {:action :create-token
                               :body {:user "user2"
                                      :validity 10
                                      :name "mynewtoken"
@@ -99,8 +94,7 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"the user foo does not exist"
-         (meuse-api! {:database database
-                      :action :create-token
+         (meuse-api! {:action :create-token
                       :body {:name "mytoken"
                              :user "foo"
                              :password "azertyui"
@@ -109,8 +103,7 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"user is not active"
-         (meuse-api! {:database database
-                      :action :create-token
+         (meuse-api! {:action :create-token
                       :body {:name "mytoken"
                              :user "user4"
                              :password "user4user4"
@@ -119,8 +112,7 @@
     (is (thrown-with-msg?
          ExceptionInfo
          #"invalid password"
-         (meuse-api! {:database database
-                      :action :create-token
+         (meuse-api! {:action :create-token
                       :body {:name "mytoken"
                              :user "user2"
                              :password "azertyui"
@@ -161,14 +153,12 @@
         token3 (token-db/create database {:user "user1"
                                           :validity 10
                                           :name "token3"})
-        tokens (get-in (meuse-api! (add-auth {:action :list-tokens
-                                              :database database}
+        tokens (get-in (meuse-api! (add-auth {:action :list-tokens}
                                              "user2"
                                              "tech"))
                        [:body :tokens])
         tokens-admin (get-in (meuse-api! (add-auth {:action :list-tokens
-                                                    :params {:user "user2"}
-                                                    :database database}
+                                                    :params {:user "user2"}}
                                                    "user1"
                                                    "admin"))
                              [:body :tokens])]
@@ -201,8 +191,7 @@
            ExceptionInfo
            #"bad permissions"
            (meuse-api! (add-auth {:action :list-tokens
-                                  :params {:user "user1"}
-                                  :database database}
+                                  :params {:user "user1"}}
                                  "user2"
                                  "tech")))))
     (testing "bad parameters"
@@ -210,8 +199,7 @@
            ExceptionInfo
            #"Wrong input parameters:\n - field user: the value should be a non empty string\n"
            (meuse-api! (add-auth {:action :list-tokens
-                                  :params {:user 1}
-                                  :database database}
+                                  :params {:user 1}}
                                  "user2"
                                  "tech")))))))
 

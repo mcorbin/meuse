@@ -5,12 +5,14 @@
   Git
   (add [this]
     (swap! state conj {:cmd "add"}))
-  (git-cmd [this args]
-    (swap! state conj {:cmd "git-cmd"
-                       :args [args]}))
   (commit [this msg-header msg-body]
     (swap! state conj {:cmd "commit"
                        :args [msg-header msg-body]}))
+  (get-lock [this]
+    lock)
+  (git-cmd [this args]
+    (swap! state conj {:cmd "git-cmd"
+                       :args [args]}))
   (push [this]
     (swap! state conj {:cmd "push"}))
   (pull [this]

@@ -1,4 +1,4 @@
-(ns meuse.db.search
+(ns meuse.db.actions.search
   "Search crates in the database."
   (:require [meuse.db.queries.search :as search-queries]
             [clojure.java.jdbc :as jdbc]

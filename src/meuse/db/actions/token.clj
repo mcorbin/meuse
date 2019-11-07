@@ -1,8 +1,8 @@
-(ns meuse.db.token
+(ns meuse.db.actions.token
   "Manage tokens in the database"
   (:require [meuse.auth.token :as auth-token]
+            [meuse.db.actions.user :as user-db]
             [meuse.db.queries.token :as token-queries]
-            [meuse.db.user :as user-db]
             [clj-time.core :as t]
             [crypto.password.bcrypt :as bcrypt]
             [clojure.java.jdbc :as jdbc]
@@ -56,9 +56,9 @@
 (defn get-token-user-role
   "Get a token by value.
   Also returns informations about the user and the role."
-  [db-tx token]
-  (-> (jdbc/query db-tx (token-queries/token-join-user-join-role
-                         (auth-token/extract-identifier token)))
+  [database token]
+  (-> (jdbc/query database (token-queries/token-join-user-join-role
+                            (auth-token/extract-identifier token)))
       first
       (clojure.set/rename-keys {:token_id :token-id
                                 :token_identifier :token-identifier

@@ -1,8 +1,8 @@
-(ns meuse.db.crate-test
+(ns meuse.db.actions.crate-test
   (:require [meuse.db :refer [database]]
-            [meuse.db.crate :refer :all]
-            [meuse.db.category :as category-db]
-            [meuse.db.user :as user-db]
+            [meuse.db.actions.crate :refer :all]
+            [meuse.db.actions.category :as category-db]
+            [meuse.db.actions.user :as user-db]
             [meuse.helpers.db-state :as db-state]
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all])
@@ -10,7 +10,7 @@
            java.util.UUID))
 
 (use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest create-test
   (let [crate {:name "test1"

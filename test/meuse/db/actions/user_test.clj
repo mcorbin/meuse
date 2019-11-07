@@ -1,17 +1,17 @@
-(ns meuse.db.user-test
+(ns meuse.db.actions.user-test
   (:require [meuse.auth.password :as password]
             [meuse.db :refer [database]]
-            [meuse.db.user :refer :all]
-            [meuse.db.crate :as crate-db]
-            [meuse.db.role :as role-db]
-            [meuse.db.token :as token-db]
+            [meuse.db.actions.user :refer :all]
+            [meuse.db.actions.crate :as crate-db]
+            [meuse.db.actions.role :as role-db]
+            [meuse.db.actions.token :as token-db]
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all]
-            [meuse.db.role :as role])
+            [meuse.db.actions.role :as role])
   (:import clojure.lang.ExceptionInfo))
 
 (use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest check-active!-test
   (is (thrown-with-msg? ExceptionInfo

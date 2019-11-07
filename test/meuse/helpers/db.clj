@@ -1,8 +1,8 @@
 (ns meuse.helpers.db
-  (:require [meuse.db.category :as category-db]
-            [meuse.db.crate :as crate-db]
-            [meuse.db.user :as user-db]
-            [meuse.db.crate-user :as crate-user-db]
+  (:require [meuse.db.actions.category :as category-db]
+            [meuse.db.actions.crate :as crate-db]
+            [meuse.db.actions.user :as user-db]
+            [meuse.db.actions.crate-user :as crate-user-db]
             [clojure.java.jdbc :as jdbc]
             [clojure.java.shell :as shell]
             [clojure.test :refer :all]))

@@ -2,12 +2,13 @@
   (:require [meuse.api.crate.http :refer :all]
             [meuse.api.crate.new :refer :all]
             [meuse.api.crate.yank :refer :all]
-            [meuse.db.crate :as crate-db]
-            [meuse.db.user :as user-db]
+            [meuse.db.actions.crate :as crate-db]
+            [meuse.db.actions.user :as user-db]
             [meuse.message :refer [publish-commit-msg
                                    yank-commit-msg]]
             [meuse.db :refer [database]]
             [meuse.crate-test :refer [create-publish-request]]
+            [meuse.git :refer [git]]
             [meuse.helpers.db-state :as db-state]
             meuse.helpers.git
             [meuse.helpers.files :refer :all]
@@ -15,15 +16,11 @@
             [meuse.metadata :as metadata]
             [clojure.test :refer :all]
             [cheshire.core :as json]
-            [meuse.db.crate :as crate-db]
             [meuse.crate :as crate])
-  (:import clojure.lang.ExceptionInfo
-           [meuse.helpers.git GitMock]))
+  (:import clojure.lang.ExceptionInfo))
 
-(use-fixtures :each tmp-fixture)
-
-(use-fixtures :once db-fixture)
-(use-fixtures :each table-fixture)
+(use-fixtures :once db-fixture inject-fixture)
+(use-fixtures :each tmp-fixture db-clean-fixture table-fixture)
 
 (deftest crates-api-new-test
   (let [{:keys [user-id]} (user-db/by-name database "user2")
@@ -33,17 +30,15 @@
             version "1.0.1"
             metadata {:name name :vers version :yanked false}
             crate-file "random content"
-            git-actions (atom [])
+            git-actions (:state git)
             request (merge
                      (create-publish-request metadata crate-file)
-                     {:git (GitMock. git-actions (java.lang.Object.))
-                      :registry-config {:allowed-registries ["default"]}
+                     {:registry-config {:allowed-registries ["default"]}
                       :action :new
                       :auth {:user-id user-id
                              :role-name "tech"}
                       :config {:crate {:path tmp-dir}
-                               :metadata {:path tmp-dir}}
-                      :database database})]
+                               :metadata {:path tmp-dir}}})]
         (= (crates-api! request)
            {:status 200
             :body {:warning {:invalid_categories []
@@ -72,17 +67,15 @@
                               :version_req "^1.0.3"
                               :registry "default"}]}
             crate-file "random content"
-            git-actions (atom [])
+            git-actions (:state git)
             request (merge
                      (create-publish-request metadata crate-file)
-                     {:git (GitMock. git-actions (java.lang.Object.))
-                      :auth {:user-id user-id
+                     {:auth {:user-id user-id
                              :role-name "tech"}
                       :registry-config {:allowed-registries ["default"]}
                       :action :new
                       :config {:crate {:path tmp-dir}
-                               :metadata {:path tmp-dir}}
-                      :database database})]
+                               :metadata {:path tmp-dir}}})]
         (= (crates-api! request)
            {:status 200
             :body {:warning {:invalid_categories []
@@ -98,17 +91,15 @@
                               :version_req "^1.0.3"
                               :registry "default"}]}
             crate-file "random content"
-            git-actions (atom [])
+            git-actions (:state git)
             request (merge
                      (create-publish-request metadata crate-file)
-                     {:git (GitMock. git-actions (java.lang.Object.))
-                      :auth {:user-id user-id
+                     {:auth {:user-id user-id
                              :role-name "tech"}
                       :registry-config {:allowed-registries ["another"]}
                       :action :new
                       :config {:crate {:path tmp-dir}
-                               :metadata {:path tmp-dir}}
-                      :database database})]
+                               :metadata {:path tmp-dir}}})]
         (is (thrown-with-msg?
              ExceptionInfo
              #"the registry default is not allowed"
@@ -118,17 +109,15 @@
             version "1.0.10"
             metadata {:name name :vers version :yanked false}
             crate-file "random content"
-            git-actions (atom [])
+            git-actions (:state git)
             request (merge
                      (create-publish-request metadata crate-file)
-                     {:git (GitMock. git-actions (java.lang.Object.))
-                      :registry-config {:allowed-registries ["default"]}
+                     {:registry-config {:allowed-registries ["default"]}
                       :action :new
                       :auth {:user-id user-id-3
                              :role-name "tech"}
                       :config {:crate {:path tmp-dir}
-                               :metadata {:path tmp-dir}}
-                      :database database})]
+                               :metadata {:path tmp-dir}}})]
         (is (thrown-with-msg? ExceptionInfo
                               #"the user does not own the crate"
                               (crates-api! request)))))
@@ -191,11 +180,9 @@
 
 (deftest crates-api-yank-unyank-test
   (testing "success:admin"
-    (let [git-actions (atom [])
+    (let [git-actions (:state git)
           user5-id (:user-id (user-db/by-name database "user5"))
-          request {:git (GitMock. git-actions (java.lang.Object.))
-                   :database database
-                   :action :yank
+          request {:action :yank
                    :auth {:user-id user5-id
                           :role-name "admin"}
                    :config {:crate {:path tmp-dir}
@@ -220,11 +207,9 @@
                                              :version-yanked false
                                              :version-description "the crate1 description, this crate is for foobar"})))
   (testing "success: the user owns the crate"
-    (let [git-actions (atom [])
+    (let [git-actions (:state git)
           user2-id (:user-id (user-db/by-name database "user2"))
-          request {:git (GitMock. git-actions (java.lang.Object.))
-                   :database database
-                   :action :yank
+          request {:action :yank
                    :auth {:user-id user2-id
                           :role-name "tech"}
                    :config {:crate {:path tmp-dir}
