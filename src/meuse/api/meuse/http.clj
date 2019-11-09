@@ -1,6 +1,5 @@
 (ns meuse.api.meuse.http
-  (:require [meuse.api.default :as default]
-            [clojure.tools.logging :refer [info warn error]]))
+  (:require [meuse.api.default :as default]))
 
 (def skip-auth
   "Skip token auth for these calls."

@@ -10,7 +10,7 @@
            java.util.Date
            java.util.UUID))
 
-(use-fixtures :once db-fixture inject-fixture)
+(use-fixtures :once system-fixture)
 (use-fixtures :each db-clean-fixture table-fixture)
 
 (def crate-id-1 (UUID/randomUUID))

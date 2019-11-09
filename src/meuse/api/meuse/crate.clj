@@ -64,8 +64,8 @@
      :body (assoc crate :categories categories)}))
 
 (defn check-crates
-  [crate-db git-object request]
+  [crate-db git-object crate-file-store request]
   (auth-request/admin-or-tech?-throw request)
   (info "check crates")
   {:status 200
-   :body (check crate-db git-object request)})
+   :body (check crate-db git-object crate-file-store request)})

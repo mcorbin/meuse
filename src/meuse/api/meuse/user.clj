@@ -54,5 +54,6 @@
 (defn list-users
   [user-db request]
   (auth-request/admin?-throw request)
+  (info "list users")
   {:status 200
    :body {:users (public-user/get-users user-db)}})

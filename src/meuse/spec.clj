@@ -103,7 +103,17 @@
                                            :metadata/url]))
 
 (s/def :crate/path ::non-empty-string)
-(s/def :crate/crate (s/keys :req-un [:crate/path]))
+
+(defmulti crate-store :store)
+(defmethod crate-store "filesystem"
+  [_]
+  (s/keys :req-un [:crate/path]))
+
+(defmethod crate-store :default
+  [_]
+  (throw (ex-info "invalid crate store configuration")))
+
+(s/def :crate/crate (s/multi-spec crate-store :store))
 
 (s/def ::level #{"debug" "info"})
 (s/def ::encoder #{"json"})

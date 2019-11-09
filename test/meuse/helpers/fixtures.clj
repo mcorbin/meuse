@@ -1,5 +1,6 @@
 (ns meuse.helpers.fixtures
   (:require [meuse.core :as core]
+            meuse.crate-file
             [meuse.db :refer [database]]
             meuse.db.public.category
             meuse.db.public.crate
@@ -12,14 +13,17 @@
             [meuse.helpers.db :as helpers]
             meuse.helpers.git
             [meuse.inject :as inject]
+            meuse.metric
+            meuse.store.filesystem
             [mount.core :as mount]
             [clojure.java.io :as io]
             [clojure.test :refer :all])
   (:import org.apache.commons.io.FileUtils
-           [meuse.helpers.git GitMock]))
+           [meuse.helpers.git GitMock]
+           [meuse.store.filesystem LocalCrateFile]))
 
 (def tmp-dir "test/resources/tmp/")
-(def db-started? (atom false))
+(def system-started? (atom false))
 
 (defn tmp-fixture
   [f]
@@ -27,32 +31,33 @@
   (FileUtils/forceMkdir (io/file tmp-dir))
   (f))
 
-(defn db-fixture
-  [f]
-  (when-not @db-started?
-    (mount/start #'meuse.config/config #'meuse.db/database)
-    (reset! db-started? true))
-  (f)
-  (comment (mount/stop #'meuse.config/config #'meuse.db/database)))
-
-(defn inject
+(defn create-system
   []
-  (-> (mount/only #{#'meuse.db.public.category/category-db
-                    #'meuse.db.public.crate/crate-db
-                    #'meuse.db.public.crate-user/crate-user-db
-                    #'meuse.db.public.crate-version/crate-version-db
-                    #'meuse.db.public.search/search-db
-                    #'meuse.db.public.token/token-db
-                    #'meuse.db.public.user/user-db
-                    #'meuse.git/git})
-      (mount/swap-states {#'meuse.git/git {:start #(GitMock. (atom [])
-                                                             (java.lang.Object.))}})
-      mount/start)
+  (when-not @system-started?
+    (-> (mount/only #{#'meuse.metric/registry
+                      #'meuse.config/config
+                      #'meuse.db/database
+                      #'meuse.crate-file/crate-file-store
+                      #'meuse.db.public.category/category-db
+                      #'meuse.db.public.crate/crate-db
+                      #'meuse.db.public.crate-user/crate-user-db
+                      #'meuse.db.public.crate-version/crate-version-db
+                      #'meuse.db.public.search/search-db
+                      #'meuse.db.public.token/token-db
+                      #'meuse.db.public.user/user-db
+                      #'meuse.git/git})
+        (mount/swap-states {#'meuse.crate-file/crate-file-store
+                            {:start #(LocalCrateFile. tmp-dir)}
+                            #'meuse.git/git
+                            {:start #(GitMock. (atom [])
+                                               (java.lang.Object.))}})
+        mount/start)
+    (reset! system-started? true))
   (inject/inject!))
 
-(defn inject-fixture
+(defn system-fixture
   [f]
-  (inject)
+  (create-system)
   (f))
 
 (defn db-clean-fixture

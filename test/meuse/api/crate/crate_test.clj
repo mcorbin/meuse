@@ -19,7 +19,7 @@
             [meuse.crate :as crate])
   (:import clojure.lang.ExceptionInfo))
 
-(use-fixtures :once db-fixture inject-fixture)
+(use-fixtures :once system-fixture)
 (use-fixtures :each tmp-fixture db-clean-fixture table-fixture)
 
 (deftest crates-api-new-test

@@ -3,10 +3,10 @@
   (:require [byte-streams :as bs]
             [cheshire.core :as json]
             [digest :as digest]
-            [meuse.crate-file :as craate-file]
             [meuse.db.public.crate :as public-crate]
             [meuse.git :as git]
             [meuse.metadata :as metadata]
+            [meuse.store.protocol :as store]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]
             [clojure.set :as set]
@@ -77,14 +77,14 @@
      :crate-file crate-file}))
 
 (defn verify-versions
-  [metadata-path crate-files-path]
+  [crate-file-store metadata-path]
   (fn [state [crate-name versions]]
     (let [crate-versions (set (map :version-version versions))
           metadata-versions (set (metadata/versions
                                   metadata-path
                                   crate-name))
-          files-versions (craate-file/versions
-                          crate-files-path
+          files-versions (store/versions
+                          crate-file-store
                           crate-name)
           files-missing (remove (fn [[k v]] v) files-versions)
           files-versions-set (set (map first files-versions))
@@ -125,13 +125,13 @@
 (defn check
   "Verifies if the database, the crate files and the metadata are not out of sync.
   Returns the list of crates and versions which are out of sync."
-  [crate-db git-object request]
+  [crate-db git-object crate-file-store request]
   (locking (git/get-lock git-object)
     (let [crates-versions (->> (public-crate/get-crates-and-versions
                                 crate-db)
                                (group-by :crate-name))]
-      (->> (reduce (verify-versions (get-in request [:config :metadata :path])
-                                    (get-in request [:config :crate :path]))
+      (->> (reduce (verify-versions crate-file-store
+                                    (get-in request [:config :metadata :path]))
                    []
                    crates-versions)
            (filter #(seq (:errors %)))))))

@@ -1,20 +1,22 @@
 (ns meuse.api.crate.download-test
   (:require [meuse.api.crate.download :refer :all]
             [meuse.api.crate.http :refer [crates-api!]]
-            [meuse.crate-file :as crate-file]
+            [meuse.crate-file :refer [crate-file-store]]
             [meuse.helpers.fixtures :refer :all]
             [meuse.helpers.request :refer [add-auth]]
+            [meuse.store.protocol :as store]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 
+(use-fixtures :once system-fixture)
 (use-fixtures :each tmp-fixture)
 
 (deftest crate-api-download-test
   (testing "success"
-    (crate-file/write-crate-file tmp-dir
-                                 {:raw-metadata {:name "foo"
-                                                 :vers "1.0.0"}
-                                  :crate-file (.getBytes "file content")}))
+    (store/write-file crate-file-store
+                      {:name "foo"
+                       :vers "1.0.0"}
+                      (.getBytes "file content")))
   (is (= (slurp (:body (crates-api!
                         (add-auth {:action :download
                                    :config {:crate {:path tmp-dir}}

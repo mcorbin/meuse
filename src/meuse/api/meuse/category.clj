@@ -31,6 +31,7 @@
   [category-db request]
   (auth-request/admin?-throw request)
   (params/validate-params request ::update)
+  (info "update category")
   (let [category-name (get-in request [:route-params :name])]
     (public-category/update-category category-db
                         category-name

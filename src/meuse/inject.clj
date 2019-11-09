@@ -1,5 +1,6 @@
 (ns meuse.inject
-  (:require [meuse.api.crate.http :refer [crates-api!]]
+  (:require [meuse.api.crate.download :as download]
+            [meuse.api.crate.http :refer [crates-api!]]
             [meuse.api.crate.new :as new]
             [meuse.api.crate.owner :as owner]
             [meuse.api.crate.search :as search]
@@ -9,6 +10,7 @@
             [meuse.api.meuse.crate :as crate]
             [meuse.api.meuse.token :as token]
             [meuse.api.meuse.user :as user]
+            [meuse.crate-file :refer [crate-file-store]]
             [meuse.db.public.category :refer [category-db]]
             [meuse.db.public.crate :refer [crate-db]]
             [meuse.db.public.crate-user :refer [crate-user-db]]
@@ -44,7 +46,7 @@
 
     (defmethod meuse-api! :check-crates
       [request]
-      (crate/check-crates crate-db git request))
+      (crate/check-crates crate-db git crate-file-store request))
 
     ;; token
 
@@ -85,7 +87,7 @@
     ;; crate
     (defmethod crates-api! :new
       [request]
-      (new/new crate-db git request))
+      (new/new crate-db git crate-file-store request))
 
     (defmethod crates-api! :yank
       [request]
@@ -95,6 +97,9 @@
       [request]
       (yank/unyank crate-user-db crate-version-db git request))
 
+    (defmethod crates-api! :download
+      [request]
+      (download/download crate-file-store request))
     ;; owner
 
     (defmethod crates-api! :add-owner

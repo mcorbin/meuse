@@ -54,6 +54,7 @@
     (if request-user
       (auth-request/admin?-throw request)
       (auth-request/admin-or-tech?-throw request))
+    (info "list tokens")
     (let [user-name (or request-user (get-in request [:auth :user-name]))
           tokens (->> (public-token/by-user token-db user-name)
                       (map #(select-keys % [:token-id

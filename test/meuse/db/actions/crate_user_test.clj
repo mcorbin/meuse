@@ -11,7 +11,7 @@
             [meuse.db.actions.role :as role])
   (:import clojure.lang.ExceptionInfo))
 
-(use-fixtures :once db-fixture)
+(use-fixtures :once system-fixture)
 (use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest create-test

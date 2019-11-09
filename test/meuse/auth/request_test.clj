@@ -9,7 +9,7 @@
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 
-(use-fixtures :once db-fixture inject-fixture)
+(use-fixtures :once system-fixture)
 (use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest check-user-test
@@ -18,8 +18,7 @@
                                                :validity 10
                                                :name "foo"})
           user (public-user/by-name database "user2")
-          request {:database database
-                   :headers {"authorization" token}}
+          request {:headers {"authorization" token}}
           result (check-user token-db request)]
       (is (= result (assoc request :auth {:user-name "user2"
                                           :user-id (:user-id user)
@@ -28,8 +27,7 @@
                                                :validity 10
                                                :name "foo"})
           user (public-user/by-name database "user1")
-          request {:database database
-                   :headers {"authorization" token}}
+          request {:headers {"authorization" token}}
           result (check-user token-db request)]
       (is (= result (assoc request :auth {:user-name "user1"
                                           :user-id (:user-id user)

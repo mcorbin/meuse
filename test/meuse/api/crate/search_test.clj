@@ -8,7 +8,7 @@
   (:import java.util.UUID
            clojure.lang.ExceptionInfo))
 
-(use-fixtures :once db-fixture inject-fixture)
+(use-fixtures :once system-fixture)
 (use-fixtures :each table-fixture)
 
 (deftest get-crate-max-version-test

@@ -4,7 +4,7 @@
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all]))
 
-(use-fixtures :once db-fixture)
+(use-fixtures :once system-fixture)
 (use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest format-query-string-test

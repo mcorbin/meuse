@@ -2,27 +2,20 @@
   (:require [meuse.api.crate.http :refer (crates-api!)]
             [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
-            [meuse.crate-file :as crate-file]
+            [meuse.store.protocol :as store]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]])
   (:import java.io.File))
 
-(defmethod crates-api! :download
-  [request]
+(defn download
+  [crate-file-store request]
   (params/validate-params request ::download)
   (auth-request/admin-or-tech?-throw request)
-  (let [{:keys [crate-name crate-version]} (:route-params request)
-        path (crate-file/crate-file-path
-              (get-in request [:config :crate :path])
-              crate-name
-              crate-version)
-        file (io/file path)]
-    (when-not (.exists file)
-      (throw (ex-info (format "the file %s does not exist" path)
-                      {:type :meuse.error/incorrect})))
-    (when (.isDirectory file)
-      (throw (ex-info (format "the file %s is a directory" path)
-                      {:type :meuse.error/incorrect})))
-    (info "serving crate file" path)
+  (let [{:keys [crate-name crate-version]} (:route-params request)]
+    (info (format "serving crate file for crate %s version %s"
+                  crate-name
+                  crate-version))
     {:status 200
-     :body file}))
+     :body (store/get-file crate-file-store
+                           crate-name
+                           crate-version)}))

@@ -3,29 +3,29 @@
             [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
             [meuse.crate :as crate]
-            [meuse.crate-file :as crate-file]
             [meuse.db.public.crate :as public-crate]
             [meuse.git :as git]
             [meuse.metadata :as metadata]
             [meuse.message :as msg]
             [meuse.registry :as registry]
+            [meuse.store.protocol :as store]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]))
 
 (defn new
-  [crate-db git-object request]
+  [crate-db git-object crate-file-store request]
   (params/validate-params request ::new)
   (let [{:keys [git-metadata raw-metadata crate-file] :as crate}
         (crate/request->crate request)]
     (params/validate-params crate ::crate)
     (auth-request/admin-or-tech?-throw request)
-    (info "publishing crate" (:name raw-metadata)
-          "version" (:vers raw-metadata))
     ;; check if the dependencies registry is allowed
     (registry/allowed-registry? raw-metadata
                                 (get-in request
                                         [:registry-config
                                          :allowed-registries]))
+    (info "publishing crate" (:name raw-metadata)
+          "version" (:vers raw-metadata))
     ;; create the crate in the db
     (locking (git/get-lock git-object)
       (public-crate/create crate-db
@@ -35,7 +35,7 @@
       (metadata/write-metadata (get-in request [:config :metadata :path])
                                git-metadata)
       ;; write the crate binary file
-      (crate-file/write-crate-file (get-in request [:config :crate :path]) crate)
+      (store/write-file crate-file-store raw-metadata crate-file)
       ;; git add
       (git/add git-object)
       ;; git commit

@@ -5,7 +5,7 @@
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 
-(use-fixtures :once db-fixture)
+(use-fixtures :once system-fixture)
 (use-fixtures :each db-clean-fixture)
 
 (deftest test-create-and-get-categories

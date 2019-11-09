@@ -1,5 +1,5 @@
-(ns meuse.crate-file-test
-  (:require [meuse.crate-file :refer :all]
+(ns meuse.store.filesystem-test
+  (:require [meuse.store.filesystem :refer :all]
             [meuse.helpers.fixtures :refer :all]
             [meuse.helpers.files :refer :all]
             [clojure.test :refer :all]))
@@ -18,24 +18,26 @@
   (let [crate {:raw-metadata {:name "test1"
                               :vers "2.3.2"}
                :crate-file (.getBytes "this is the crate file content")}]
-    (write-crate-file tmp-dir crate)
+    (write tmp-dir (:raw-metadata crate) (:crate-file crate))
     (test-crate-file (str tmp-dir "/test1/2.3.2/download")
                      (:crate-file crate))))
 
 (deftest versions-test
 
-  (write-crate-file tmp-dir {:raw-metadata {:name "test1"
-                                            :vers "2.3.2"}
-                             :crate-file (.getBytes "roflmap")})
+  (write tmp-dir
+         {:name "test1"
+          :vers "2.3.2"}
+         (.getBytes "roflmap"))
   (is (= {"2.3.2" true}
-         (versions tmp-dir "test1")))
-  (write-crate-file tmp-dir {:raw-metadata {:name "test1"
-                                            :vers "2.3.4"}
-                             :crate-file (.getBytes "roflmap")})
+         (filesystem-versions tmp-dir "test1")))
+  (write tmp-dir
+          {:name "test1"
+           :vers "2.3.4"}
+          (.getBytes "roflmap"))
   (is (= {"2.3.2" true
           "2.3.4" true}
-         (versions tmp-dir "test1")))
+         (filesystem-versions tmp-dir "test1")))
   (clojure.java.io/delete-file (str tmp-dir "/test1/2.3.4/download"))
   (is (= {"2.3.2" true
           "2.3.4" false}
-         (versions tmp-dir "test1"))))
+         (filesystem-versions tmp-dir "test1"))))

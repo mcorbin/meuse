@@ -18,4 +18,5 @@ metadata:
   target: "origin/master"
   url: "https://github.com/mcorbin/testregistry"
 crate:
+  store: "filesystem"
   path: "/home/mathieu/prog/rust/crates"
