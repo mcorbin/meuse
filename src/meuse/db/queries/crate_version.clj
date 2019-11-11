@@ -19,30 +19,39 @@
   (let [now (new Timestamp (.getTime (new Date)))
         keywords (:keywords metadata)
         categories (:categories metadata)
-        tsvector (cond-> "(to_tsvector(?) || to_tsvector(?)"
-                   (seq keywords) (str "|| to_tsvector(?)")
-                   (seq categories) (str "|| to_tsvector(?)")
-                   true (str ")"))]
+        tsvector (cond-> "(to_tsvector(?)"
+
+                   (not (string/blank? (:description metadata)))
+                   (str "|| to_tsvector(?)")
+
+                   (seq keywords)
+                   (str "|| to_tsvector(?)")
+
+                   (seq categories)
+                   (str "|| to_tsvector(?)")
+
+                   true
+                   (str ")"))]
     (cond->
-     (-> (h/insert-into :crates_versions)
-         (h/columns :id
-                    :version
-                    :description
-                    :yanked
-                    :created_at
-                    :updated_at
-                    :crate_id
-                    :document_vectors)
-         (h/values [[(UUID/randomUUID)
-                     (:vers metadata)
-                     (:description metadata)
-                     (:yanked metadata false)
-                     now
-                     now
-                     crate-id
-                     (sql/raw tsvector)]])
-         sql/format
-         (conj (:name metadata))
-         (conj (:description metadata "")))
+        (-> (h/insert-into :crates_versions)
+            (h/columns :id
+                       :version
+                       :description
+                       :yanked
+                       :created_at
+                       :updated_at
+                       :crate_id
+                       :document_vectors)
+            (h/values [[(UUID/randomUUID)
+                        (:vers metadata)
+                        (:description metadata)
+                        (:yanked metadata false)
+                        now
+                        now
+                        crate-id
+                        (sql/raw tsvector)]])
+            sql/format
+            (conj (:name metadata)))
+      (not (string/blank? (:description metadata))) (conj (:description metadata))
       (seq keywords) (conj (string/join " " keywords))
       (seq categories) (conj (string/join " " categories)))))

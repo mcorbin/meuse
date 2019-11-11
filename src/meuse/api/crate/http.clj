@@ -2,6 +2,10 @@
   (:require [meuse.api.default :as default]
             [clojure.tools.logging :refer [info debug error]]))
 
+(def skip-auth
+  "Skip token auth for these calls."
+  #{:search})
+
 (def crates-routes
   {#"/new/?" {:put ::new}
    #"/?" {:get ::search}

@@ -1,7 +1,7 @@
 (ns meuse.http
   "HTTP server and handlers"
   (:require meuse.api.crate.download
-            [meuse.api.crate.http :refer [crates-routes crates-api!]]
+            [meuse.api.crate.http :as crate-http]
             [meuse.api.default :refer [not-found]]
             [meuse.api.meuse.http :as meuse-http]
             [meuse.api.mirror.http :as mirror-http]
@@ -38,7 +38,7 @@
 
 (def routes
   ["/"
-   [["api/v1/crates" crates-routes]
+   [["api/v1/crates" crate-http/crates-routes]
     ["api/v1/meuse" meuse-http/meuse-routes]
     ["api/v1/mirror" mirror-http/mirror-routes]
     [#"me/?" :meuse.api.public.http/me]
@@ -52,7 +52,10 @@
 
 (defmethod route! :meuse.api.crate.http
   [request]
-  (crates-api! (auth-request/check-user token-db request)))
+  (let [request (if (crate-http/skip-auth (:action request))
+                  request
+                  (auth-request/check-user token-db request))]
+    (crate-http/crates-api! request)))
 
 (defmethod route! :meuse.api.mirror.http
   [request]
