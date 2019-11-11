@@ -24,8 +24,7 @@
 (defn download-crate
   "Download a crate file."
   [crate-name version]
-  (let [url (str crates-io-base-url "/" crate-name "/" version "/download")
-        response @(http/get url)]
+  (let [url (str crates-io-base-url "/" crate-name "/" version "/download")]
     (-> @(http/get url)
         :body
         (bs/to-byte-array))))

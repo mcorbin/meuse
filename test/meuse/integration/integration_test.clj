@@ -963,3 +963,59 @@
                                              :throw-exceptions false})]
       (is (= 200 status))
       (is (.contains body "http_requests_seconds_max")))))
+
+
+(deftest ^:integration mirror-api-integration-test
+  ;; create a token for an admin user
+  (let [token (token-db/create database {:user "user1"
+                                         :validity 10
+                                         :name "integration_token"})
+        _ (testing "creating user: success"
+            (test-http
+             {:status 200
+              :body (js {:ok true})}
+             (client/post (str meuse-url "/api/v1/meuse/user")
+                          {:headers {"Authorization" token}
+                           :content-type :json
+                           :body (js {:description "integration test user"
+                                      :password "azertyui"
+                                      :name "integration"
+                                      :active true
+                                      :role "tech"})
+                           :throw-exceptions false})))
+        _ (testing "creating user: not active"
+            (test-http
+             {:status 200
+              :body (js {:ok true})}
+             (client/post (str meuse-url "/api/v1/meuse/user")
+                          {:headers {"Authorization" token}
+                           :content-type :json
+                           :body (js {:description "integration test user not active"
+                                      :password "azertyui"
+                                      :name "integration_not_active"
+                                      :active false
+                                      :role "tech"})
+                           :throw-exceptions false})))
+        integration-token (token-db/create database
+                                           {:user "integration"
+                                            :validity 10
+                                            :name "integration_token_user"})
+        integration-na-token (token-db/create database
+                                              {:user "integration_not_active"
+                                               :validity 10
+                                               :name "integration_token_na"})]
+    ;; write a crate file in the mirror store
+    (meuse.store.protocol/write-file
+     meuse.mirror/mirror-store
+     {:name "foo"
+      :vers "1.0.0"}
+     (.getBytes "file content"))
+    ;; auth is disabled for the mirror for now
+    (testing "download crate file: no auth"
+      (test-http
+       {:status 200
+        :body "file content"}
+       (client/get (str meuse-url "/api/v1/mirror/foo/1.0.0/download")
+                   {:content-type :json
+                    :headers {}
+                    :throw-exceptions false})))))

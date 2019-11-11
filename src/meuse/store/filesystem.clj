@@ -2,7 +2,7 @@
   "Manipulates the crate files in the filesystem."
   (:require [meuse.config :as config]
             [meuse.path :as path]
-            [meuse.store.protocol :refer [ICrateFile]]
+            [meuse.store.protocol :refer [ICrateStore]]
             [mount.core :refer [defstate]]
             [clojure.java.io :as io]))
 
@@ -39,7 +39,7 @@
       (.write w crate-file))))
 
 (defrecord LocalCrateFile [base-path]
-  ICrateFile
+  ICrateStore
   (exists [this crate-name version]
     (let [path (crate-file-path base-path
                                 crate-name

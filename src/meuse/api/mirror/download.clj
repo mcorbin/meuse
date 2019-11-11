@@ -11,7 +11,7 @@
 (defn download
   [mirror-store request]
   (params/validate-params request :meuse.api.crate.download/download)
-;  (auth-request/admin-or-tech?-throw request)
+   ;;  (auth-request/admin-or-tech?-throw request)
   (let [{:keys [crate-name crate-version]} (:route-params request)]
     (infof "mirror: serving crate file for crate %s version %s"
            crate-name
