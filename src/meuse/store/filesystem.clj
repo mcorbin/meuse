@@ -1,9 +1,7 @@
 (ns meuse.store.filesystem
   "Manipulates the crate files in the filesystem."
-  (:require [meuse.config :as config]
-            [meuse.path :as path]
+  (:require [meuse.path :as path]
             [meuse.store.protocol :refer [ICrateStore]]
-            [mount.core :refer [defstate]]
             [clojure.java.io :as io]))
 
 (defn crate-file-path

@@ -4,7 +4,7 @@
 
 (def skip-auth
   "Skip token auth for these calls."
-  #{:search})
+  #{:search :download})
 
 (def crates-routes
   {#"/new/?" {:put ::new}

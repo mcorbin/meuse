@@ -10,7 +10,7 @@
 (defn download
   [crate-file-store request]
   (params/validate-params request ::download)
-  (auth-request/admin-or-tech?-throw request)
+  ;(auth-request/admin-or-tech?-throw request)
   (let [{:keys [crate-name crate-version]} (:route-params request)]
     (info (format "serving crate file for crate %s version %s"
                   crate-name

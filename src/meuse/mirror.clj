@@ -1,23 +1,17 @@
 (ns meuse.mirror
   "The store for the crates.io mirror."
   (:require [meuse.config :as config]
-            [meuse.path :as path]
-            meuse.store.filesystem
+            [meuse.crate-file :refer [->CrateStore]]
             [meuse.store.protocol :as store]
             [aleph.http :as http]
             [byte-streams :as bs]
             [mount.core :refer [defstate]]
-            [clojure.tools.logging :refer [infof]])
-  (:import [meuse.store.filesystem LocalCrateFile]))
+            [clojure.tools.logging :refer [infof]]))
 
 (defstate mirror-store
   :start
-  (let [crate-config (:crate config/config)
-        store (:store crate-config)]
-    (condp = store
-      "filesystem" (LocalCrateFile. (path/new-path (:path crate-config)
-                                                   ".crates.io"))
-      (throw (ex-info (str "invalid crate store " store) {})))))
+  (let [crate-config (:crate config/config)]
+    (->CrateStore crate-config true)))
 
 (def crates-io-base-url "https://crates.io/api/v1/crates")
 

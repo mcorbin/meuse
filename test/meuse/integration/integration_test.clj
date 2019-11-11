@@ -955,7 +955,6 @@
       (is (= 200 status))
       (is (.contains body "http_requests_seconds_max")))))
 
-
 (deftest ^:integration mirror-api-integration-test
   ;; create a token for an admin user
   (let [token (token-db/create database {:user "user1"

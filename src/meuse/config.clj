@@ -29,20 +29,6 @@
                                         path)]
                      (error e error-msg)
                      (stop!)))})]
-    (let [metadata-dir (io/file (get-in config [:metadata :path]))
-          crate-dir (io/file (get-in config [:crate :path]))]
-      (when-not (and metadata-dir
-                     (.exists metadata-dir)
-                     (.isDirectory metadata-dir))
-        (throw (ex-info (format "invalid directory %s"
-                                (get-in config [:metadata :path]))
-                        {})))
-      (when-not (and crate-dir
-                     (.exists crate-dir)
-                     (.isDirectory crate-dir))
-        (throw (ex-info (format "invalid directory %s"
-                                (get-in config [:crate :path]))
-                        {}))))
     (start-logging! (:logging config))
     (debug "config loaded, logger started !")
     config))

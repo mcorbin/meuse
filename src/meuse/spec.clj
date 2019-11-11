@@ -17,6 +17,11 @@
                 (let [file (io/file path)]
                   (and (.exists file)
                        (.isFile file)))))
+
+(s/def ::directory (fn [path]
+                     (let [file (io/file path)]
+                       (and (.exists file)
+                            (.isDirectory file)))))
 ;; crate
 
 (s/def :crate/name ::non-empty-string)
@@ -94,19 +99,32 @@
                                    :http/cert
                                    :http/cacert]))
 
-(s/def :metadata/path ::non-empty-string)
+(s/def :metadata/path ::directory)
 (s/def :metadata/target ::non-empty-string)
 (s/def :metadata/url ::non-empty-string)
 (s/def :metadata/metadata (s/keys :req-un [:metadata/path
                                            :metadata/target
                                            :metadata/url]))
 
-(s/def :crate/path ::non-empty-string)
+(s/def :crate/path ::directory)
 
 (defmulti crate-store :store)
+
 (defmethod crate-store "filesystem"
   [_]
   (s/keys :req-un [:crate/path]))
+
+(s/def :s3/access-key ::non-empty-string)
+(s/def :s3/secret-key ::non-empty-string)
+(s/def :s3/endpoint ::non-empty-string)
+(s/def :s3/bucket ::non-empty-string)
+
+(defmethod crate-store "s3"
+  [_]
+  (s/keys :req-un [:s3/access-key
+                   :s3/secret-key
+                   :s3/endpoint
+                   :s3/bucket]))
 
 (defmethod crate-store :default
   [_]

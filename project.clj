@@ -5,6 +5,7 @@
   :maintainer {:name "Mathieu Corbin"
                :website "https://meuse.mcorbin.fr"}
   :dependencies [[aleph "0.4.7-alpha5"]
+                 [amazonica "0.3.139"]
                  [bidi "2.1.6"]
                  [cc.qbits/ex "0.1.3"]
                  [cheshire "5.9.0"]
@@ -20,6 +21,7 @@
                  [less-awful-ssl "1.0.4"]
                  [metosin/spec-tools "0.10.0"]
                  [mount "0.1.16"]
+                 [commons-codec/commons-codec "1.13"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/java.jdbc "0.7.10"]
                  [org.clojure/tools.logging "0.5.0"]
