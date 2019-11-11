@@ -1,10 +1,8 @@
 (ns meuse.crate-file
   "Manipulates the crate file."
   (:require [meuse.config :as config]
-            [meuse.path :as path]
             meuse.store.filesystem
-            [mount.core :refer [defstate]]
-            [clojure.java.io :as io])
+            [mount.core :refer [defstate]])
   (:import [meuse.store.filesystem LocalCrateFile]))
 
 (defstate crate-file-store

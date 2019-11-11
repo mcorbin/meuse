@@ -4,6 +4,7 @@
             [meuse.api.crate.http :refer [crates-routes crates-api!]]
             [meuse.api.default :refer [not-found]]
             [meuse.api.meuse.http :as meuse-http]
+            [meuse.api.mirror.http :as mirror-http]
             [meuse.api.public.http :as public-http]
             meuse.api.public.healthz
             meuse.api.public.me
@@ -13,7 +14,7 @@
             [meuse.config :refer [config]]
             [meuse.db.public.token :refer [token-db]]
             [meuse.error :as err]
-            ;[meuse.inject :as inject]
+            [meuse.inject :as inject]
             [meuse.metric :as metric]
             [meuse.middleware :refer [wrap-json]]
             [meuse.registry :as registry]
@@ -39,6 +40,7 @@
   ["/"
    [["api/v1/crates" crates-routes]
     ["api/v1/meuse" meuse-http/meuse-routes]
+    ["api/v1/mirror" mirror-http/mirror-routes]
     [#"me/?" :meuse.api.public.http/me]
     [#"metrics/?" :meuse.api.public.http/metrics]
     [#"healthz/?" :meuse.api.public.http/healthz]
@@ -51,6 +53,13 @@
 (defmethod route! :meuse.api.crate.http
   [request]
   (crates-api! (auth-request/check-user token-db request)))
+
+(defmethod route! :meuse.api.mirror.http
+  [request]
+  (info (:action request))
+  (mirror-http/mirror-api! ;(auth-request/check-user token-db request)
+   request
+   ))
 
 (defmethod route! :meuse.api.public.http
   [request]
@@ -117,11 +126,12 @@
                                                             (:cacert http-config))
                                       false
                                       ClientAuth/REQUIRE))
-        config (cond-> {:socket-address (InetSocketAddress.
+        config (cond-> {:epoll true
+                        :socket-address (InetSocketAddress.
                                          ^String (:address http-config)
                                          ^Integer (:port http-config))}
                  ssl-context (assoc :ssl-context ssl-context))]
-    ;(inject/inject!)
+    (inject/inject!)
     (http/start-server (-> (get-handler crate-config
                                         metadata-config)
                            wrap-json

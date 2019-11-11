@@ -28,6 +28,7 @@
      {}
      versions)))
 
+;; todo: refactor: should take name and version and not raw-metadata
 (defn write
   [base-path raw-metadata crate-file]
   (let [path (crate-file-path base-path
@@ -39,9 +40,11 @@
 
 (defrecord LocalCrateFile [base-path]
   ICrateFile
-  (write-file [this raw-metadata crate-file]
-    (write base-path raw-metadata crate-file))
-
+  (exists [this crate-name version]
+    (let [path (crate-file-path base-path
+                                crate-name
+                                version)]
+      (.exists (io/file path))))
   (get-file [this crate-name version]
     (let [path (crate-file-path
                 base-path
@@ -56,4 +59,6 @@
                         {:type :meuse.error/incorrect})))
       file))
   (versions [this crate-name]
-    (filesystem-versions base-path crate-name)))
+    (filesystem-versions base-path crate-name))
+  (write-file [this raw-metadata crate-file]
+    (write base-path raw-metadata crate-file)))

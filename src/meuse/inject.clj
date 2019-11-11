@@ -10,6 +10,8 @@
             [meuse.api.meuse.crate :as crate]
             [meuse.api.meuse.token :as token]
             [meuse.api.meuse.user :as user]
+            [meuse.api.mirror.http :refer [mirror-api!]]
+            [meuse.api.mirror.download :as mirror-download]
             [meuse.crate-file :refer [crate-file-store]]
             [meuse.db.public.category :refer [category-db]]
             [meuse.db.public.crate :refer [crate-db]]
@@ -18,7 +20,8 @@
             [meuse.db.public.search :refer [search-db]]
             [meuse.db.public.token :refer [token-db]]
             [meuse.db.public.user :refer [user-db]]
-            [meuse.git :refer [git]]))
+            [meuse.git :refer [git]]
+            [meuse.mirror :refer [mirror-store]]))
 
 (defn inject-meuse-api!
   "Inject multimethods to handle HTTP requests for the Meuse API"
@@ -120,7 +123,17 @@
       [request]
       (search/search search-db request))))
 
+(defn inject-mirror-api!
+  "Inject multimethods to handle HTTP requests for the Mirror API"
+  []
+  (do
+    (defmethod mirror-api! :download
+      [request]
+      (mirror-download/download mirror-store request))))
+
+
 (defn inject!
   []
   (inject-crate-api!)
-  (inject-meuse-api!))
+  (inject-meuse-api!)
+  (inject-mirror-api!))
