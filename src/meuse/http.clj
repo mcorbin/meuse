@@ -56,10 +56,9 @@
 
 (defmethod route! :meuse.api.mirror.http
   [request]
-  (info (:action request))
-  (mirror-http/mirror-api! ;(auth-request/check-user token-db request)
-   request
-   ))
+  (mirror-http/mirror-api!
+   ;;(auth-request/check-user token-db request)
+   request))
 
 (defmethod route! :meuse.api.public.http
   [request]
