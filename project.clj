@@ -5,7 +5,13 @@
   :maintainer {:name "Mathieu Corbin"
                :website "https://meuse.mcorbin.fr"}
   :dependencies [[aleph "0.4.7-alpha5"]
-                 [amazonica "0.3.139"]
+                 [amazonica "0.3.139"
+                  :exclusions
+                  [com.amazonaws/aws-java-sdk
+                   com.amazonaws/amazon-kinesis-client]]
+
+                 [com.amazonaws/aws-java-sdk-core "1.11.495"]
+                 [com.amazonaws/aws-java-sdk-s3 "1.11.495"]
                  [bidi "2.1.6"]
                  [cc.qbits/ex "0.1.3"]
                  [cheshire "5.9.0"]
