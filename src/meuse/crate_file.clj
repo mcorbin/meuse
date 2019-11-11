@@ -23,7 +23,8 @@
                                                 :endpoint])
                            (:bucket config)
                            (when mirror? ".crates.io"))
-       (throw (ex-info (str "invalid crate store " store) {}))))))
+       (throw (ex-info (str "invalid crate store " store)
+                       {:type :meuse.error/incorrect}))))))
 
 (defstate crate-file-store
   :start
