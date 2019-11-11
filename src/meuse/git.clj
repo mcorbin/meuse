@@ -25,9 +25,9 @@
   (git-cmd [this args]
     (debug "git command" (string/join " " args))
     (let [result (apply shell/sh "git" "-C" path args)]
-      (debug "git command status code="(:exit result)
-             "out="(:out result)
-             "err="(:err result))
+      (debug "git command status code=" (:exit result)
+             "out=" (:out result)
+             "err=" (:err result))
       (when-not (= 0 (:exit result))
         (throw (ex-info "error executing git command"
                         {:type :meuse.error/fault

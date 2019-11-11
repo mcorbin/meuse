@@ -1,5 +1,5 @@
 (ns meuse.store.filesystem
-"Manipulates the crate files in the filesystem."
+  "Manipulates the crate files in the filesystem."
   (:require [meuse.config :as config]
             [meuse.path :as path]
             [meuse.store.protocol :refer [ICrateFile]]
@@ -52,8 +52,8 @@
                 version)
           file (io/file path)]
       (when-not (.exists file)
-      (throw (ex-info (format "the file %s does not exist" path)
-                      {:type :meuse.error/incorrect})))
+        (throw (ex-info (format "the file %s does not exist" path)
+                        {:type :meuse.error/incorrect})))
       (when (.isDirectory file)
         (throw (ex-info (format "the file %s is a directory" path)
                         {:type :meuse.error/incorrect})))

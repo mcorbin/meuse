@@ -11,8 +11,8 @@
   (auth-request/admin?-throw request)
   (info "create category" (get-in request [:body :name]))
   (public-category/create category-db
-             (get-in request [:body :name])
-             (get-in request [:body :description]))
+                          (get-in request [:body :name])
+                          (get-in request [:body :description]))
   {:status 200
    :body {:ok true}})
 
@@ -34,8 +34,8 @@
   (info "update category")
   (let [category-name (get-in request [:route-params :name])]
     (public-category/update-category category-db
-                        category-name
-                        (:body request))
+                                     category-name
+                                     (:body request))
     {:status 200
      :body {:ok true}}))
 

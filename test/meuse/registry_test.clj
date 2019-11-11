@@ -37,10 +37,10 @@
 
 (deftest allowed-registry?-test
   (is (allowed-registry? {:deps [{:registry
-                                   "https://github.com/rust-lang/crates.io-index"}]}
+                                  "https://github.com/rust-lang/crates.io-index"}]}
                          (:allowed-registries registry-config)))
   (is (allowed-registry? {:deps [{:registry
-                                   "https://my-intranet:8080/index"}]}
+                                  "https://my-intranet:8080/index"}]}
                          (:allowed-registries registry-config)))
   (is (allowed-registry? {}
                          (:allowed-registries registry-config)))

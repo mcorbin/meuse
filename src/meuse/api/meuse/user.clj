@@ -11,7 +11,7 @@
   (auth-request/admin?-throw request)
   (info "create user" (get-in request [:body :name]))
   (public-user/create user-db
-                  (:body request))
+                      (:body request))
   {:status 200
    :body {:ok true}})
 

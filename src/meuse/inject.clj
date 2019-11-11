@@ -131,7 +131,6 @@
       [request]
       (mirror-download/download mirror-store request))))
 
-
 (defn inject!
   []
   (inject-crate-api!)

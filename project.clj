@@ -43,7 +43,8 @@
                    :env {:meuse-configuration "dev/resources/config.yaml"}
                    :plugins [[lein-environ "1.1.0"]
                              [lein-cloverage "1.1.1"]
-                             [lein-ancient "0.6.15"]]
+                             [lein-ancient "0.6.15"]
+                             [lein-cljfmt "0.6.5"]]
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
                    :repl-options {:init-ns user}

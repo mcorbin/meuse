@@ -24,25 +24,25 @@
                    (seq categories) (str "|| to_tsvector(?)")
                    true (str ")"))]
     (cond->
-        (-> (h/insert-into :crates_versions)
-            (h/columns :id
-                       :version
-                       :description
-                       :yanked
-                       :created_at
-                       :updated_at
-                       :crate_id
-                       :document_vectors)
-            (h/values [[(UUID/randomUUID)
-                        (:vers metadata)
-                        (:description metadata)
-                        (:yanked metadata false)
-                        now
-                        now
-                        crate-id
-                        (sql/raw tsvector)]])
-            sql/format
-            (conj (:name metadata))
-            (conj (:description metadata "")))
+     (-> (h/insert-into :crates_versions)
+         (h/columns :id
+                    :version
+                    :description
+                    :yanked
+                    :created_at
+                    :updated_at
+                    :crate_id
+                    :document_vectors)
+         (h/values [[(UUID/randomUUID)
+                     (:vers metadata)
+                     (:description metadata)
+                     (:yanked metadata false)
+                     now
+                     now
+                     crate-id
+                     (sql/raw tsvector)]])
+         sql/format
+         (conj (:name metadata))
+         (conj (:description metadata "")))
       (seq keywords) (conj (string/join " " keywords))
       (seq categories) (conj (string/join " " categories)))))

@@ -145,7 +145,7 @@
 
 (deftest list-tokens-test
   (let [token1 (token-db/create database {:user "user2"
-                                         :validity 10
+                                          :validity 10
                                           :name "token1"})
         token2 (token-db/create database {:user "user2"
                                           :validity 10

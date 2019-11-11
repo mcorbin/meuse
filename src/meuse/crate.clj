@@ -22,7 +22,6 @@
                             (alength #^bytes byte-array))
                     {:type :meuse.error/incorrect}))))
 
-
 (def git-metadata-keys [:name :vers :deps :cksum :features :yanked :links])
 (def deps-metadata-keys [:name :version_req :features :optional :default_features :target :kind :registry :explicit_name_in_toml])
 (def deps-keys-renamed {:version_req :req

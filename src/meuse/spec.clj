@@ -73,8 +73,7 @@
                                      :db/key
                                      :db/cert
                                      :db/cacert
-                                     :db/ssl-mode]
-                            ))
+                                     :db/ssl-mode]))
 
 (s/def :http/port ::pos-int)
 (s/def :http/address ::non-empty-string)
@@ -120,7 +119,6 @@
 (s/def ::console (s/or :bool ::boolean
                        :map (s/keys :req-un [::encoder])))
 (s/def ::logging (s/keys :req-un [::level ::console]))
-
 
 (s/def ::config (s/keys :req-un [:http/http
                                  :db/database

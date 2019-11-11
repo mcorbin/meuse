@@ -51,7 +51,7 @@
              (fn [line]
                ;; worst way to patch a file ever
                ;; todo: do something more robust
-               (if (string/includes? line (str "\"vers\":\""crate-version"\""))
+               (if (string/includes? line (str "\"vers\":\"" crate-version "\""))
                  (string/replace line
                                  (re-pattern (str "\"yanked\":" (not yanked?)))
                                  (str "\"yanked\":" yanked?))
@@ -74,6 +74,6 @@
   (let [[_ metadata-path] (metadata-file-path base-path crate-name)]
     (if (.exists (io/file metadata-path))
       (->> (string/split (slurp metadata-path) #"\n")
-          (map #(json/parse-string % true))
-          (map :vers))
+           (map #(json/parse-string % true))
+           (map :vers))
       [])))

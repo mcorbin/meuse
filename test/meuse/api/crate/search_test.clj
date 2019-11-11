@@ -38,31 +38,31 @@
 
 (deftest format-search-result-test
   (is (= [{:name "foo"
-            :max_version "1.3.1"
+           :max_version "1.3.1"
            :description "crate description"}
           {:name "bar"
-            :max_version "3.4.1"
-            :description "another description"}]
-       (format-search-result [{:crate-name "foo"
-                               :version-version "1.1.1"
-                               :version-description "crate description"
-                               :version_yanked false}
-                              {:crate-name "foo"
-                               :version-version "1.3.1"
-                               :version-description "crate description"
-                               :version_yanked false}
-                              {:crate-name "foo"
-                               :version-version "1.2.1"
-                               :version-description "crate description"
-                               :version_yanked false}
-                              {:crate-name "bar"
-                               :version-version "3.3.1"
-                               :version-description "another description"
-                               :version_yanked false}
-                              {:crate-name "bar"
-                               :version-version "3.4.1"
-                               :version-description "another description"
-                               :version_yanked false}]))))
+           :max_version "3.4.1"
+           :description "another description"}]
+         (format-search-result [{:crate-name "foo"
+                                 :version-version "1.1.1"
+                                 :version-description "crate description"
+                                 :version_yanked false}
+                                {:crate-name "foo"
+                                 :version-version "1.3.1"
+                                 :version-description "crate description"
+                                 :version_yanked false}
+                                {:crate-name "foo"
+                                 :version-version "1.2.1"
+                                 :version-description "crate description"
+                                 :version_yanked false}
+                                {:crate-name "bar"
+                                 :version-version "3.3.1"
+                                 :version-description "another description"
+                                 :version_yanked false}
+                                {:crate-name "bar"
+                                 :version-version "3.4.1"
+                                 :version-description "another description"
+                                 :version_yanked false}]))))
 
 (deftest format-search-result-test
   (is (= []

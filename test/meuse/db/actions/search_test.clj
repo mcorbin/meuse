@@ -25,4 +25,4 @@
       (is (= 3 (count result)))))
   (testing "search by keyword"
     (let [result (search database "keyword1")]
-    (is (= 1 (count result))))))
+      (is (= 1 (count result))))))

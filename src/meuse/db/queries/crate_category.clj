@@ -16,7 +16,6 @@
                        [:= :c.crate_id crate-id]
                        [:= :c.category_id category-id]]))
 
-
 (defn create
   [crate-id category-id]
   (-> (h/insert-into :crates_categories)

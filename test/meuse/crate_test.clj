@@ -50,8 +50,8 @@
                     :yanked false
                     :foo "bar"
                     :deps [{:version_req "0.1.0"
-                             :foo "bar"
-                             :explicit_name_in_toml "toto"}]
+                            :foo "bar"
+                            :explicit_name_in_toml "toto"}]
                     :cksum (digest/sha-256 crate-file)}
           request (create-publish-request metadata crate-file)]
       (is (= {:raw-metadata metadata
@@ -60,7 +60,7 @@
                              :yanked false
                              :deps [{:req "0.1.0"
                                      :package "toto"}]
-                    :cksum (digest/sha-256 crate-file)}
+                             :cksum (digest/sha-256 crate-file)}
               :crate-file (String. (.getBytes crate-file))}
              (-> (request->crate request)
                  (update :crate-file #(String. #^bytes %)))))))

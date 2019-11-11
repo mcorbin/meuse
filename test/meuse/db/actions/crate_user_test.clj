@@ -68,8 +68,8 @@
 (deftest create-crate-users-test
   (testing "success"
     (crate-user-db/create-crate-users database
-                        "crate2"
-                        ["user2" "user3"])
+                                      "crate2"
+                                      ["user2" "user3"])
     (let [crate-db-id (:crate-id (crate-db/by-name
                                   database
                                   "crate2"))
@@ -108,8 +108,8 @@
 (deftest delete-crate-users-test
   (testing "success"
     (crate-user-db/delete-crate-users database
-                        "crate1"
-                        ["user2" "user3"])
+                                      "crate1"
+                                      ["user2" "user3"])
     (let [crate-db-id (:crate-id (crate-db/by-name
                                   database
                                   "crate1"))
@@ -117,7 +117,6 @@
           user2-db-id (:user-id (user-db/by-name database "user3"))]
       (is (nil? (crate-user-db/by-id database crate-db-id user1-db-id)))
       (is (nil? (crate-user-db/by-id database crate-db-id user2-db-id))))))
-
 
 (deftest owned-by?-test
   (testing "success"

@@ -9,7 +9,7 @@
 (deftest crate-file-path-test
   (is (= "/tmp/foo/foobar/1.0.0/download"
          (crate-file-path "/tmp/foo" "foobar" "1.0.0")))
-    (is (= "/tmp/foo/foobar/1.0.0/download"
+  (is (= "/tmp/foo/foobar/1.0.0/download"
          (crate-file-path "/tmp/foo/" "foobar" "1.0.0")))
   (is (= "/tmp/foo/foobaz/1.0.3/download"
          (crate-file-path "/tmp/foo" "foobaz" "1.0.3"))))
@@ -31,9 +31,9 @@
   (is (= {"2.3.2" true}
          (filesystem-versions tmp-dir "test1")))
   (write tmp-dir
-          {:name "test1"
-           :vers "2.3.4"}
-          (.getBytes "roflmap"))
+         {:name "test1"
+          :vers "2.3.4"}
+         (.getBytes "roflmap"))
   (is (= {"2.3.2" true
           "2.3.4" true}
          (filesystem-versions tmp-dir "test1")))

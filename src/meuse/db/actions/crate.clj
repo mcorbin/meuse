@@ -97,7 +97,7 @@
       (let [crate-id (UUID/randomUUID)
             created-crate (crate-queries/create metadata crate-id)
             created-version (crate-version-queries/create metadata
-                                                         crate-id)]
+                                                          crate-id)]
         (jdbc/execute! db-tx created-crate)
         (jdbc/execute! db-tx created-version)
         (crate-category/create-categories db-tx

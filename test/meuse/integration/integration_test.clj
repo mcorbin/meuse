@@ -96,7 +96,7 @@
                                    {:headers {"Authorization" integration-token}
                                     :content-type :json
                                     :throw-exceptions false})
-                    body (json/parse-string body true)]
+            body (json/parse-string body true)]
         (is (= 200 status))
         (is (= 3 (count body)))))
     (testing "check crates: invalid token"
@@ -471,8 +471,7 @@
                        :headers {"Authorization" integration-token}
                        :throw-exceptions false
                        :body (js {:name "integration_token_na"
-                                  :user "integration_not_active"
-                                  })})))
+                                  :user "integration_not_active"})})))
     (testing "delete token: the token does not exist"
       (test-http
        {:status 404
@@ -482,8 +481,7 @@
                        :headers {"Authorization" token}
                        :throw-exceptions false
                        :body (js {:name "notfound"
-                                  :user "integration_not_active"
-                                  })})))
+                                  :user "integration_not_active"})})))
     (testing "delete token: the user does not exist"
       (test-http
        {:status 404
@@ -552,7 +550,7 @@
                                   :throw-exceptions false})
             categories (:categories (json/parse-string (:body response) true))
             email (-> (filter #(= "email" (:name %)) categories)
-                    first)
+                      first)
             system (-> (filter #(= "system" (:name %)) categories)
                        first)]
         (is (= 200 (:status response)))
@@ -932,36 +930,36 @@
 
 (deftest ^:integration public-api-integration-test
   (testing "/me"
-      (test-http
-       {:status 200
-        :body me-msg}
-       (client/get (str meuse-url "/me")
-                   {:content-type :json
-                    :throw-exceptions false})))
-    (testing "/healthz"
-      (test-http
-       {:status 200
-        :body healthz-msg}
-       (client/get (str meuse-url "/healthz")
-                   {:content-type :json
-                    :throw-exceptions false})))
+    (test-http
+     {:status 200
+      :body me-msg}
+     (client/get (str meuse-url "/me")
+                 {:content-type :json
+                  :throw-exceptions false})))
+  (testing "/healthz"
+    (test-http
+     {:status 200
+      :body healthz-msg}
+     (client/get (str meuse-url "/healthz")
+                 {:content-type :json
+                  :throw-exceptions false})))
   (testing "/health"
-      (test-http
-       {:status 200
-        :body healthz-msg}
-       (client/get (str meuse-url "/health")
-                   {:content-type :json
-                    :throw-exceptions false})))
+    (test-http
+     {:status 200
+      :body healthz-msg}
+     (client/get (str meuse-url "/health")
+                 {:content-type :json
+                  :throw-exceptions false})))
   (testing "/status"
-      (test-http
-       {:status 200
-        :body healthz-msg}
-       (client/get (str meuse-url "/status")
-                   {:content-type :json
-                    :throw-exceptions false})))
+    (test-http
+     {:status 200
+      :body healthz-msg}
+     (client/get (str meuse-url "/status")
+                 {:content-type :json
+                  :throw-exceptions false})))
   (testing "/metrics"
-      (let [{:keys [body status]} (client/get (str meuse-url "/metrics")
-                                              {:content-type :json
-                                               :throw-exceptions false})]
-        (is (= 200 status))
-        (is (.contains body "http_requests_seconds_max")))))
+    (let [{:keys [body status]} (client/get (str meuse-url "/metrics")
+                                            {:content-type :json
+                                             :throw-exceptions false})]
+      (is (= 200 status))
+      (is (.contains body "http_requests_seconds_max")))))

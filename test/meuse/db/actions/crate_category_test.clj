@@ -41,8 +41,8 @@
                                    database
                                    "email"))
         system-db-id (:category-id (category-db/by-name
-                                      database
-                                      "system"))
+                                    database
+                                    "system"))
         _ (create-categories database crate-db-id ["system" "email"])
         crate-category-email (by-crate-and-category database
                                                     crate-db-id

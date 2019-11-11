@@ -62,8 +62,8 @@
                :yanked false}
         {:keys [user-id]} (user-db/by-name database "user2")]
     (is (thrown-with-msg? ExceptionInfo
-                            #"the category cat1 does not exist"
-                            (create database crate user-id)))))
+                          #"the category cat1 does not exist"
+                          (create database crate user-id)))))
 
 (deftest get-crates-and-versions-test
   (let [result (get-crates-and-versions database)

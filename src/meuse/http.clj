@@ -95,7 +95,7 @@
                                       :metadata metadata-config}
                              :subsystem (-> request :handler namespace keyword)
                              :action (-> request :handler name keyword)
-                            :registry-config registry-config)]
+                             :registry-config registry-config)]
           (debug "request" (:request-id request)
                  "with subsystem" (:subsystem request)
                  "with action" (:action request))
@@ -104,13 +104,13 @@
                                                          :request-method
                                                          name)]
             (ex/try+
-                (route! request)
-                (catch-data
-                 :meuse.error/user
-                 data
-                 (err/handle-user-error request data))
-                (catch Exception e
-                  (err/handle-unexpected-error request e)))))
+             (route! request)
+             (catch-data
+              :meuse.error/user
+              data
+              (err/handle-user-error request data))
+             (catch Exception e
+               (err/handle-unexpected-error request e)))))
         (catch Exception e
           (error e "internal error")
           {:status 500

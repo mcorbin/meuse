@@ -78,7 +78,7 @@
   (jdbc/with-db-transaction [db-tx database]
     (if-let [user (user-db/by-name db-tx user-name)]
       (->> (jdbc/query db-tx (token-queries/by-user
-                             (:user-id user)))
+                              (:user-id user)))
            (map #(clojure.set/rename-keys % {:token_id :token-id
                                              :token_identifier :token-identifier
                                              :token_name :token-name

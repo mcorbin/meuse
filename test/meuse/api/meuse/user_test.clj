@@ -73,26 +73,26 @@
                 :active true
                 :description "it's me mathieu"
                 :role "admin"}
-        request (add-auth {:action :new-user
-                           :body user}
-                          "user1"
-                          "tech")]
+          request (add-auth {:action :new-user
+                             :body user}
+                            "user1"
+                            "tech")]
       (is (thrown-with-msg?
-         ExceptionInfo
-         #"bad permissions"
-         (meuse-api! request)))))
+           ExceptionInfo
+           #"bad permissions"
+           (meuse-api! request)))))
   (testing "bad permissions: no auth"
     (let [user {:name "mathieu"
-              :password "foobarbaz"
-              :active true
-              :description "it's me mathieu"
-              :role "admin"}
+                :password "foobarbaz"
+                :active true
+                :description "it's me mathieu"
+                :role "admin"}
           request {:action :new-user
                    :body user}]
       (is (thrown-with-msg?
-         ExceptionInfo
-         #"bad permissions"
-         (meuse-api! request))))))
+           ExceptionInfo
+           #"bad permissions"
+           (meuse-api! request))))))
 
 (deftest delete-user-test
   (let [username "user2"
@@ -164,8 +164,7 @@
                                 :route-params {:name "user2"}
                                 :body {:role "admin"}}
                                "user2"
-                               "tech"))
-         ))
+                               "tech"))))
     (is (thrown-with-msg?
          ExceptionInfo
          #"only admins can enable or disable an user"

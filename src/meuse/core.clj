@@ -29,15 +29,15 @@
       (do (error "missing parameter for the password subcommand")
           (System/exit 1))))
   (with-handler :term
-      (info "SIGTERM, stopping")
-      (stop!)
-      (info "the system is stopped")
-      (System/exit 0))
+    (info "SIGTERM, stopping")
+    (stop!)
+    (info "the system is stopped")
+    (System/exit 0))
 
-    (with-handler :int
-      (info "SIGINT, stopping")
-      (stop!)
-      (info "the system is stopped")
-      (System/exit 0))
+  (with-handler :int
+    (info "SIGINT, stopping")
+    (stop!)
+    (info "the system is stopped")
+    (System/exit 0))
   (start!))
 

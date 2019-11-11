@@ -69,11 +69,11 @@
   (let [result (shell/sh "psql" "-h" "localhost" "-d" "meuse" "-p" "5432" "-U" "meuse" "-f" dump-file
                          :env {"PGPASSWORD" "meuse"})]
     (when-not (= 0 (:exit result))
-        (throw (ex-info "error executing psql command"
-                        {:status 500
-                         :exit-code (:exit result)
-                         :stdout (:out result)
-                         :stderr (:err result)})))))
+      (throw (ex-info "error executing psql command"
+                      {:status 500
+                       :exit-code (:exit result)
+                       :stdout (:out result)
+                       :stderr (:err result)})))))
 
 (defn clean!
   [database]
