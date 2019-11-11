@@ -32,6 +32,7 @@
   (doseq [dep (:deps metadata)]
     (when-let [registry (:registry dep)]
       (when-not ((set allowed-registries) registry)
-        (throw (ex-info (str "the registry " registry " is not allowed")
+        (throw (ex-info (str "the registry " registry " is not allowed."
+                             " Please check https://github.com/rust-lang/rfcs/blob/master/text/2141-alternative-registries.md#registry-index-format-specification")
                         {:type :meuse.error/unauthorized})))))
   true)

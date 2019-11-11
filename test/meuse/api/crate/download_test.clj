@@ -23,15 +23,6 @@
                                    :route-params {:crate-name "foo"
                                                   :crate-version "1.0.0"}}))))
          "file content"))
-  (testing "bad permissions"
-    (is (thrown-with-msg?
-         ExceptionInfo
-         #"bad permissions"
-         (crates-api! {:action :download
-                       :auth {}
-                       :config {:crate {:path tmp-dir}}
-                       :route-params {:crate-name "foo"
-                                      :crate-version "1.0.0"}}))))
   (testing "error"
     (is (thrown-with-msg?
          ExceptionInfo

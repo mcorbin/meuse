@@ -909,14 +909,6 @@
         :body "crate file content"}
        (client/get (str meuse-url "/api/v1/crates/foo/1.10.3/download")
                    {:content-type :json
-                    :headers {"Authorization" integration-token}
-                    :throw-exceptions false})))
-    (testing "download crate file: no auth"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "token missing in the header"}]})}
-       (client/get (str meuse-url "/api/v1/crates/foo/1.10.3/download")
-                   {:content-type :json
                     :throw-exceptions false})))))
 
 (deftest ^:integration public-api-integration-test
