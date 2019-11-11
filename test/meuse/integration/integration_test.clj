@@ -894,20 +894,11 @@
                    :meta {:total 1}})}
        (client/get (str meuse-url "/api/v1/crates?q=foo")
                    {:content-type :json
-                    :headers {"Authorization" integration-token}
                     :throw-exceptions false})))
     (testing "search: no query"
       (test-http
        {:status 200
         :body (js {:errors [{:detail "Wrong input parameters:\n - field q missing in params\n"}]})}
-       (client/get (str meuse-url "/api/v1/crates")
-                   {:content-type :json
-                    :headers {"Authorization" integration-token}
-                    :throw-exceptions false})))
-    (testing "search: no auth"
-      (test-http
-       {:status 200
-        :body (js {:errors [{:detail "token missing in the header"}]})}
        (client/get (str meuse-url "/api/v1/crates")
                    {:content-type :json
                     :throw-exceptions false})))
