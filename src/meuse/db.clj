@@ -2,6 +2,7 @@
   "The database component"
   (:require [meuse.config :refer [config]]
             [meuse.metric :as metric]
+            [meuse.migration :as migration]
             [aleph.http :as http]
             [mount.core :refer [defstate]]
             [clojure.java.jdbc :as j]
@@ -37,7 +38,9 @@
     {:datasource (HikariDataSource. config)}))
 
 (defstate database
-  :start (pool (:database config))
+  :start (let [db-pool (pool (:database config))]
+           (migration/migrate! db-pool)
+           db-pool)
   :stop (do (debug "stopping db pool")
             (.close ^HikariDataSource (:datasource database))
             (debug "db pool stopped")))

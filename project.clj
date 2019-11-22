@@ -32,6 +32,7 @@
                  [org.clojure/java.jdbc "0.7.10"]
                  [org.clojure/tools.logging "0.5.0"]
                  [org.postgresql/postgresql "42.2.8"]
+                 [ragtime "0.8.0"]
                  [ring/ring-core "1.7.1"]
                  [spootnik/signal "0.2.4"]
                  [spootnik/unilog "0.7.25"]]
