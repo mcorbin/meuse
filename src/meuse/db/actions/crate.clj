@@ -12,6 +12,7 @@
 (def db-renaming
   {:crate_id :crate-id
    :crate_name :crate-name
+   :crate_versions_count :crate-versions-count
    :version_id :version-id
    :version_version :version-version
    :version_description :version-description
@@ -107,3 +108,25 @@
         (jdbc/execute! db-tx (crate-user-queries/create
                               crate-id
                               user-id))))))
+
+(defn get-crates-range
+  "Get crates with the number of versions per crates. The crates will start
+  by the prefix.
+  Returns the rows between start and end (the crates are sorted by name)."
+  [database start end prefix]
+  (->> (jdbc/query database (crate-queries/get-crates-range start end prefix))
+       (map #(clojure.set/rename-keys % db-renaming))))
+
+(defn count-crates
+  "Count the number of crates"
+  [database]
+  (-> (jdbc/query database (crate-queries/count-crates))
+      first
+      (clojure.set/rename-keys {:crates_count :crates-count})))
+
+(defn count-crates-prefix
+  "Count the number of crates starting by a prefix"
+  [database prefix]
+  (-> (jdbc/query database (crate-queries/count-crates-prefix prefix))
+      first
+      (clojure.set/rename-keys {:crates_count :crates-count})))

@@ -52,3 +52,10 @@
       (throw (ex-info (format "the category %s does not exist"
                               category-name)
                       {:type :meuse.error/not-found})))))
+
+(defn count-crates-for-categories
+  "count the number of crates in categories"
+  [database]
+  (->> (jdbc/query database
+                   (queries/count-crates-for-categories))
+       (map #(clojure.set/rename-keys % {:category_id :category-id}))))

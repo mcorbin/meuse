@@ -71,3 +71,9 @@
       (h/sset fields)
       (h/where [:= :id user-id])
       sql/format))
+
+(defn count-users
+  []
+  (-> (h/select [:%count.* "users_count"])
+      (h/from [:users :c])
+      sql/format))

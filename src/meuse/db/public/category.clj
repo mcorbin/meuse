@@ -7,7 +7,8 @@
   (by-crate-id [this crate-id])
   (create [this category-name description])
   (update-category [this category-name fields])
-  (get-categories [this]))
+  (get-categories [this])
+  (count-crates [this]))
 
 (defrecord CategoryDB [database]
   ICategoryDB
@@ -21,7 +22,10 @@
     (category/update-category database category-name fields))
 
   (get-categories [this]
-    (category/get-categories database)))
+    (category/get-categories database))
+
+  (count-crates [this]
+    (category/count-crates-for-categories database)))
 
 (defstate category-db
   :start (CategoryDB. database))

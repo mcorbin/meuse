@@ -9,7 +9,8 @@
   (create [this user])
   (delete [this user-name])
   (get-users [this])
-  (update-user [this user-name fields]))
+  (update-user [this user-name fields])
+  (count-users [this]))
 
 (defrecord UserDB [database]
   IUserDB
@@ -24,7 +25,9 @@
   (get-users [this]
     (user/get-users database))
   (update-user [this user-name fields]
-    (user/update-user database user-name fields)))
+    (user/update-user database user-name fields))
+  (count-users [this]
+    (user/count-users database)))
 
 (defstate user-db
   :start (UserDB. database))

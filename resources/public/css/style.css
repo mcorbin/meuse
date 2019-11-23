@@ -1,0 +1,120 @@
+
+body {
+    color: #222;
+    background-color: #F1F1F1;
+    font-family: serif, Arial;
+    font-size: 19px;
+}
+
+#core {
+    padding-top: 30px;
+    background-color: #fefbf3;
+}
+
+
+#footer {
+    background-color: #fefbf3;
+}
+
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+
+.clear {
+    clear:both;
+}
+
+#page .col-sm {
+    padding: 15px;
+}
+
+.center {
+    text-align: center;
+}
+
+.red {
+    background-color: red;
+}
+
+/* index Menu */
+
+#menu {
+    background-image: linear-gradient(to right, #336600, #59b300);
+    padding-bottom: 5px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+#menu h1 {
+    display: inline;
+    color: white;
+}
+
+#menu #menu-search {
+    padding-top: 10px;
+}
+
+#menu #menu-search input {
+    width: 90%;
+    
+}
+
+#menu #menu-links {
+    padding-top: 10px;
+}
+
+#menu #menu-links a {
+    color: #F1F1F1;
+}
+
+#menu #menu-links .menu-element {
+    margin-right: 10px;
+}
+
+/* index page */
+
+.index-links .btn {
+    margin: 10px;
+}
+
+.index-stats-row {
+    margin: 10px;
+    border-top: 1px solid black;
+}
+
+.index-stats-row div {
+    margin-top: 10px;
+}
+
+.stat-num {
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.index-last-updated-block {
+    margin-bottom: 20px;
+    padding:10px;
+    border-radius: 5px;
+    background-color: #faf0d7;
+    border: 1px solid #ece2c8;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+/* search page */
+
+.search-result-crate {
+    margin-bottom: 20px;
+    padding:10px;
+    border-radius: 5px;
+    background-color: #faf0d7;
+    border: 1px solid #ece2c8;
+}

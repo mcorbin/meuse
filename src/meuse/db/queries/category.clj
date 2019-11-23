@@ -53,3 +53,11 @@
       (h/sset fields)
       (h/where [:= :id category-id])
       sql/format))
+
+(defn count-crates-for-categories
+  []
+  (-> (h/select [:%count.* "count"]
+                [:category_id "category_id"])
+      (h/from [:crates_categories :cc])
+      (h/group :cc.category_id)
+      sql/format))
