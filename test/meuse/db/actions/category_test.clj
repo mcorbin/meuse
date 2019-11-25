@@ -58,3 +58,11 @@
          #"the category foo does not exist"
          (update-category database "foo" {:name "music"
                                           :description "music description"})))))
+
+(deftest count-crates-for-categories-test
+  (let [categories (get-categories database)
+        count-crates (count-crates-for-categories database)]
+    (is (= (count categories) (count count-crates)))
+    (doseq [count-crate count-crates]
+      (is (string? (:category-id count-crate)))
+      (is (= 1 (:count count-crate))))))

@@ -93,3 +93,30 @@
       (h/where [:= :cat.category_id category-id])
       sql/format))
 
+(defn get-crates-range
+  [start end prefix]
+  (-> (h/select [:c.id "crate_id"]
+                [:c.name "crate_name"]
+                [:%count.* "crate_versions_count"])
+      (h/from [:crates :c])
+      (h/where [:like :c.name (str prefix "%")])
+      (h/join [:crates_versions :v]
+              [:= :c.id :v.crate_id])
+      (h/group :c.id)
+      (h/order-by :c.name)
+      (h/offset start)
+      (h/limit end)
+      sql/format))
+
+(defn count-crates
+  []
+  (-> (h/select [:%count.* "crates_count"])
+      (h/from [:crates :c])
+      sql/format))
+
+(defn count-crates-prefix
+  [prefix]
+  (-> (h/select [:%count.* "crates_count"])
+      (h/from [:crates :c])
+      (h/where [:like :c.name (str prefix "%")])
+      sql/format))

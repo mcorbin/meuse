@@ -14,6 +14,8 @@
             [meuse.config :refer [config]]
             [meuse.db.public.token :refer [token-db]]
             [meuse.error :as err]
+            [meuse.front.base :as base-http]
+            [meuse.front.http :as front-http]
             [meuse.inject :as inject]
             [meuse.metric :as metric]
             [meuse.middleware :refer [wrap-json]]
@@ -22,10 +24,12 @@
             [aleph.http :as http]
             [aleph.netty :as netty]
             [bidi.bidi :refer [match-route*]]
+            [hiccup.page :as page]
             [less.awful.ssl :as less-ssl]
             [mount.core :refer [defstate]]
             [qbits.ex :as ex]
             [ring.middleware.content-type :refer [wrap-content-type]]
+            [ring.middleware.resource :refer [wrap-resource]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.params :refer [wrap-params]]
             [clojure.java.jdbc :as jdbc]
@@ -41,10 +45,11 @@
    [["api/v1/crates" crate-http/crates-routes]
     ["api/v1/meuse" meuse-http/meuse-routes]
     ["api/v1/mirror" mirror-http/mirror-routes]
-    [#"me/?" :meuse.api.public.http/me]
-    [#"metrics/?" :meuse.api.public.http/metrics]
+    ["front" front-http/front-routes]
     [#"healthz/?" :meuse.api.public.http/healthz]
     [#"health/?" :meuse.api.public.http/healthz]
+    [#"me/?" :meuse.api.public.http/me]
+    [#"metrics/?" :meuse.api.public.http/metrics]
     [#"status/?" :meuse.api.public.http/healthz]
     [true :meuse.api.public.http/default]]])
 
@@ -73,6 +78,12 @@
                   request
                   (auth-request/check-user token-db request))]
     (meuse-http/meuse-api! (-> (convert-body-edn request)))))
+
+(defmethod route! :meuse.front.http
+  [request]
+  {:status 200
+   :headers {"Content-Type" "text/html; charset=utf-8"}
+   :body (base-http/html (front-http/front-api! request))})
 
 (defmethod route! :default
   [request]
@@ -136,9 +147,11 @@
     (inject/inject!)
     (http/start-server (-> (get-handler crate-config
                                         metadata-config)
+                           (wrap-resource "public")
                            wrap-json
                            wrap-keyword-params
-                           wrap-params)
+                           wrap-params
+                           )
                        config)))
 
 (defstate http-server

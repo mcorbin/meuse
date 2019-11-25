@@ -102,3 +102,10 @@
                                          :user_description :description
                                          :user_active :active
                                          :role_name :role}))))
+
+(defn count-users
+  "count the number of users"
+  [database]
+  (-> (jdbc/query database (user-queries/count-users))
+      first
+      (clojure.set/rename-keys {:users_count :users-count})))

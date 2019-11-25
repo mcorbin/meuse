@@ -31,3 +31,15 @@
     (is (thrown-with-msg? ExceptionInfo
                           #"the version does not exist$"
                           (update-yank database "crate1" "0.1.4" false)))))
+
+(deftest last-updated-test
+  (let [crates (last-updated database 1)]
+    (is (= 1 (count crates)))
+    (is (= "crate3" (-> crates first :crate-name))))
+  (let [crates (last-updated database 2)]
+    (is (= 2 (count crates)))
+    (is (= "crate3" (-> crates first :crate-name)))
+    (is (= "crate2" (-> crates second :crate-name)))))
+
+(deftest count-crates-versions-test
+  (is (= {:crates-versions-count 5} (count-crates-versions database))))

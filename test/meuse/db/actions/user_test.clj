@@ -105,3 +105,6 @@
             :id (:user-id user1)}
            (-> (filter #(= (:name %) "user1") users)
                first)))))
+
+(deftest count-users-test
+  (is (= {:users-count 5} (count-users database))))

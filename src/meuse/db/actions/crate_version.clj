@@ -36,3 +36,16 @@
                       {:type :meuse.error/not-found
                        :crate-name crate-name
                        :crate-version crate-version})))))
+
+(defn last-updated
+  "Get the last n updated versions"
+  [database n]
+  (->> (jdbc/query database (crate-version-queries/last-updated n))
+       (map #(clojure.set/rename-keys % crate-db/db-renaming))))
+
+(defn count-crates-versions
+  "Count crates versions"
+  [database]
+  (-> (jdbc/query database (crate-version-queries/count-crates-versions))
+      first
+      (clojure.set/rename-keys {:crates_versions_count :crates-versions-count})))

@@ -34,4 +34,3 @@
   [db-tx crate-id categories]
   (doseq [category categories]
     (create db-tx crate-id category)))
-

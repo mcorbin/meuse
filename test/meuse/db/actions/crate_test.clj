@@ -119,3 +119,37 @@
          ExceptionInfo
          #"the category doesnotexist does not exist"
          (get-crates-for-category database "doesnotexist")))))
+
+(deftest get-crates-range-test
+  (let [crates (get-crates-range database 0 3 "c")]
+    (is (= 3 (count crates)))
+    (is (= "crate1" (-> crates first :crate-name)))
+    (is (uuid? (-> crates first :crate-id)))
+    (is (= 3 (-> crates first :crate-versions-count)))
+    (is (= "crate2" (-> crates second :crate-name)))
+    (is (uuid? (-> crates second :crate-id)))
+    (is (= 1 (-> crates second :crate-versions-count)))
+    (is (= "crate3" (-> crates last :crate-name)))
+    (is (uuid? (-> crates last :crate-id)))
+    (is (= 1 (-> crates last :crate-versions-count))))
+  (let [crates (get-crates-range database 0 3 "crate1")]
+    (is (= 1 (count crates)))
+    (is (= "crate1" (-> crates first :crate-name)))
+    (is (uuid? (-> crates first :crate-id)))
+    (is (= 3 (-> crates first :crate-versions-count))))
+  (let [crates (get-crates-range database 0 1 "c")]
+    (is (= 1 (count crates)))
+    (is (= "crate1" (-> crates first :crate-name)))
+    (is (uuid? (-> crates first :crate-id)))
+    (is (= 3 (-> crates first :crate-versions-count))))
+  (let [crates (get-crates-range database 1 3 "c")]
+    (is (= 2 (count crates)))
+    (is (= "crate2" (-> crates first :crate-name)))
+    (is (uuid? (-> crates first :crate-id)))
+    (is (= 1 (-> crates first :crate-versions-count)))
+    (is (= "crate3" (-> crates last :crate-name)))
+    (is (uuid? (-> crates last :crate-id)))
+    (is (= 1 (-> crates last :crate-versions-count)))))
+
+(deftest count-crates-test
+  (is (= {:crates-count 3} (count-crates database))))

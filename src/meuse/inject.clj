@@ -20,6 +20,13 @@
             [meuse.db.public.search :refer [search-db]]
             [meuse.db.public.token :refer [token-db]]
             [meuse.db.public.user :refer [user-db]]
+            [meuse.front.http :refer [front-api!]]
+            [meuse.front.pages.category :as category-page]
+            [meuse.front.pages.crates-category :as crates-category-page]
+            [meuse.front.pages.crate :as crate-page]
+            [meuse.front.pages.crates :as crates-page]
+            [meuse.front.pages.index :as index-page]
+            [meuse.front.pages.search :as search-page]
             [meuse.git :refer [git]]
             [meuse.mirror :refer [mirror-store]]))
 
@@ -131,8 +138,48 @@
       [request]
       (mirror-download/download mirror-store request))))
 
+(defn inject-front-api!
+  "Inject multimethods to handle HTTP requests for the front API"
+  []
+  (do
+    (defmethod front-api! :index
+      [request]
+      (index-page/index-page category-db
+                             crate-db
+                             crate-version-db
+                             user-db
+                             request))
+
+    (defmethod front-api! :search
+      [request]
+      (search-page/page search-db
+                        request))
+
+
+    (defmethod front-api! :crate
+      [request]
+      (crate-page/page crate-db
+                       request))
+
+    (defmethod front-api! :crates
+      [request]
+      (crates-page/page crate-db
+                        request))
+
+    (defmethod front-api! :categories
+      [request]
+      (category-page/page category-db
+                          request))
+
+    (defmethod front-api! :crates-category
+      [request]
+      (crates-category-page/page crate-db
+                                 request))
+    ))
+
 (defn inject!
   []
   (inject-crate-api!)
   (inject-meuse-api!)
-  (inject-mirror-api!))
+  (inject-mirror-api!)
+  (inject-front-api!))

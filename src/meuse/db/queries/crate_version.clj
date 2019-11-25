@@ -55,3 +55,26 @@
       (not (string/blank? (:description metadata))) (conj (:description metadata))
       (seq keywords) (conj (string/join " " keywords))
       (seq categories) (conj (string/join " " categories)))))
+
+(defn last-updated
+  [n]
+  (-> (h/select [:c.id "crate_id"]
+                [:c.name "crate_name"]
+                [:v.id "version_id"]
+                [:v.version "version_version"]
+                [:v.description "version_description"]
+                [:v.yanked "version_yanked"]
+                [:v.created_at "version_created_at"]
+                [:v.updated_at "version_updated_at"])
+      (h/from [:crates :c])
+      (h/join [:crates_versions :v]
+              [:= :c.id :v.crate_id])
+      (h/order-by [:v.updated_at :desc])
+      (h/limit n)
+      sql/format))
+
+(defn count-crates-versions
+  []
+  (-> (h/select [:%count.* "crates_versions_count"])
+      (h/from [:crates_versions :c])
+      sql/format))
