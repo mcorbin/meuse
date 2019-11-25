@@ -1,10 +1,32 @@
 (ns meuse.db.queries.crate-version
-  (:require [honeysql.core :as sql]
+  (:require [cheshire.core :as json]
+            [honeysql.core :as sql]
             [honeysql.helpers :as h]
+            [clojure.java.jdbc :as jdbc]
             [clojure.string :as string])
-  (:import java.util.Date
+  (:import java.nio.charset.Charset
+           java.util.Date
            java.util.UUID
-           java.sql.Timestamp))
+           java.sql.Timestamp
+           org.postgresql.util.PGobject))
+
+(defn jsonb
+  [value]
+  (doto (PGobject.)
+    (.setType "jsonb")
+    (.setValue (json/generate-string value))))
+
+(extend-protocol jdbc/ISQLValue
+  clojure.lang.IPersistentMap
+  (sql-value [value] (jsonb value)))
+(extend-protocol jdbc/IResultSetReadColumn
+  org.postgresql.util.PGobject
+  (result-set-read-column [pgobj metadata idx]
+    (let [type (.getType pgobj)
+          value (.getValue pgobj)]
+      (if (#{"jsonb" "json"} type)
+        (json/parse-string value true)
+        value))))
 
 (defn update-yanked
   [version-id yanked?]
@@ -41,6 +63,7 @@
                        :created_at
                        :updated_at
                        :crate_id
+                       :metadata
                        :document_vectors)
             (h/values [[(UUID/randomUUID)
                         (:vers metadata)
@@ -49,6 +72,7 @@
                         now
                         now
                         crate-id
+                        (jsonb metadata)
                         (sql/raw tsvector)]])
             sql/format
             (conj (:name metadata)))
