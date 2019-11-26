@@ -2,11 +2,13 @@
   (:require [cheshire.core :as json]
             [honeysql.core :as sql]
             [honeysql.helpers :as h]
-            [clojure.java.jdbc :as jdbc]
+            [next.jdbc.prepare :as p]
+            [next.jdbc.result-set :as rs]
             [clojure.string :as string])
   (:import java.nio.charset.Charset
            java.util.Date
            java.util.UUID
+           java.sql.PreparedStatement
            java.sql.Timestamp
            org.postgresql.util.PGobject))
 
@@ -16,12 +18,13 @@
     (.setType "jsonb")
     (.setValue (json/generate-string value))))
 
-(extend-protocol jdbc/ISQLValue
+(extend-protocol p/SettableParameter
   clojure.lang.IPersistentMap
-  (sql-value [value] (jsonb value)))
-(extend-protocol jdbc/IResultSetReadColumn
+  (set-parameter [^clojure.lang.IPersistentMap v ^PreparedStatement s ^long i]
+    (.setObject s i (jsonb v))))
+(extend-protocol rs/ReadableColumn
   org.postgresql.util.PGobject
-  (result-set-read-column [pgobj metadata idx]
+  (read-column-by-index [pgobj metadata idx]
     (let [type (.getType pgobj)
           value (.getValue pgobj)]
       (if (#{"jsonb" "json"} type)
@@ -55,41 +58,41 @@
                    true
                    (str ")"))]
     (cond->
-        (-> (h/insert-into :crates_versions)
-            (h/columns :id
-                       :version
-                       :description
-                       :yanked
-                       :created_at
-                       :updated_at
-                       :crate_id
-                       :metadata
-                       :document_vectors)
-            (h/values [[(UUID/randomUUID)
-                        (:vers metadata)
-                        (:description metadata)
-                        (:yanked metadata false)
-                        now
-                        now
-                        crate-id
-                        (jsonb metadata)
-                        (sql/raw tsvector)]])
-            sql/format
-            (conj (:name metadata)))
+     (-> (h/insert-into :crates_versions)
+         (h/columns :id
+                    :version
+                    :description
+                    :yanked
+                    :created_at
+                    :updated_at
+                    :crate_id
+                    :metadata
+                    :document_vectors)
+         (h/values [[(UUID/randomUUID)
+                     (:vers metadata)
+                     (:description metadata)
+                     (:yanked metadata false)
+                     now
+                     now
+                     crate-id
+                     (jsonb metadata)
+                     (sql/raw tsvector)]])
+         sql/format
+         (conj (:name metadata)))
       (not (string/blank? (:description metadata))) (conj (:description metadata))
       (seq keywords) (conj (string/join " " keywords))
       (seq categories) (conj (string/join " " categories)))))
 
 (defn last-updated
   [n]
-  (-> (h/select [:c.id "crate_id"]
-                [:c.name "crate_name"]
-                [:v.id "version_id"]
-                [:v.version "version_version"]
-                [:v.description "version_description"]
-                [:v.yanked "version_yanked"]
-                [:v.created_at "version_created_at"]
-                [:v.updated_at "version_updated_at"])
+  (-> (h/select :c.id
+                :c.name
+                :v.id
+                :v.version
+                :v.description
+                :v.yanked
+                :v.created_at
+                :v.updated_at)
       (h/from [:crates :c])
       (h/join [:crates_versions :v]
               [:= :c.id :v.crate_id])
@@ -99,6 +102,6 @@
 
 (defn count-crates-versions
   []
-  (-> (h/select [:%count.* "crates_versions_count"])
+  (-> (h/select :%count.*)
       (h/from [:crates_versions :c])
       sql/format))

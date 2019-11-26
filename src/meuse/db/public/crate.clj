@@ -34,8 +34,7 @@
     (crate/count-crates database))
 
   (count-crates-prefix [this prefix]
-    (crate/count-crates-prefix database prefix))
-  )
+    (crate/count-crates-prefix database prefix)))
 
 (defstate crate-db
   :start (CrateDB. database))

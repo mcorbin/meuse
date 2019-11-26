@@ -33,5 +33,5 @@
                                          :name "mytoken"})
         db-token (token-db/get-token-user-role database token)]
     (is (valid? token db-token))
-    (is (not (valid? token (assoc db-token :token-expired-at (t/now)))))
+    (is (not (valid? token (assoc db-token :tokens/expired_at (t/now)))))
     (is (not (valid? "foo" db-token)))))

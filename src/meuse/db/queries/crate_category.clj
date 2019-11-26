@@ -4,8 +4,8 @@
 
 (defn get-crate-category
   [where-clause]
-  (-> (h/select [:c.crate_id "crate_id"]
-                [:c.category_id "category_id"])
+  (-> (h/select :c.crate_id
+                :c.category_id)
       (h/from [:crates_categories :c])
       (h/where where-clause)
       sql/format))

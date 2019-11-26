@@ -76,7 +76,7 @@
       (is (= [{:crate "foo"
                :errors ["metadata does not exist for version 1.1.0"
                         "crate binary file does not exist for version 1.1.0"]}]
-             (f [] ["foo" [{:version-version "1.1.0"}]]))))
+             (f [] ["foo" [{:crates_versions/version "1.1.0"}]]))))
     (testing "files exists"
       (store/write-file crate-file/crate-file-store
                         {:name "foo"
@@ -86,13 +86,13 @@
                                         :vers "1.1.0"})
       (is (= [{:crate "foo"
                :errors []}]
-             (f [] ["foo" [{:version-version "1.1.0"}]]))))
+             (f [] ["foo" [{:crates_versions/version "1.1.0"}]]))))
     (testing "metadata exists but should not"
       (metadata/write-metadata tmp-dir {:name "foo"
                                         :vers "1.1.3"})
       (is (= [{:crate "foo"
                :errors ["metata exists but not in the database for version 1.1.3"]}]
-             (f [] ["foo" [{:version-version "1.1.0"}]]))))
+             (f [] ["foo" [{:crates_versions/version "1.1.0"}]]))))
     (testing "crate-file exists but should not"
       (store/write-file crate-file/crate-file-store
                         {:name "foo"
@@ -101,18 +101,18 @@
       (is (= [{:crate "foo"
                :errors ["metata exists but not in the database for version 1.1.3"
                         "crate binary file exists but not in the db for version 1.1.3"]}]
-             (f [] ["foo" [{:version-version "1.1.0"}]]))))
+             (f [] ["foo" [{:crates_versions/version "1.1.0"}]]))))
     (testing "success: pass multiple versions"
       (is (= [{:crate "foo"
                :errors []}]
-             (f [] ["foo" [{:version-version "1.1.0"}
-                           {:version-version "1.1.3"}]]))))
+             (f [] ["foo" [{:crates_versions/version "1.1.0"}
+                           {:crates_versions/version "1.1.3"}]]))))
     (testing "the binary file does not exist for a version"
       (clojure.java.io/delete-file (str tmp-dir "/foo/1.1.3/download"))
       (is (= [{:crate "foo"
                :errors ["missing crate binary file for version 1.1.3"]}]
-             (f [] ["foo" [{:version-version "1.1.0"}
-                           {:version-version "1.1.3"}]]))))))
+             (f [] ["foo" [{:crates_versions/version "1.1.0"}
+                           {:crates_versions/version "1.1.3"}]]))))))
 
 (deftest check-test
   (let [request {:git {:lock "foo"}
@@ -120,8 +120,8 @@
                           :metadata {:path tmp-dir}}}]
     (testing "metadata/files don't exist"
       (with-redefs [crate-action/get-crates-and-versions
-                    (spy/stub [{:crate-name "foo"
-                                :version-version "1.1.0"}])]
+                    (spy/stub [{:crates/name "foo"
+                                :crates_versions/version "1.1.0"}])]
         (is (= [{:crate "foo"
                  :errors ["metadata does not exist for version 1.1.0"
                           "crate binary file does not exist for version 1.1.0"]}]
@@ -134,16 +134,16 @@
       (metadata/write-metadata tmp-dir {:name "foo"
                                         :vers "1.1.0"})
       (with-redefs [crate-action/get-crates-and-versions
-                    (spy/stub [{:crate-name "foo"
-                                :version-version "1.1.0"}])]
+                    (spy/stub [{:crates/name "foo"
+                                :crates_versions/version "1.1.0"}])]
         (is (= []
                (check crate-db git crate-file/crate-file-store request)))))
     (testing "metadata exists but should not"
       (metadata/write-metadata tmp-dir {:name "foo"
                                         :vers "1.1.3"})
       (with-redefs [crate-action/get-crates-and-versions
-                    (spy/stub [{:crate-name "foo"
-                                :version-version "1.1.0"}])]
+                    (spy/stub [{:crates/name "foo"
+                                :crates_versions/version "1.1.0"}])]
         (is (= [{:crate "foo"
                  :errors ["metata exists but not in the database for version 1.1.3"]}]
                (check crate-db git crate-file/crate-file-store request)))))
@@ -153,27 +153,27 @@
                          :vers "1.1.3"}
                         (.getBytes "lol"))
       (with-redefs [crate-action/get-crates-and-versions
-                    (spy/stub [{:crate-name "foo"
-                                :version-version "1.1.0"}])]
+                    (spy/stub [{:crates/name "foo"
+                                :crates_versions/version "1.1.0"}])]
         (is (= [{:crate "foo"
                  :errors ["metata exists but not in the database for version 1.1.3"
                           "crate binary file exists but not in the db for version 1.1.3"]}]
                (check crate-db git crate-file/crate-file-store request)))))
     (testing "success: pass multiple versions"
       (with-redefs [crate-action/get-crates-and-versions
-                    (spy/stub [{:crate-name "foo"
-                                :version-version "1.1.0"}
-                               {:crate-name "foo"
-                                :version-version "1.1.3"}])]
+                    (spy/stub [{:crates/name "foo"
+                                :crates_versions/version "1.1.0"}
+                               {:crates/name "foo"
+                                :crates_versions/version "1.1.3"}])]
         (is (= []
                (check crate-db git crate-file/crate-file-store request)))))
     (testing "the binary file does not exist for a version"
       (clojure.java.io/delete-file (str tmp-dir "/foo/1.1.3/download"))
       (with-redefs [crate-action/get-crates-and-versions
-                    (spy/stub [{:crate-name "foo"
-                                :version-version "1.1.0"}
-                               {:crate-name "foo"
-                                :version-version "1.1.3"}])]
+                    (spy/stub [{:crates/name "foo"
+                                :crates_versions/version "1.1.0"}
+                               {:crates/name "foo"
+                                :crates_versions/version "1.1.3"}])]
         (is (= [{:crate "foo"
                  :errors ["missing crate binary file for version 1.1.3"]}]
                (check crate-db git crate-file/crate-file-store request)))))
@@ -183,12 +183,12 @@
                          :vers "1.1.3"}
                         (.getBytes "lol"))
       (with-redefs [crate-action/get-crates-and-versions
-                    (spy/stub [{:crate-name "foo"
-                                :version-version "1.1.0"}
-                               {:crate-name "bar"
-                                :version-version "3.0.1"}
-                               {:crate-name "foo"
-                                :version-version "1.1.3"}])]
+                    (spy/stub [{:crates/name "foo"
+                                :crates_versions/version "1.1.0"}
+                               {:crates/name "bar"
+                                :crates_versions/version "3.0.1"}
+                               {:crates/name "foo"
+                                :crates_versions/version "1.1.3"}])]
         (is (= [{:crate "bar"
                  :errors ["metadata does not exist for version 3.0.1"
                           "crate binary file does not exist for version 3.0.1"]}]
@@ -201,24 +201,24 @@
       (metadata/write-metadata tmp-dir {:name "bar"
                                         :vers "3.0.1"})
       (with-redefs [crate-action/get-crates-and-versions
-                    (spy/stub [{:crate-name "foo"
-                                :version-version "1.1.0"}
-                               {:crate-name "bar"
-                                :version-version "3.0.1"}
-                               {:crate-name "foo"
-                                :version-version "1.1.3"}])]
+                    (spy/stub [{:crates/name "foo"
+                                :crates_versions/version "1.1.0"}
+                               {:crates/name "bar"
+                                :crates_versions/version "3.0.1"}
+                               {:crates/name "foo"
+                                :crates_versions/version "1.1.3"}])]
         (is (= []
                (check crate-db git crate-file/crate-file-store request)))))
     (testing "two crates in error"
       (clojure.java.io/delete-file (str tmp-dir "/foo/1.1.3/download"))
       (clojure.java.io/delete-file (str tmp-dir "/bar/3.0.1/download"))
       (with-redefs [crate-action/get-crates-and-versions
-                    (spy/stub [{:crate-name "foo"
-                                :version-version "1.1.0"}
-                               {:crate-name "bar"
-                                :version-version "3.0.1"}
-                               {:crate-name "foo"
-                                :version-version "1.1.3"}])]
+                    (spy/stub [{:crates/name "foo"
+                                :crates_versions/version "1.1.0"}
+                               {:crates/name "bar"
+                                :crates_versions/version "3.0.1"}
+                               {:crates/name "foo"
+                                :crates_versions/version "1.1.3"}])]
         (is (= [{:crate "foo"
                  :errors ["missing crate binary file for version 1.1.3"]}
                 {:crate "bar"

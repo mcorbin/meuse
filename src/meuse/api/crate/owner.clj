@@ -64,8 +64,8 @@
     {:status 200
      :body {:users (map
                     (fn [u]
-                      {:login (:user-name u)
-                       :name (:user-name u)
+                      {:login (:users/name u)
+                       :name (:users/name u)
                        :id (rand-int 100)})
                     users)}}))
 

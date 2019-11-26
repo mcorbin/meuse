@@ -28,12 +28,12 @@
     (create database user)
     (let [user-db (by-name database "mathieu")
           admin-role (role/get-admin-role database)]
-      (is (uuid? (:user-id user-db)))
-      (is (= (:name user) (:user-name user-db)))
-      (is (password/check (:password user) (:user-password user-db)))
-      (is (= (:description user) (:user-description user-db)))
-      (is (= (:active user) (:user-active user-db)))
-      (is (= (:role-id admin-role) (:user-role-id user-db))))
+      (is (uuid? (:users/id user-db)))
+      (is (= (:name user) (:users/name user-db)))
+      (is (password/check (:password user) (:users/password user-db)))
+      (is (= (:description user) (:users/description user-db)))
+      (is (= (:active user) (:users/active user-db)))
+      (is (= (:roles/id admin-role) (:users/role_id user-db))))
     (is (thrown-with-msg? ExceptionInfo
                           #"already exists$"
                           (create database user))))
@@ -71,15 +71,16 @@
                                        :role "admin"})
       (let [result (by-name database "mathieu")
             role-admin (role/get-admin-role database)]
-        (is (= (:role-id role-admin) (:user-role-id result)))
-        (is (not (:user-active role-admin)))
-        (is (= (:user-description result) "new"))
+        (is (= (:roles/id role-admin) (:users/role_id result)))
+        (is (not (:users/active role-admin)))
+        (is (= (:users/description result) "new"))
         (is (thrown-with-msg? ExceptionInfo
                               #"invalid password"
-                              (password/check (:password user) (:user-password result))))
-        (is (password/check "new password" (:user-password result)))
+                              (password/check (:password user)
+                                              (:users/password result))))
+        (is (password/check "new password" (:users/password result)))
         ;; name not updated
-        (is (= (:name user) (:user-name result))))))
+        (is (= (:name user) (:users/name result))))))
   (testing "the user does not exist"
     (is (thrown-with-msg? ExceptionInfo
                           #"the user doesnotexist does not exist"
@@ -98,13 +99,13 @@
   (let [users (get-users database)
         user1 (by-name database "user1")]
     (is (= 5 (count users)))
-    (is (= {:name "user1"
-            :role "admin"
-            :description "desc1"
-            :active true
-            :id (:user-id user1)}
-           (-> (filter #(= (:name %) "user1") users)
+    (is (= {:users/name "user1"
+            :roles/name "admin"
+            :users/description "desc1"
+            :users/active true
+            :users/id (:users/id user1)}
+           (-> (filter #(= (:users/name %) "user1") users)
                first)))))
 
 (deftest count-users-test
-  (is (= {:users-count 5} (count-users database))))
+  (is (= {:count 5} (count-users database))))

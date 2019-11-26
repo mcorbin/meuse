@@ -23,9 +23,9 @@
   {:status 200
    :body {:categories (->> (public-category/get-categories category-db)
                            (map #(clojure.set/rename-keys
-                                  % {:category-id :id
-                                     :category-name :name
-                                     :category-description :description})))}})
+                                  % {:categories/id :id
+                                     :categories/name :name
+                                     :categories/description :description})))}})
 
 (defn update-category
   [category-db request]

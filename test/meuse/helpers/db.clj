@@ -3,7 +3,7 @@
             [meuse.db.actions.crate :as crate-db]
             [meuse.db.actions.user :as user-db]
             [meuse.db.actions.crate-user :as crate-user-db]
-            [clojure.java.jdbc :as jdbc]
+            [next.jdbc :as jdbc]
             [clojure.java.shell :as shell]
             [clojure.test :refer :all]))
 

@@ -15,8 +15,8 @@
 (use-fixtures :each db-clean-fixture table-fixture)
 
 (deftest add-owner-test
-  (let [user5-id (:user-id (user-db/by-name database "user5"))
-        user2-id (:user-id (user-db/by-name database "user2"))]
+  (let [user5-id (:users/id (user-db/by-name database "user5"))
+        user2-id (:users/id (user-db/by-name database "user2"))]
     (testing "success: admin"
       (is (= {:status 200
               :body {:ok true
@@ -30,15 +30,15 @@
                            :body (json/generate-string
                                   {:users ["user2"
                                            "user3"]})})))
-      (let [crate-db-id (:crate-id (crate-db/by-name
+      (let [crate-db-id (:crates/id (crate-db/by-name
+                                     database
+                                     "crate2"))
+            user1-db-id (:users/id (user-db/by-name
                                     database
-                                    "crate2"))
-            user1-db-id (:user-id (user-db/by-name
-                                   database
-                                   "user2"))
-            user2-db-id (:user-id (user-db/by-name
-                                   database
-                                   "user3"))
+                                    "user2"))
+            user2-db-id (:users/id (user-db/by-name
+                                    database
+                                    "user3"))
             crate-user1 (crate-user-db/by-id
                          database
                          crate-db-id
@@ -47,11 +47,11 @@
                          database
                          crate-db-id
                          user2-db-id)]
-        (is (= {:crate-id crate-db-id
-                :user-id user1-db-id}
+        (is (= {:crates_users/crate_id crate-db-id
+                :crates_users/user_id user1-db-id}
                crate-user1))
-        (is (= {:crate-id crate-db-id
-                :user-id user2-db-id}
+        (is (= {:crates_users/crate_id crate-db-id
+                :crates_users/user_id user2-db-id}
                crate-user2))))
     (testing "success: owner of the crate"
       (is (= {:status 200
@@ -65,18 +65,18 @@
                                   :role-name "tech"}
                            :body (json/generate-string
                                   {:users ["user4"]})})))
-      (let [crate-db-id (:crate-id (crate-db/by-name
+      (let [crate-db-id (:crates/id (crate-db/by-name
+                                     database
+                                     "crate2"))
+            user4-db-id (:users/id (user-db/by-name
                                     database
-                                    "crate2"))
-            user4-db-id (:user-id (user-db/by-name
-                                   database
-                                   "user4"))
+                                    "user4"))
             crate-user4 (crate-user-db/by-id
                          database
                          crate-db-id
                          user4-db-id)]
-        (is (= {:crate-id crate-db-id
-                :user-id user4-db-id}
+        (is (= {:crates_users/crate_id crate-db-id
+                :crates_users/user_id user4-db-id}
                crate-user4))))
     (testing "user does not own the crate"
       (is (thrown-with-msg?
@@ -106,8 +106,8 @@
                                 {:users ["foo"]})}))))))
 
 (deftest remove-owner-test
-  (let [user5-id (:user-id (user-db/by-name database "user5"))
-        user1-id (:user-id (user-db/by-name database "user1"))]
+  (let [user5-id (:users/id (user-db/by-name database "user5"))
+        user1-id (:users/id (user-db/by-name database "user1"))]
     (testing "success: admin"
       (is (= {:status 200
               :body {:ok true
@@ -121,15 +121,15 @@
                            :body (json/generate-string
                                   {:users ["user2"
                                            "user3"]})})))
-      (let [crate-db-id (:crate-id (crate-db/by-name
+      (let [crate-db-id (:crates/id (crate-db/by-name
+                                     database
+                                     "crate1"))
+            user1-db-id (:users/id (user-db/by-name
                                     database
-                                    "crate1"))
-            user1-db-id (:user-id (user-db/by-name
-                                   database
-                                   "user2"))
-            user2-db-id (:user-id (user-db/by-name
-                                   database
-                                   "user3"))]
+                                    "user2"))
+            user2-db-id (:users/id (user-db/by-name
+                                    database
+                                    "user3"))]
         (is (nil? (crate-user-db/by-id
                    database
                    crate-db-id
@@ -150,9 +150,9 @@
                            :route-params {:crate-name "crate1"}
                            :body (json/generate-string
                                   {:users ["user1"]})})))
-      (let [crate-db-id (:crate-id (crate-db/by-name
-                                    database
-                                    "crate1"))]
+      (let [crate-db-id (:crates/id (crate-db/by-name
+                                     database
+                                     "crate1"))]
         (is (nil? (crate-user-db/by-id
                    database
                    crate-db-id

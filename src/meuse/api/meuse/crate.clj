@@ -11,24 +11,24 @@
 
 (defn format-crate
   [[crate-id crate-versions]]
-  (let [versions (->> (map  #(set/rename-keys % {:version-version :version
-                                                 :version-description :description
-                                                 :version-yanked :yanked
-                                                 :version-created-at :created-at
-                                                 :version-updated-at :updated-at})
+  (let [versions (->> (map  #(set/rename-keys % {:crates_versions/version :version
+                                                 :crates_versions/description :description
+                                                 :crates_versions/yanked :yanked
+                                                 :crates_versions/created-at :created-at
+                                                 :crates_versions/updated-at :updated-at})
                             crate-versions)
                       (map #(select-keys %
                                          [:version :description :yanked
                                           :created-at :updated-at])))]
     {:id crate-id
-     :name (-> crate-versions first :crate-name)
+     :name (-> crate-versions first :crates/name)
      :versions versions}))
 
 (defn format-crates
   "Takes a list of crates and versions.
   Groups the versions by crates, and returns the result"
   [crates-versions]
-  (->> (group-by :crate-id crates-versions)
+  (->> (group-by :crates/id crates-versions)
        (map format-crate)))
 
 (defn list-crates
@@ -57,9 +57,9 @@
         categories (->> (public-category/by-crate-id category-db (:id crate))
                         (map #(clojure.set/rename-keys
                                %
-                               {:category-id :id
-                                :category-name :name
-                                :category-description :description})))]
+                               {:categories/id :id
+                                :categories/name :name
+                                :categories/description :description})))]
     {:status 200
      :body (assoc crate :categories categories)}))
 

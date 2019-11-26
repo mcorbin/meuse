@@ -23,15 +23,15 @@
       (let [[db-token :as tokens] (token-db/by-user database "user2")]
         (is (= 1 (count tokens)))
         (is (= (auth-token/extract-identifier token)
-               (:token-identifier db-token)))
-        (is (uuid? (:token-id db-token)))
-        (is (= token-name (:token-name db-token)))
+               (:tokens/identifier db-token)))
+        (is (uuid? (:tokens/id db-token)))
+        (is (= token-name (:tokens/name db-token)))
         (is (t/within? (t/minus (t/now) (t/minutes 1))
                        (t/now)
-                       (DateTime. (:token-created-at db-token))))
+                       (DateTime. (:tokens/created_at db-token))))
         (is (t/within? (t/plus (t/minus (t/now) (t/minutes 1)) (t/days validity))
                        (t/plus (t/now) (t/days validity))
-                       (DateTime. (:token-expired-at db-token))))
+                       (DateTime. (:tokens/expired_at db-token))))
         (is (auth-token/valid? token db-token))
         (is (thrown-with-msg?
              ExceptionInfo
@@ -78,9 +78,9 @@
                                            :validity validity
                                            :name token-name})
           db-token (token-db/get-token-user-role database token)]
-      (is (= token-name (:token-name db-token)))
+      (is (= token-name (:tokens/name db-token)))
       (is (= (auth-token/extract-identifier token)
-             (:token-identifier db-token)))
+             (:tokens/identifier db-token)))
       (is (auth-token/valid? token db-token))
-      (is (= user-name (:user-name db-token)))
-      (is (= "tech" (:role-name db-token))))))
+      (is (= user-name (:users/name db-token)))
+      (is (= "tech" (:roles/name db-token))))))

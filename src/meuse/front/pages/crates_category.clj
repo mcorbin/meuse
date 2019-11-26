@@ -26,7 +26,4 @@
           "More informations"]]
         [:div {:class "col-5"}
          [:p "Created on " (:version-created-at crate)]
-         [:p "Last update " (:version-updated-at crate)]]])
-     ]
-    )
-  )
+         [:p "Last update " (:version-updated-at crate)]]])]))

@@ -30,6 +30,7 @@
                  [mount "0.1.16"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/java.jdbc "0.7.10"]
+                 [seancorfield/next.jdbc "1.0.10"]
                  [org.clojure/tools.logging "0.5.0"]
                  [org.postgresql/postgresql "42.2.8"]
                  [ragtime "0.8.0"]
@@ -53,7 +54,7 @@
                    :plugins [[lein-environ "1.1.0"]
                              [lein-cloverage "1.1.1"]
                              [lein-ancient "0.6.15"]
-                             [lein-cljfmt "0.6.5"]]
+                             [lein-cljfmt "0.6.6"]]
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
                    :repl-options {:init-ns user}

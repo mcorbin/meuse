@@ -78,7 +78,7 @@
 (defn verify-versions
   [crate-file-store metadata-path]
   (fn [state [crate-name versions]]
-    (let [crate-versions (set (map :version-version versions))
+    (let [crate-versions (set (map :crates_versions/version versions))
           metadata-versions (set (metadata/versions
                                   metadata-path
                                   crate-name))
@@ -128,7 +128,7 @@
   (locking (git/get-lock git-object)
     (let [crates-versions (->> (public-crate/get-crates-and-versions
                                 crate-db)
-                               (group-by :crate-name))]
+                               (group-by :crates/name))]
       (->> (reduce (verify-versions crate-file-store
                                     (get-in request [:config :metadata :path]))
                    []

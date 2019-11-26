@@ -21,7 +21,7 @@
           request {:headers {"authorization" token}}
           result (check-user token-db request)]
       (is (= result (assoc request :auth {:user-name "user2"
-                                          :user-id (:user-id user)
+                                          :user-id (:users/id user)
                                           :role-name "tech"}))))
     (let [token (public-token/create database {:user "user1"
                                                :validity 10
@@ -30,7 +30,7 @@
           request {:headers {"authorization" token}}
           result (check-user token-db request)]
       (is (= result (assoc request :auth {:user-name "user1"
-                                          :user-id (:user-id user)
+                                          :user-id (:users/id user)
                                           :role-name "admin"})))))
   (testing "token missing"
     (is (thrown-with-msg?

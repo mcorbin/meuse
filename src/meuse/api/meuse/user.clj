@@ -56,4 +56,11 @@
   (auth-request/admin?-throw request)
   (info "list users")
   {:status 200
-   :body {:users (public-user/get-users user-db)}})
+   :body {:users (->> (public-user/get-users user-db)
+                      (map #(clojure.set/rename-keys
+                             %
+                             {:users/id :id
+                              :users/name :name
+                              :users/description :description
+                              :users/active :active
+                              :roles/name :role})))}})

@@ -6,23 +6,23 @@
   "Takes a crate with its version, checks if the crate/version exists in the database."
   [database expected]
   (let [crate (crate-db/by-name-and-version database
-                                            (:crate-name expected)
-                                            (:version-version expected))]
-    (is (uuid? (:crate-id crate)))
-    (is (uuid? (:version-id crate)))
-    (is (inst? (:version-created-at crate)))
-    (is (inst? (:version-updated-at crate)))
+                                            (:crates/name expected)
+                                            (:crates_versions/version expected))]
+    (is (uuid? (:crates/id crate)))
+    (is (uuid? (:crates_versions/id crate)))
+    (is (inst? (:crates_versions/created_at crate)))
+    (is (inst? (:crates_versions/updated_at crate)))
     (are [x y] (= x y)
-      (:crate-name expected) (:crate-name crate)
-      (:version-version expected) (:version-version crate)
-      (:version-yanked expected) (:version-yanked crate)
-      (:version-description expected) (:version-description crate)
-      (:crate-id crate) (:version-crate-id crate))))
+      (:crates/name expected) (:crates/name crate)
+      (:crates_versions/version expected) (:crates_versions/version crate)
+      (:crates_versions/yanked expected) (:crates_versions/yanked crate)
+      (:crates_versions/description expected) (:crates_versions/description crate)
+      (:crates/id crate) (:crates_versions/crate_id crate))))
 
 (defn test-crate
   "Takes a crate, checks if the crate exists in the database."
   [database expected]
   (let [crate (crate-db/by-name database
-                                (:crate-name expected))]
-    (is (uuid? (:crate-id crate)))
-    (is (= (:crate-name expected) (:crate-name crate)))))
+                                (:crates/name expected))]
+    (is (uuid? (:crates/id crate)))
+    (is (= (:crates/name expected) (:crates/name crate)))))

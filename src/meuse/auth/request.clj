@@ -12,16 +12,18 @@
   [token-db request]
   (if-let [token (header/extract-token request)]
     (if-let [db-token (public-token/get-token-user-role token-db token)]
-      (if (:user-active db-token)
+      (if (:users/active db-token)
         (if (auth-token/valid? token db-token)
           (do
-            (info "user" (:user-name token) "authenticated")
+            (info "user" (:users/name db-token) "authenticated")
             (assoc request
                    :auth
-                   (-> (select-keys db-token [:role-name
-                                              :user-name
-                                              :token-user-id])
-                       (rename-keys {:token-user-id :user-id}))))
+                   (-> (select-keys db-token [:roles/name
+                                              :users/name
+                                              :tokens/user_id])
+                       (rename-keys {:tokens/user_id :user-id
+                                     :roles/name :role-name
+                                     :users/name :user-name}))))
           (throw (ex-info "invalid token" {:type :meuse.error/forbidden})))
         (throw (ex-info "user is not active" {:type :meuse.error/forbidden})))
       (throw (ex-info "token not found" {:type :meuse.error/forbidden})))

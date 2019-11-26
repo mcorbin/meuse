@@ -1,7 +1,7 @@
 (ns meuse.db.actions.search
   "Search crates in the database."
   (:require [meuse.db.queries.search :as search-queries]
-            [clojure.java.jdbc :as jdbc]
+            [next.jdbc :as jdbc]
             [clojure.string :as string]
             [clojure.tools.logging :refer [debug info error]]))
 
@@ -15,17 +15,5 @@
   "Takes a query string, and returns crates (with their versions) matching the
   query."
   [database query-string]
-  (->> (jdbc/query database
-                   (search-queries/search-crates (format-query-string query-string)))
-       (map #(clojure.set/rename-keys
-              %
-              {:crate_id :crate-id
-               :crate_name :crate-name
-               :version_id :version-id
-               :version_version :version-version
-               :version_description :version-description
-               :version_yanked :version-yanked
-               :version_created_at :version-created-at
-               :version_updated_at :version-updated-at
-               :version_document_vectors :version-document-vectors
-               :version_crate_id :version-crate-id}))))
+  (->> (jdbc/execute! database
+                      (search-queries/search-crates (format-query-string query-string)))))

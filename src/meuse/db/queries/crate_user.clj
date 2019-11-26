@@ -27,8 +27,8 @@
 
 (defn get-crate-user
   [where-clause]
-  (-> (h/select [:c.crate_id "crate_id"]
-                [:c.user_id "user_id"])
+  (-> (h/select :c.crate_id
+                :c.user_id)
       (h/from [:crates_users :c])
       (h/where where-clause)
       sql/format))

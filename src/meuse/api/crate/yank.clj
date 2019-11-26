@@ -21,17 +21,17 @@
     (public-crate-version/update-yank crate-version-db
                                       crate-name
                                       crate-version yanked?)
-    (locking (git/get-lock git-object))
-    (metadata/update-yank (get-in request [:config :metadata :path])
-                          crate-name
-                          crate-version
-                          yanked?)
-    (git/add git-object)
-    (apply git/commit git-object (msg/yank-commit-msg
-                                  crate-name
-                                  crate-version
-                                  yanked?))
-    (git/push git-object))
+    (locking (git/get-lock git-object)
+      (metadata/update-yank (get-in request [:config :metadata :path])
+                            crate-name
+                            crate-version
+                            yanked?)
+      (git/add git-object)
+      (apply git/commit git-object (msg/yank-commit-msg
+                                    crate-name
+                                    crate-version
+                                    yanked?))
+      (git/push git-object)))
   {:status 200
    :body {:ok true}})
 

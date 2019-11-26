@@ -5,7 +5,7 @@
             [meuse.migration :as migration]
             [aleph.http :as http]
             [mount.core :refer [defstate]]
-            [clojure.java.jdbc :as j]
+            [next.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]])
   (:import com.zaxxer.hikari.HikariConfig
            com.zaxxer.hikari.HikariDataSource))
@@ -35,7 +35,7 @@
       (.addDataSourceProperty config "sslrootcert" cacert)
       (.addDataSourceProperty config "sslmode" (or ssl-mode
                                                    default-ssl-mode)))
-    {:datasource (HikariDataSource. config)}))
+    (HikariDataSource. config)))
 
 (defstate database
   :start (let [db-pool (pool (:database config))]

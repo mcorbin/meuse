@@ -32,10 +32,10 @@
   (params/validate-params request ::create)
   (let [{:keys [name user password] :as body} (:body request)]
     (if-let [db-user (public-user/by-name user-db user)]
-      (do (when-not (:user-active db-user)
+      (do (when-not (:users/active db-user)
             (throw (ex-info "user is not active"
                             {:type :meuse.error/forbidden})))
-          (auth-password/check password (:user-password db-user))
+          (auth-password/check password (:users/password db-user))
           (info (format "creating token %s for user %s"
                         name
                         user))
@@ -57,16 +57,16 @@
     (info "list tokens")
     (let [user-name (or request-user (get-in request [:auth :user-name]))
           tokens (->> (public-token/by-user token-db user-name)
-                      (map #(select-keys % [:token-id
-                                            :token-name
-                                            :token-created-at
-                                            :token-expired-at]))
+                      (map #(select-keys % [:tokens/id
+                                            :tokens/name
+                                            :tokens/created_at
+                                            :tokens/expired_at]))
                       (map #(clojure.set/rename-keys
                              %
-                             {:token-id :id
-                              :token-name :name
-                              :token-created-at :created-at
-                              :token-expired-at :expired-at})))]
+                             {:tokens/id :id
+                              :tokens/name :name
+                              :tokens/created_at :created-at
+                              :tokens/expired_at :expired-at})))]
       {:status 200
        :body {:tokens tokens}})))
 

@@ -27,12 +27,12 @@
             :body {:ok true}} (meuse-api! request)))
     (let [user-db (user-db/by-name database "mathieu")
           admin-role (role-db/get-admin-role database)]
-      (is (uuid? (:user-id user-db)))
-      (is (= (:name user) (:user-name user-db)))
-      (is (password/check (:password user) (:user-password user-db)))
-      (is (= (:description user) (:user-description user-db)))
-      (is (= (:active user) (:user-active user-db)))
-      (is (= (:role-id admin-role) (:user-role-id user-db))))
+      (is (uuid? (:users/id user-db)))
+      (is (= (:name user) (:users/name user-db)))
+      (is (password/check (:password user) (:users/password user-db)))
+      (is (= (:description user) (:users/description user-db)))
+      (is (= (:active user) (:users/active user-db)))
+      (is (= (:roles/id admin-role) (:users/role_id user-db))))
     (is (thrown-with-msg? ExceptionInfo
                           #"already exists$"
                           (meuse-api! request))))
@@ -138,10 +138,10 @@
                                  "admin"))))
     (let [user-db (user-db/by-name database "user3")
           admin-role (role-db/get-admin-role database)]
-      (is (password/check "new_password" (:user-password user-db)))
-      (is (= "foo" (:user-description user-db)))
-      (is (not (:user-active user-db)))
-      (is (= (:role-id admin-role) (:user-role-id user-db))))
+      (is (password/check "new_password" (:users/password user-db)))
+      (is (= "foo" (:users/description user-db)))
+      (is (not (:users/active user-db)))
+      (is (= (:roles/id admin-role) (:users/role_id user-db))))
     (is (nil? (user-db/by-name database "new_name"))))
   (testing "success: update by himself"
     (meuse-api! (add-auth {:action :update-user
@@ -152,9 +152,9 @@
                           "tech"))
     (let [user-db (user-db/by-name database "user2")
           tech-role (role-db/get-tech-role database)]
-      (is (password/check "new_password_2" (:user-password user-db)))
-      (is (= "foobar" (:user-description user-db)))
-      (is (= (:role-id tech-role) (:user-role-id user-db))))
+      (is (password/check "new_password_2" (:users/password user-db)))
+      (is (= "foobar" (:users/description user-db)))
+      (is (= (:roles/id tech-role) (:users/role_id user-db))))
     (is (nil? (user-db/by-name database "new_name"))))
   (testing "error: not admin and restrictions"
     (is (thrown-with-msg?
@@ -212,7 +212,7 @@
               :role "admin"
               :description "desc1"
               :active true
-              :id (:user-id user1)}
+              :id (:users/id user1)}
              (-> (filter #(= (:name %) "user1") users)
                  first)))))
   (testing "list users: not admin"

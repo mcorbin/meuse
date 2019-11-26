@@ -44,21 +44,18 @@
       "this project."]]
     [:div {:class "col-5 "}
      [:span {:class "stat-num"} (:crates-count
-                                   (public-crate/count-crates crate-db))]
+                                 (public-crate/count-crates crate-db))]
      " Crates in stock"
      [:br]
      [:span {:class "stat-num"} (:crates-versions-count
-                                   (public-crate-version/count-crates-versions
-                                    crate-version-db))]
+                                 (public-crate-version/count-crates-versions
+                                  crate-version-db))]
      " Crates versions uploaded"
      [:br]
      [:span {:class "stat-num"} (:users-count
-                                   (public-user/count-users
-                                    user-db))]
+                                 (public-user/count-users
+                                  user-db))]
      " Users"]]
 
-
    [:div {:class "row"}
-    (last-updated-crates crate-version-db)
-    ]
-   ])
+    (last-updated-crates crate-version-db)]])
