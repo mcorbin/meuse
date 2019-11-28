@@ -150,8 +150,7 @@
                            (wrap-resource "public")
                            wrap-json
                            wrap-keyword-params
-                           wrap-params
-                           )
+                           wrap-params)
                        config)))
 
 (defstate http-server

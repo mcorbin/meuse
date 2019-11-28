@@ -8,6 +8,4 @@
                               crates-db crate-name)
                              (sort-by :version-created-at)
                              reverse)]
-    [:h1 (:crate-name (first crates-versions))]
-    )
-  )
+    [:h1 (:crate-name (first crates-versions))]))

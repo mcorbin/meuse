@@ -32,8 +32,7 @@
     [:div {:class "col-7" :id "menu-links"}
      [:span {:class "menu-element"} [:a {:href "/front/crates"} "Browse All Crates"]]
      [:span {:class "menu-element"} "|"]
-     [:span {:class "menu-element"} [:a {:href "/front/categories"} "Browse Categories"]]
-     ]]])
+     [:span {:class "menu-element"} [:a {:href "/front/categories"} "Browse Categories"]]]]])
 
 (def footer
   [:div {:id "footer"
@@ -44,7 +43,6 @@
       [:a {:href "https://meuse.mcorbin.fr/"} "Documentation"] " | "
       [:a {:href "https://github.com/mcorbin/meuse"} "Github"] " | "
       "Made by " [:a {:href "https://mcorbin.fr"} "mcorbin"]]]]])
-
 
 (defn html
   [body]
@@ -58,5 +56,4 @@
     (page/include-js "/js/jquery-3.3.1.slim.min.js")
     (page/include-js "/js/popper.min.js")
     (page/include-js "/js/bootstrap.min.js")]
-    footer
-   ))
+   footer))

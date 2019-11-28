@@ -4,8 +4,8 @@
 
 (defn get-role
   [where-clause]
-  (-> (h/select [:r.id "role_id"]
-                [:r.name "role_name"])
+  (-> (h/select :r.id
+                :r.name)
       (h/from [:roles :r])
       (h/where where-clause)
       sql/format))

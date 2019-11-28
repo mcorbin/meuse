@@ -16,44 +16,44 @@
   (let [crate {:name "test1"
                :vers "0.1.3"
                :yanked false}
-        {:keys [^UUID user-id]} (user-db/by-name database "user2")]
+        user-id (:users/id (user-db/by-name database "user2"))]
     (create database crate user-id)
     (is (thrown-with-msg? ExceptionInfo
                           #"already exists$"
                           (create database crate user-id)))
-    (db-state/test-crate-version database {:crate-name "test1"
-                                           :version-version "0.1.3"
-                                           :version-yanked false
-                                           :version-description nil})
-    (db-state/test-crate database {:crate-name "test1"})
+    (db-state/test-crate-version database {:crates/name "test1"
+                                           :crates_versions/version "0.1.3"
+                                           :crates_versions/yanked false
+                                           :crates_versions/description nil})
+    (db-state/test-crate database {:crates/name "test1"})
     (create database (assoc crate :vers "2.0.0") user-id)
-    (db-state/test-crate-version database {:crate-name "test1"
-                                           :version-version "2.0.0"
-                                           :version-yanked false
-                                           :version-description nil})
-    (db-state/test-crate database {:crate-name "test1"})))
+    (db-state/test-crate-version database {:crates/name "test1"
+                                           :crates_versions/version "2.0.0"
+                                           :crates_versions/yanked false
+                                           :crates_versions/description nil})
+    (db-state/test-crate database {:crates/name "test1"})))
 
 (deftest create-with-categories
   (let [crate {:name "test-crate-category"
                :vers "0.1.3"
                :categories ["email" "system"]
                :yanked false}
-        {:keys [user-id]} (user-db/by-name database "user2")]
+        user-id (:users/id (user-db/by-name database "user2"))]
     (create database crate user-id)
     (let [crate-db (by-name database "test-crate-category")
           [c1 c2 :as categories] (->> (category-db/by-crate-id
                                        database
-                                       (:crate-id crate-db))
-                                      (sort-by :category-name))]
+                                       (:crates/id crate-db))
+                                      (sort-by :categories/name))]
       (is (= 2 (count categories)))
-      (is (uuid? (:category-id c1)))
-      (is (= {:category-name "email"
-              :category-description "the email category"}
-             (dissoc c1 :category-id)))
-      (is (uuid? (:category-id c2)))
-      (is (= {:category-name "system"
-              :category-description "the system category"}
-             (dissoc c2 :category-id))))))
+      (is (uuid? (:categories/id c1)))
+      (is (= {:categories/name "email"
+              :categories/description "the email category"}
+             (dissoc c1 :categories/id)))
+      (is (uuid? (:categories/id c2)))
+      (is (= {:categories/name "system"
+              :categories/description "the system category"}
+             (dissoc c2 :categories/id))))))
 
 (deftest create-with-categories-error
   (let [crate {:name "test1"
@@ -67,33 +67,33 @@
 
 (deftest get-crates-and-versions-test
   (let [result (get-crates-and-versions database)
-        crate1 (first (filter #(and (= (:crate-name %) "crate1")
-                                    (= (:version-version %) "1.1.0"))
+        crate1 (first (filter #(and (= (:crates/name %) "crate1")
+                                    (= (:crates_versions/version %) "1.1.0"))
                               result))]
     (is (= 5 (count result)))
-    (is (uuid? (:crate-id crate1)))
-    (is (= (:crate-name crate1) "crate1"))
-    (is (uuid? (:version-id crate1)))
-    (is (= (:version-version crate1) "1.1.0"))
-    (is (= (:version-description crate1) "the crate1 description, this crate is for foobar"))
-    (is (not (:version-yanked crate1)))
-    (is (inst? (:version-created-at crate1)))
-    (is (inst? (:version-updated-at crate1)))))
+    (is (uuid? (:crates/id crate1)))
+    (is (= (:crates/name crate1) "crate1"))
+    (is (uuid? (:crates_versions/id crate1)))
+    (is (= (:crates_versions/version crate1) "1.1.0"))
+    (is (= (:crates_versions/description crate1) "the crate1 description, this crate is for foobar"))
+    (is (not (:crates_versions/yanked crate1)))
+    (is (inst? (:crates_versions/created_at crate1)))
+    (is (inst? (:crates_versions/updated_at crate1)))))
 
 (deftest get-crate-and-versions-test
   (testing "success"
     (let [result (get-crate-and-versions database "crate1")
-          version1 (first (filter #(= (:version-version %) "1.1.0")
+          version1 (first (filter #(= (:crates_versions/version %) "1.1.0")
                                   result))]
       (is (= 3 (count result)))
-      (is (uuid? (:crate-id version1)))
-      (is (= (:crate-name version1) "crate1"))
-      (is (uuid? (:version-id version1)))
-      (is (= (:version-version version1) "1.1.0"))
-      (is (= (:version-description version1) "the crate1 description, this crate is for foobar"))
-      (is (not (:version-yanked version1)))
-      (is (inst? (:version-created-at version1)))
-      (is (inst? (:version-updated-at version1)))))
+      (is (uuid? (:crates/id version1)))
+      (is (= (:crates/name version1) "crate1"))
+      (is (uuid? (:crates_versions/id version1)))
+      (is (= (:crates_versions/version version1) "1.1.0"))
+      (is (= (:crates_versions/description version1) "the crate1 description, this crate is for foobar"))
+      (is (not (:crates_versions/yanked version1)))
+      (is (inst? (:crates_versions/created_at version1)))
+      (is (inst? (:crates_versions/updated_at version1)))))
   (testing "the crate does not exist"
     (is (thrown-with-msg?
          ExceptionInfo
@@ -103,17 +103,17 @@
 (deftest get-crates-for-category-test
   (testing "success"
     (let [result (get-crates-for-category database "email")
-          version1 (first (filter #(= (:version-version %) "1.1.0")
+          version1 (first (filter #(= (:crates_versions/version %) "1.1.0")
                                   result))]
       (is (= 3 (count result)))
-      (is (uuid? (:crate-id version1)))
-      (is (= (:crate-name version1) "crate1"))
-      (is (uuid? (:version-id version1)))
-      (is (= (:version-version version1) "1.1.0"))
-      (is (= (:version-description version1) "the crate1 description, this crate is for foobar"))
-      (is (not (:version-yanked version1)))
-      (is (inst? (:version-created-at version1)))
-      (is (inst? (:version-updated-at version1)))))
+      (is (uuid? (:crates/id version1)))
+      (is (= (:crates/name version1) "crate1"))
+      (is (uuid? (:crates_versions/id version1)))
+      (is (= (:crates_versions/version version1) "1.1.0"))
+      (is (= (:crates_versions/description version1) "the crate1 description, this crate is for foobar"))
+      (is (not (:crates_versions/yanked version1)))
+      (is (inst? (:crates_versions/created_at version1)))
+      (is (inst? (:crates_versions/updated_at version1)))))
   (testing "the category does not exist"
     (is (thrown-with-msg?
          ExceptionInfo
@@ -123,33 +123,33 @@
 (deftest get-crates-range-test
   (let [crates (get-crates-range database 0 3 "c")]
     (is (= 3 (count crates)))
-    (is (= "crate1" (-> crates first :crate-name)))
-    (is (uuid? (-> crates first :crate-id)))
-    (is (= 3 (-> crates first :crate-versions-count)))
-    (is (= "crate2" (-> crates second :crate-name)))
-    (is (uuid? (-> crates second :crate-id)))
-    (is (= 1 (-> crates second :crate-versions-count)))
-    (is (= "crate3" (-> crates last :crate-name)))
-    (is (uuid? (-> crates last :crate-id)))
-    (is (= 1 (-> crates last :crate-versions-count))))
+    (is (= "crate1" (-> crates first :crates/name)))
+    (is (uuid? (-> crates first :crates/id)))
+    (is (= 3 (-> crates first :count)))
+    (is (= "crate2" (-> crates second :crates/name)))
+    (is (uuid? (-> crates second :crates/id)))
+    (is (= 1 (-> crates second :count)))
+    (is (= "crate3" (-> crates last :crates/name)))
+    (is (uuid? (-> crates last :crates/id)))
+    (is (= 1 (-> crates last :count))))
   (let [crates (get-crates-range database 0 3 "crate1")]
     (is (= 1 (count crates)))
-    (is (= "crate1" (-> crates first :crate-name)))
-    (is (uuid? (-> crates first :crate-id)))
-    (is (= 3 (-> crates first :crate-versions-count))))
+    (is (= "crate1" (-> crates first :crates/name)))
+    (is (uuid? (-> crates first :crates/id)))
+    (is (= 3 (-> crates first :count))))
   (let [crates (get-crates-range database 0 1 "c")]
     (is (= 1 (count crates)))
-    (is (= "crate1" (-> crates first :crate-name)))
-    (is (uuid? (-> crates first :crate-id)))
-    (is (= 3 (-> crates first :crate-versions-count))))
+    (is (= "crate1" (-> crates first :crates/name)))
+    (is (uuid? (-> crates first :crates/id)))
+    (is (= 3 (-> crates first :count))))
   (let [crates (get-crates-range database 1 3 "c")]
     (is (= 2 (count crates)))
-    (is (= "crate2" (-> crates first :crate-name)))
-    (is (uuid? (-> crates first :crate-id)))
-    (is (= 1 (-> crates first :crate-versions-count)))
-    (is (= "crate3" (-> crates last :crate-name)))
-    (is (uuid? (-> crates last :crate-id)))
-    (is (= 1 (-> crates last :crate-versions-count)))))
+    (is (= "crate2" (-> crates first :crates/name)))
+    (is (uuid? (-> crates first :crates/id)))
+    (is (= 1 (-> crates first :count)))
+    (is (= "crate3" (-> crates last :crates/name)))
+    (is (uuid? (-> crates last :crates/id)))
+    (is (= 1 (-> crates last :count)))))
 
 (deftest count-crates-test
-  (is (= {:crates-count 3} (count-crates database))))
+  (is (= {:count 3} (count-crates database))))

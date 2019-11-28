@@ -12,24 +12,24 @@
 (defn get-crate-max-version
   "Get the max version from a list of crate."
   [[_ result]]
-  (-> (sort #(semver/compare-versions (:version-version %1)
-                                      (:version-version %2))
+  (-> (sort #(semver/compare-versions (:crates_versions/version %1)
+                                      (:crates_versions/version %2))
             result)
       last))
 
 (defn format-version
   "Updates and selects a crate version for the Cargo API."
   [version]
-  (-> (clojure.set/rename-keys version {:crate-name :name
-                                        :version-version :max_version
-                                        :version-description :description})
+  (-> (clojure.set/rename-keys version {:crates/name :name
+                                        :crates_versions/version :max_version
+                                        :crates_versions/description :description})
       (select-keys [:name :max_version :description])
       (update :description #(if % % ""))))
 
 (defn format-search-result
   "Takes a search result from the db, format it for the Cargo API."
   [result]
-  (->> (group-by :crate-id result)
+  (->> (group-by :crates/id result)
        (map get-crate-max-version)
        (map format-version)))
 

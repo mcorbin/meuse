@@ -2,7 +2,6 @@
   (:require [meuse.db.public.crate :as public-crate]
             [clojure.string :as string]))
 
-
 (def letters
   [:div {:class "row" :id "letters"}
    [:div {:class "col-12"}
@@ -10,15 +9,12 @@
                   "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"]]
       [:a {:href (str "/front/crates?letter=" letter)} letter])]])
 
-
 (defn pages
   []
   [:div {:class "pages-next"}
    [:a {:href ""} "previous"]
    " - "
-   [:a {:href ""} "next"]
-   ]
-  )
+   [:a {:href ""} "next"]])
 
 (defn page
   [crates-db request]
@@ -33,7 +29,7 @@
      letters
      [:p [:span {:class "bold"} nb-crates-prefix] " crates starting by "
       [:span {:class "bold"} letter]
-      " on a total of "[:span {:class "bold"} nb-crates] " crates"]
+      " on a total of " [:span {:class "bold"} nb-crates] " crates"]
      (pages)
      (for [crate crates]
        [:div {:class "row search-result-crate"}
@@ -44,8 +40,4 @@
          [:a {:href (str "/front/crates/" (:crate-name crate))}
           "More informations"]]
         [:div {:class "col-5"}
-         [:p [:span {:class "stat-num"} (:crate-versions-count crate)] " Releases"]]
-        ]
-       )
-     ])
-  )
+         [:p [:span {:class "stat-num"} (:crate-versions-count crate)] " Releases"]]])]))

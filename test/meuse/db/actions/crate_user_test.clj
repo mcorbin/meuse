@@ -23,16 +23,16 @@
     (testing "success"
       (user-db/create database user)
       (crate-user-db/create database "crate1" (:name user))
-      (let [crate-db-id (:crate-id (crate-db/by-name
-                                    database
-                                    "crate1"))
-            user-db-id (:user-id (user-db/by-name database (:name user)))
+      (let [crate-db-id (:crates/id (crate-db/by-name
+                                     database
+                                     "crate1"))
+            user-db-id (:users/id (user-db/by-name database (:name user)))
             crate-user (crate-user-db/by-id
                         database
                         crate-db-id
                         user-db-id)]
-        (is (= {:crate-id crate-db-id
-                :user-id user-db-id}
+        (is (= {:crates_users/crate_id crate-db-id
+                :crates_users/user_id user-db-id}
                crate-user))))
     (testing "error"
       (is (thrown-with-msg? ExceptionInfo
@@ -49,10 +49,10 @@
 (deftest delete-test
   (testing "success"
     (crate-user-db/delete database "crate1" "user2")
-    (let [crate-db-id (:crate-id (crate-db/by-name
-                                  database
-                                  "crate1"))
-          user-db-id (:user-id (user-db/by-name database "user2"))]
+    (let [crate-db-id (:crates/id (crate-db/by-name
+                                   database
+                                   "crate1"))
+          user-db-id (:users/id (user-db/by-name database "user2"))]
       (is (nil? (crate-user-db/by-id database crate-db-id user-db-id)))))
   (testing "error"
     (is (thrown-with-msg? ExceptionInfo
@@ -70,13 +70,13 @@
     (crate-user-db/create-crate-users database
                                       "crate2"
                                       ["user2" "user3"])
-    (let [crate-db-id (:crate-id (crate-db/by-name
-                                  database
-                                  "crate2"))
+    (let [crate-db-id (:crates/id (crate-db/by-name
+                                   database
+                                   "crate2"))
           ;; user1 is created by the test fixture
-          user0-db-id (:user-id (user-db/by-name database "user1"))
-          user1-db-id (:user-id (user-db/by-name database "user2"))
-          user2-db-id (:user-id (user-db/by-name database "user3"))
+          user0-db-id (:users/id (user-db/by-name database "user1"))
+          user1-db-id (:users/id (user-db/by-name database "user2"))
+          user2-db-id (:users/id (user-db/by-name database "user3"))
           crate-user1 (crate-user-db/by-id
                        database
                        crate-db-id
@@ -85,45 +85,45 @@
                        database
                        crate-db-id
                        user2-db-id)]
-      (is (= {:crate-id crate-db-id
-              :user-id user1-db-id}
+      (is (= {:crates_users/crate_id crate-db-id
+              :crates_users/user_id user1-db-id}
              crate-user1))
-      (is (= {:crate-id crate-db-id
-              :user-id user2-db-id}
+      (is (= {:crates_users/crate_id crate-db-id
+              :crates_users/user_id user2-db-id}
              crate-user2))
       (let [crate-users (user-db/crate-owners database "crate2")]
-        (is (int? (:user-cargo-id (first crate-users))))
-        (is (int? (:user-cargo-id (second crate-users))))
-        (is (= (set [{:user-id user0-db-id
-                      :user-name "user1"
-                      :crate-id crate-db-id}
-                     {:user-id user1-db-id
-                      :user-name "user2"
-                      :crate-id crate-db-id}
-                     {:user-id user2-db-id
-                      :user-name "user3"
-                      :crate-id crate-db-id}])
-               (set (map #(dissoc % :user-cargo-id) crate-users))))))))
+        (is (int? (:users/cargo_id (first crate-users))))
+        (is (int? (:users/cargo_id (second crate-users))))
+        (is (= (set [{:users/id user0-db-id
+                      :users/name "user1"
+                      :crates_users/crate_id crate-db-id}
+                     {:users/id user1-db-id
+                      :users/name "user2"
+                      :crates_users/crate_id crate-db-id}
+                     {:users/id user2-db-id
+                      :users/name "user3"
+                      :crates_users/crate_id crate-db-id}])
+               (set (map #(dissoc % :users/cargo_id) crate-users))))))))
 
 (deftest delete-crate-users-test
   (testing "success"
     (crate-user-db/delete-crate-users database
                                       "crate1"
                                       ["user2" "user3"])
-    (let [crate-db-id (:crate-id (crate-db/by-name
-                                  database
-                                  "crate1"))
-          user1-db-id (:user-id (user-db/by-name database "user2"))
-          user2-db-id (:user-id (user-db/by-name database "user3"))]
+    (let [crate-db-id (:crates/id (crate-db/by-name
+                                   database
+                                   "crate1"))
+          user1-db-id (:users/id (user-db/by-name database "user2"))
+          user2-db-id (:users/id (user-db/by-name database "user3"))]
       (is (nil? (crate-user-db/by-id database crate-db-id user1-db-id)))
       (is (nil? (crate-user-db/by-id database crate-db-id user2-db-id))))))
 
 (deftest owned-by?-test
   (testing "success"
-    (let [user2-id (:user-id (user-db/by-name database "user2"))]
+    (let [user2-id (:users/id (user-db/by-name database "user2"))]
       (is (crate-user-db/owned-by? database "crate1" user2-id))))
   (testing "failures"
-    (let [user4-id (:user-id (user-db/by-name database "user4"))]
+    (let [user4-id (:users/id (user-db/by-name database "user4"))]
       (is (thrown-with-msg? ExceptionInfo
                             #"user does not own the crate"
                             (crate-user-db/owned-by? database "crate1" user4-id)))

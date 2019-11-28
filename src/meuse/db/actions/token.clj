@@ -3,9 +3,9 @@
   (:require [meuse.auth.token :as auth-token]
             [meuse.db.actions.user :as user-db]
             [meuse.db.queries.token :as token-queries]
+            [next.jdbc :as jdbc]
             [clj-time.core :as t]
             [crypto.password.bcrypt :as bcrypt]
-            [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]])
   (:import java.util.UUID))
 
@@ -13,17 +13,10 @@
   "Get a token by name for an user."
   [db-tx user-name token-name]
   (if-let [user (user-db/by-name db-tx user-name)]
-    (-> (jdbc/query db-tx (token-queries/by-user-and-name
-                           (:user-id user)
-                           token-name))
-        first
-        (clojure.set/rename-keys {:token_id :token-id
-                                  :token_identifier :token-identifier
-                                  :token_name :token-name
-                                  :token_token :token-token
-                                  :token_created_at :token-created-at
-                                  :token_expired_at :token-expired-at
-                                  :token_user_id :token-user-id}))
+    (-> (jdbc/execute! db-tx (token-queries/by-user-and-name
+                              (:users/id user)
+                              token-name))
+        first)
     (throw (ex-info (format "the user %s does not exist"
                             user-name)
                     {:type :meuse.error/not-found}))))
@@ -33,7 +26,7 @@
   expiration of the token.
   Returns the generated token."
   [database token]
-  (jdbc/with-db-transaction [db-tx database]
+  (jdbc/with-transaction [db-tx database]
     (if-let [user (user-db/by-name db-tx (:user token))]
       (do
         (when (by-user-and-name db-tx (:user token) (:name token))
@@ -46,7 +39,7 @@
                                 (auth-token/extract-identifier generated-token)
                                 (bcrypt/encrypt generated-token)
                                 (:name token)
-                                (:user-id user)
+                                (:users/id user)
                                 (auth-token/expiration-date (:validity token))))
           generated-token))
       (throw (ex-info (format "the user %s does not exist"
@@ -57,35 +50,17 @@
   "Get a token by value.
   Also returns informations about the user and the role."
   [database token]
-  (-> (jdbc/query database (token-queries/token-join-user-join-role
-                            (auth-token/extract-identifier token)))
-      first
-      (clojure.set/rename-keys {:token_id :token-id
-                                :token_identifier :token-identifier
-                                :token_name :token-name
-                                :token_token :token-token
-                                :token_created_at :token-created-at
-                                :token_expired_at :token-expired-at
-                                :token_user_id :token-user-id
-                                :user_name :user-name
-                                :user_active :user-active
-                                :user_role_id :user-role-id
-                                :role_name :role-name})))
+  (-> (jdbc/execute! database (token-queries/token-join-user-join-role
+                               (auth-token/extract-identifier token)))
+      first))
 
 (defn by-user
   "Get the tokens for an user."
   [database user-name]
-  (jdbc/with-db-transaction [db-tx database]
+  (jdbc/with-transaction [db-tx database]
     (if-let [user (user-db/by-name db-tx user-name)]
-      (->> (jdbc/query db-tx (token-queries/by-user
-                              (:user-id user)))
-           (map #(clojure.set/rename-keys % {:token_id :token-id
-                                             :token_identifier :token-identifier
-                                             :token_name :token-name
-                                             :token_token :token-token
-                                             :token_created_at :token-created-at
-                                             :token_expired_at :token-expired-at
-                                             :token_user_id :token-user-id})))
+      (->> (jdbc/execute! db-tx (token-queries/by-user
+                                 (:users/id user))))
       (throw (ex-info (format "the user %s does not exist"
                               user-name)
                       {:type :meuse.error/not-found})))))
@@ -93,10 +68,10 @@
 (defn delete
   "Deletes a token for an user."
   [database user-name token-name]
-  (jdbc/with-db-transaction [db-tx database]
+  (jdbc/with-transaction [db-tx database]
     (if-let [token (by-user-and-name db-tx user-name token-name)]
       (jdbc/execute! db-tx (token-queries/delete
-                            (:token-id token)))
+                            (:tokens/id token)))
       (throw (ex-info (format "the token %s does not exist for the user %s"
                               token-name
                               user-name)

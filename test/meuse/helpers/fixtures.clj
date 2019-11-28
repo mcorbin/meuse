@@ -24,6 +24,7 @@
 
 (def tmp-dir "test/resources/tmp/")
 (def system-started? (atom false))
+(def git-mock-state (atom []))
 
 (defn tmp-fixture
   [f]
@@ -49,10 +50,11 @@
         (mount/swap-states {#'meuse.crate-file/crate-file-store
                             {:start #(LocalCrateFile. tmp-dir)}
                             #'meuse.git/git
-                            {:start #(GitMock. (atom [])
+                            {:start #(GitMock. git-mock-state
                                                (java.lang.Object.))}})
         mount/start)
     (reset! system-started? true))
+  (reset! git-mock-state [])
   (inject/inject!))
 
 (defn system-fixture

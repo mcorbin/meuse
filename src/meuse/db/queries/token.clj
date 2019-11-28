@@ -28,13 +28,13 @@
 
 (defn get-token
   [where-clause]
-  (-> (h/select [:t.id "token_id"]
-                [:t.identifier "token_identifier"]
-                [:t.token "token_token"]
-                [:t.name "token_name"]
-                [:t.created_at "token_created_at"]
-                [:t.expired_at "token_expired_at"]
-                [:t.user_id "token_user_id"])
+  (-> (h/select :t.id
+                :t.identifier
+                :t.token
+                :t.name
+                :t.created_at
+                :t.expired_at
+                :t.user_id)
       (h/from [:tokens :t])
       (h/where where-clause)
       sql/format))
@@ -47,13 +47,13 @@
 
 (defn by-user
   [user-id]
-  (-> (h/select [:t.id "token_id"]
-                [:t.identifier "token_identifier"]
-                [:t.token "token_token"]
-                [:t.name "token_name"]
-                [:t.created_at "token_created_at"]
-                [:t.expired_at "token_expired_at"]
-                [:t.user_id "token_user_id"])
+  (-> (h/select :t.id
+                :t.identifier
+                :t.token
+                :t.name
+                :t.created_at
+                :t.expired_at
+                :t.user_id)
       (h/from [:tokens :t])
       (h/where [:= :t.user_id user-id])
       sql/format))
@@ -66,17 +66,17 @@
 
 (defn token-join-user-join-role
   [identifier]
-  (-> (h/select [:t.id "token_id"]
-                [:t.identifier "token_identifier"]
-                [:t.token "token_token"]
-                [:t.name "token_name"]
-                [:t.created_at "token_created_at"]
-                [:t.expired_at "token_expired_at"]
-                [:t.user_id "token_user_id"]
-                [:u.name "user_name"]
-                [:u.active "user_active"]
-                [:u.role_id "user_role_id"]
-                [:r.name "role_name"])
+  (-> (h/select :t.id
+                :t.identifier
+                :t.token
+                :t.name
+                :t.created_at
+                :t.expired_at
+                :t.user_id
+                :u.name
+                :u.active
+                :u.role_id
+                :r.name)
       (h/from [:tokens :t])
       (h/join [:users :u] [:= :t.user_id :u.id]
               [:roles :r] [:= :u.role_id :r.id])

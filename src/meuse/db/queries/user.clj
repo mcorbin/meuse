@@ -6,23 +6,23 @@
 
 (defn get-user
   [where-clause]
-  (-> (h/select [:u.id "user_id"]
-                [:u.name "user_name"]
-                [:u.password "user_password"]
-                [:u.description "user_description"]
-                [:u.active "user_active"]
-                [:u.role_id "user_role_id"])
+  (-> (h/select :u.id
+                :u.name
+                :u.password
+                :u.description
+                :u.active
+                :u.role_id)
       (h/from [:users :u])
       (h/where where-clause)
       sql/format))
 
 (defn get-users-join-role
   []
-  (-> (h/select [:u.id "user_id"]
-                [:u.name "user_name"]
-                [:u.description "user_description"]
-                [:u.active "user_active"]
-                [:r.name "role_name"])
+  (-> (h/select :u.id
+                :u.name
+                :u.description
+                :u.active
+                :r.name)
       (h/from [:users :u])
       (h/join [:roles :r] [:= :u.role_id :r.id])
       sql/format))
@@ -56,10 +56,10 @@
 
 (defn users-join-crates-users
   [crate-id]
-  (-> (h/select [:u.id "user_id"]
-                [:u.name "user_name"]
-                [:u.cargo_id "user_cargo_id"]
-                [:c.crate_id "crate_id"])
+  (-> (h/select :u.id
+                :u.name
+                :u.cargo_id
+                :c.crate_id)
       (h/from [:users :u])
       (h/join [:crates_users :c] [:= :c.user_id :u.id])
       (h/where [:= :c.crate_id crate-id])
@@ -74,6 +74,6 @@
 
 (defn count-users
   []
-  (-> (h/select [:%count.* "users_count"])
+  (-> (h/select :%count.*)
       (h/from [:users :c])
       sql/format))

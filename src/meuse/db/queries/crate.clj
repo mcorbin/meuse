@@ -7,24 +7,24 @@
 
 (defn get-crate
   [where-clause]
-  (-> (h/select [:c.id "crate_id"]
-                [:c.name "crate_name"])
+  (-> (h/select :c.id
+                :c.name)
       (h/from [:crates :c])
       (h/where where-clause)
       sql/format))
 
 (defn by-name-join-version
   [crate-name crate-version]
-  (-> (h/select [:c.id "crate_id"]
-                [:c.name "crate_name"]
-                [:v.id "version_id"]
-                [:v.version "version_version"]
-                [:v.description "version_description"]
-                [:v.yanked "version_yanked"]
-                [:v.created_at "version_created_at"]
-                [:v.updated_at "version_updated_at"]
-                [:v.document_vectors "version_document_vectors"]
-                [:v.crate_id "version_crate_id"])
+  (-> (h/select :c.id
+                :c.name
+                :v.id
+                :v.version
+                :v.description
+                :v.yanked
+                :v.created_at
+                :v.updated_at
+                :v.document_vectors
+                :v.crate_id)
       (h/from [:crates :c])
       (h/left-join [:crates_versions :v] [:and
                                           [:= :c.id :v.crate_id]
@@ -46,14 +46,14 @@
 
 (defn get-crates-and-versions
   []
-  (-> (h/select [:c.id "crate_id"]
-                [:c.name "crate_name"]
-                [:v.id "version_id"]
-                [:v.version "version_version"]
-                [:v.description "version_description"]
-                [:v.yanked "version_yanked"]
-                [:v.created_at "version_created_at"]
-                [:v.updated_at "version_updated_at"])
+  (-> (h/select :c.id
+                :c.name
+                :v.id
+                :v.version
+                :v.description
+                :v.yanked
+                :v.created_at
+                :v.updated_at)
       (h/from [:crates :c])
       (h/join [:crates_versions :v]
               [:= :c.id :v.crate_id])
@@ -61,14 +61,14 @@
 
 (defn get-crate-and-versions
   [crate-name]
-  (-> (h/select [:c.id "crate_id"]
-                [:c.name "crate_name"]
-                [:v.id "version_id"]
-                [:v.version "version_version"]
-                [:v.description "version_description"]
-                [:v.yanked "version_yanked"]
-                [:v.created_at "version_created_at"]
-                [:v.updated_at "version_updated_at"])
+  (-> (h/select :c.id
+                :c.name
+                :v.id
+                :v.version
+                :v.description
+                :v.yanked
+                :v.created_at
+                :v.updated_at)
       (h/from [:crates :c])
       (h/join [:crates_versions :v]
               [:= :c.id :v.crate_id])
@@ -77,14 +77,14 @@
 
 (defn get-crates-for-category
   [category-id]
-  (-> (h/select [:c.id "crate_id"]
-                [:c.name "crate_name"]
-                [:v.id "version_id"]
-                [:v.version "version_version"]
-                [:v.description "version_description"]
-                [:v.yanked "version_yanked"]
-                [:v.created_at "version_created_at"]
-                [:v.updated_at "version_updated_at"])
+  (-> (h/select :c.id
+                :c.name
+                :v.id
+                :v.version
+                :v.description
+                :v.yanked
+                :v.created_at
+                :v.updated_at)
       (h/from [:crates :c])
       (h/join [:crates_versions :v]
               [:= :c.id :v.crate_id]
@@ -95,9 +95,9 @@
 
 (defn get-crates-range
   [start end prefix]
-  (-> (h/select [:c.id "crate_id"]
-                [:c.name "crate_name"]
-                [:%count.* "crate_versions_count"])
+  (-> (h/select :c.id
+                :c.name
+                :%count.*)
       (h/from [:crates :c])
       (h/where [:like :c.name (str prefix "%")])
       (h/join [:crates_versions :v]
@@ -110,13 +110,13 @@
 
 (defn count-crates
   []
-  (-> (h/select [:%count.* "crates_count"])
+  (-> (h/select :%count.*)
       (h/from [:crates :c])
       sql/format))
 
 (defn count-crates-prefix
   [prefix]
-  (-> (h/select [:%count.* "crates_count"])
+  (-> (h/select :%count.*)
       (h/from [:crates :c])
       (h/where [:like :c.name (str prefix "%")])
       sql/format))

@@ -2,7 +2,6 @@
   (:require [meuse.api.crate.search :as api-search]
             [meuse.db.public.search :as public-search]))
 
-
 (defn format-result
   [result]
   (->> (group-by :crate-id result)

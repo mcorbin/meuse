@@ -4,16 +4,16 @@
 
 (defn search-crates
   [query]
-  (-> (h/select [:c.id "crate_id"]
-                [:c.name "crate_name"]
-                [:v.id "version_id"]
-                [:v.version "version_version"]
-                [:v.description "version_description"]
-                [:v.yanked "version_yanked"]
-                [:v.created_at "version_created_at"]
-                [:v.updated_at "version_updated_at"]
-                [:v.document_vectors "version_document_vectors"]
-                [:v.crate_id "version_crate_id"])
+  (-> (h/select :c.id
+                :c.name
+                :v.id
+                :v.version
+                :v.description
+                :v.yanked
+                :v.created_at
+                :v.updated_at
+                :v.document_vectors
+                :v.crate_id)
       (h/from [:crates :c])
       (h/join [:crates_versions :v] [:and
                                      [:= :c.id :v.crate_id]

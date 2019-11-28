@@ -55,8 +55,8 @@
   "Returns the versions stored on s3 for a crate."
   [credentials bucket crate-name]
   (->> (s3/list-objects-v2 credentials
-                          {:bucket-name bucket
-                           :prefix (str crate-name "/")})
+                           {:bucket-name bucket
+                            :prefix (str crate-name "/")})
        :object-summaries
        (map :key)
        (reduce validate-crate-version {})))

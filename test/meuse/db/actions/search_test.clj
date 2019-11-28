@@ -16,7 +16,7 @@
 (deftest search-test
   (let [result (search database "crate1")]
     (is (= 3 (count result)))
-    (map #(is (= "crate1" (:crate-name %)) result)))
+    (mapv #(is (= "crate1" (:crates/name %))) result))
   (let [result (search database "barbaz")]
     (is (= 1 (count result))))
   (is (empty? (search database "arandomstring")))

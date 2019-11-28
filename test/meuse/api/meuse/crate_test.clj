@@ -27,13 +27,13 @@
                       :created-at date-1
                       :updated-at date-2}]}
          (format-crate [crate-id-1
-                        [{:crate-id crate-id-1
-                          :crate-name "foo"
-                          :version-description "desc1"
-                          :version-version "1.1.0"
-                          :version-yanked false
-                          :version-created-at date-1
-                          :version-updated-at date-2
+                        [{:crates/id crate-id-1
+                          :crates/name "foo"
+                          :crates_versions/description "desc1"
+                          :crates_versions/version "1.1.0"
+                          :crates_versions/yanked false
+                          :crates_versions/created-at date-1
+                          :crates_versions/updated-at date-2
                           :foo "bar"}]])))
   (is (= {:id crate-id-1
           :name "foo"
@@ -48,65 +48,21 @@
                       :created-at date-1
                       :updated-at date-2}]}
          (format-crate [crate-id-1
-                        [{:crate-id crate-id-1
-                          :crate-name "foo"
-                          :version-description "desc1"
-                          :version-version "1.1.0"
-                          :version-yanked false
-                          :version-created-at date-1
-                          :version-updated-at date-2
+                        [{:crates/id crate-id-1
+                          :crates/name "foo"
+                          :crates_versions/description "desc1"
+                          :crates_versions/version "1.1.0"
+                          :crates_versions/yanked false
+                          :crates_versions/created-at date-1
+                          :crates_versions/updated-at date-2
                           :foo "bar"}
-                         {:crate-id crate-id-1
-                          :version-description "desc2"
-                          :crate-name "foo"
-                          :version-version "1.1.8"
-                          :version-yanked false
-                          :version-created-at date-1
-                          :version-updated-at date-2}]]))))
-
-(deftest format-crates-test
-  (is (= [{:id crate-id-1
-           :name "foo"
-           :versions [{:version "1.1.0"
-                       :yanked false
-                       :description "desc1"
-                       :created-at date-1
-                       :updated-at date-2}]}]
-         (format-crates [{:crate-id crate-id-1
-                          :crate-name "foo"
-                          :version-description "desc1"
-                          :version-version "1.1.0"
-                          :version-yanked false
-                          :version-created-at date-1
-                          :version-updated-at date-2
-                          :foo "bar"}])))
-  (is (= [{:id crate-id-1
-           :name "foo"
-           :versions [{:version "1.1.0"
-                       :yanked false
-                       :description "desc1"
-                       :created-at date-1
-                       :updated-at date-2}
-                      {:version "1.1.8"
-                       :yanked false
-                       :description "desc2"
-                       :created-at date-1
-                       :updated-at date-2}]}]
-         (format-crates [{:crate-id crate-id-1
-                          :crate-name "foo"
-                          :version-description "desc1"
-                          :version-version "1.1.0"
-                          :version-yanked false
-                          :version-created-at date-1
-                          :version-updated-at date-2
-                          :foo "bar"}
-                         {:crate-id crate-id-1
-                          :version-description "desc2"
-                          :crate-name "foo"
-                          :version-version "1.1.8"
-                          :version-yanked false
-                          :version-created-at date-1
-                          :version-updated-at date-2}])))
+                         {:crates/id crate-id-1
+                          :crates/name "foo"
+                          :crates_versions/description "desc2"
+                          :crates_versions/version "1.1.8"
+                          :crates_versions/yanked false
+                          :crates_versions/created-at date-1
+                          :crates_versions/updated-at date-2}]])))
   (is (= [{:id crate-id-1
            :name "foo"
            :versions [{:version "1.1.0"
@@ -126,28 +82,28 @@
                        :description "desc3"
                        :created-at date-1
                        :updated-at date-2}]}]
-         (format-crates [{:crate-id crate-id-1
-                          :crate-name "foo"
-                          :version-description "desc1"
-                          :version-version "1.1.0"
-                          :version-yanked false
-                          :version-created-at date-1
-                          :version-updated-at date-2
+         (format-crates [{:crates/id crate-id-1
+                          :crates/name "foo"
+                          :crates_versions/description "desc1"
+                          :crates_versions/version "1.1.0"
+                          :crates_versions/yanked false
+                          :crates_versions/created-at date-1
+                          :crates_versions/updated-at date-2
                           :foo "bar"}
-                         {:crate-id crate-id-1
-                          :version-description "desc2"
-                          :crate-name "foo"
-                          :version-version "1.1.8"
-                          :version-yanked false
-                          :version-created-at date-1
-                          :version-updated-at date-2}
-                         {:crate-id crate-id-2
-                          :version-description "desc3"
-                          :crate-name "bar"
-                          :version-version "3.0.0"
-                          :version-yanked true
-                          :version-created-at date-1
-                          :version-updated-at date-2}]))))
+                         {:crates/id crate-id-1
+                          :crates/name "foo"
+                          :crates_versions/description "desc2"
+                          :crates_versions/version "1.1.8"
+                          :crates_versions/yanked false
+                          :crates_versions/created-at date-1
+                          :crates_versions/updated-at date-2}
+                         {:crates/id crate-id-2
+                          :crates/name "bar"
+                          :crates_versions/description "desc3"
+                          :crates_versions/version "3.0.0"
+                          :crates_versions/yanked true
+                          :crates_versions/created-at date-1
+                          :crates_versions/updated-at date-2}]))))
 
 (deftest list-crates-test
   (testing "success"

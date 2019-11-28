@@ -32,5 +32,5 @@
   "Takes a token and a token encrypted with bcrypt.
   Checks if the token is valid."
   [token db-token]
-  (and (bcrypt/check token (:token-token db-token))
-       (t/before? (t/now) (DateTime. (:token-expired-at db-token)))))
+  (and (bcrypt/check token (:tokens/token db-token))
+       (t/before? (t/now) (DateTime. (:tokens/expired_at db-token)))))

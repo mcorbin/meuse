@@ -8,8 +8,9 @@
 
 (defn migrate!
   [database]
-  (let [store (jdbc/sql-database database
-                                 {:migrations-table migrations-table})
-        migrations (jdbc/load-resources migrations-path)
-        index (ragtime/into-index migrations)]
-    (ragtime/migrate-all store index migrations)))
+  (let [database {:datasource database}]
+    (let [store (jdbc/sql-database database
+                                   {:migrations-table migrations-table})
+          migrations (jdbc/load-resources migrations-path)
+          index (ragtime/into-index migrations)]
+      (ragtime/migrate-all store index migrations))))

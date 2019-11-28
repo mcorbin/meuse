@@ -14,32 +14,32 @@
                         #"already exists$"
                         (create database "cat1" "category description")))
   (let [category (by-name database "cat1")]
-    (is (uuid? (:category-id category)))
-    (is (= "cat1" (:category-name category)))
-    (is (= "category description" (:category-description category))))
+    (is (uuid? (:categories/id category)))
+    (is (= "cat1" (:categories/name category)))
+    (is (= "category description" (:categories/description category))))
   (create database "cat2" "another category")
   (let [category (by-name database "cat2")]
-    (is (uuid? (:category-id category)))
-    (is (= "cat2" (:category-name category)))
-    (is (= "another category" (:category-description category)))))
+    (is (uuid? (:categories/id category)))
+    (is (= "cat2" (:categories/name category)))
+    (is (= "another category" (:categories/description category)))))
 
 (deftest get-categories-test
   (create database "email" "the email category")
   (create database "system" "the system category")
   (let [result (get-categories database)
-        email (-> (filter #(= "email" (:category-name %)) result)
+        email (-> (filter #(= "email" (:categories/name %)) result)
                   first)
-        system (-> (filter #(= "system" (:category-name %)) result)
+        system (-> (filter #(= "system" (:categories/name %)) result)
                    first)]
     (is (= 2 (count result)))
-    (is (uuid? (:category-id system)))
-    (is (= (dissoc system :category-id)
-           {:category-name "system"
-            :category-description "the system category"}))
-    (is (uuid? (:category-id email)))
-    (is (= (dissoc email :category-id)
-           {:category-name "email"
-            :category-description "the email category"}))))
+    (is (uuid? (:categories/id system)))
+    (is (= (dissoc system :categories/id)
+           {:categories/name "system"
+            :categories/description "the system category"}))
+    (is (uuid? (:categories/id email)))
+    (is (= (dissoc email :categories/id)
+           {:categories/name "email"
+            :categories/description "the email category"}))))
 
 (deftest update-category-test
   (testing "success"
@@ -47,10 +47,10 @@
     (update-category database "email" {:name "music"
                                        :description "music description"})
     (let [categories (get-categories database)
-          music (-> (filter #(= "music" (:category-name %)) categories)
+          music (-> (filter #(= "music" (:categories/name %)) categories)
                     first)]
-      (is (= "music description" (:category-description music)))
-      (is (nil? (-> (filter #(= "email" (:category-name %)) categories)
+      (is (= "music description" (:categories/description music)))
+      (is (nil? (-> (filter #(= "email" (:categories/name %)) categories)
                     first)))))
   (testing "the category does not exist"
     (is (thrown-with-msg?
@@ -64,5 +64,5 @@
         count-crates (count-crates-for-categories database)]
     (is (= (count categories) (count count-crates)))
     (doseq [count-crate count-crates]
-      (is (string? (:category-id count-crate)))
-      (is (= 1 (:count count-crate))))))
+      (is (string? (:categories/id count-crate)))
+      (is (= 1 (:categories/count count-crate))))))

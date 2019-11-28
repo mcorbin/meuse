@@ -39,4 +39,4 @@
                                     :vers "1.0.0"}
                                    crate-file))
         (is (spy/called-once-with? aleph.http/get
-                                 "https://crates.io/api/v1/crates/foo/1.0.0/download"))))))
+                                   "https://crates.io/api/v1/crates/foo/1.0.0/download"))))))

@@ -21,9 +21,9 @@
     (is (= {:status 200
             :body {:ok true}} (meuse-api! request)))
     (let [category (category-db/by-name database "foo")]
-      (is (uuid? (:category-id category)))
-      (is (= "foo" (:category-name category)))
-      (is (= "the description" (:category-description category))))
+      (is (uuid? (:categories/id category)))
+      (is (= "foo" (:categories/name category)))
+      (is (= "the description" (:categories/description category))))
     (is (thrown-with-msg? ExceptionInfo
                           #"already exists$"
                           (meuse-api! request))))
@@ -82,10 +82,10 @@
                             "admin")]
       (is {:status 200 :body {:ok true}}) (meuse-api! request)
       (let [categories (category-db/get-categories database)
-            music (-> (filter #(= "music" (:category-name %)) categories)
+            music (-> (filter #(= "music" (:categories/name %)) categories)
                       first)]
-        (is (= "music description" (:category-description music)))
-        (is (nil? (-> (filter #(= "email" (:category-name %)) categories)
+        (is (= "music description" (:categories/description music)))
+        (is (nil? (-> (filter #(= "email" (:categories/name %)) categories)
                       first))))))
   (testing "invalid parameters"
     (is (thrown-with-msg?

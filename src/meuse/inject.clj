@@ -155,7 +155,6 @@
       (search-page/page search-db
                         request))
 
-
     (defmethod front-api! :crate
       [request]
       (crate-page/page crate-db
@@ -174,8 +173,7 @@
     (defmethod front-api! :crates-category
       [request]
       (crates-category-page/page crate-db
-                                 request))
-    ))
+                                 request))))
 
 (defn inject!
   []

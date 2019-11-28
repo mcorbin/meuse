@@ -3,7 +3,7 @@
             [meuse.db.actions.role :as role]
             [meuse.db.actions.user :as user-db]
             [meuse.db.queries.crate-user :as crate-user-queries]
-            [clojure.java.jdbc :as jdbc]
+            [next.jdbc :as jdbc]
             [clojure.set :as set]
             [clojure.tools.logging :refer [debug info error]])
   (:import java.util.UUID))
@@ -11,10 +11,8 @@
 (defn by-id
   "Get the crate/user relation for a crate and an user."
   [db-tx crate-id user-id]
-  (-> (jdbc/query db-tx (crate-user-queries/by-crate-and-user crate-id user-id))
-      first
-      (clojure.set/rename-keys {:crate_id :crate-id
-                                :user_id :user-id})))
+  (-> (jdbc/execute! db-tx (crate-user-queries/by-crate-and-user crate-id user-id))
+      first))
 
 (defn create
   "Add an user as a owner of a crate"
@@ -22,14 +20,14 @@
   (if-let [user (user-db/by-name db-tx user-name)]
     (if-let [crate (crate/by-name db-tx crate-name)]
       (do
-        (when (by-id db-tx (:crate-id crate) (:user-id user))
+        (when (by-id db-tx (:crates/id crate) (:users/id user))
           (throw (ex-info (format "the user %s already owns the crate %s"
                                   user-name
                                   crate-name)
                           {:type :meuse.error/incorrect})))
         (jdbc/execute! db-tx (crate-user-queries/create
-                              (:crate-id crate)
-                              (:user-id user))))
+                              (:crates/id crate)
+                              (:users/id user))))
       (throw (ex-info (format "the crate %s does not exist"
                               crate-name)
                       {:type :meuse.error/not-found})))
@@ -40,7 +38,7 @@
 (defn create-crate-users
   "Add multiple users as owner of a crate"
   [database crate-name users]
-  (jdbc/with-db-transaction [db-tx database]
+  (jdbc/with-transaction [db-tx database]
     (doseq [user users]
       (create db-tx crate-name user))))
 
@@ -48,9 +46,9 @@
   "Checks if a crate is owned by an user."
   [database crate-name user-id]
   (if-let [crate (crate/by-name database crate-name)]
-    (if (-> (jdbc/query database (crate-user-queries/by-crate-and-user
-                                  (:crate-id crate)
-                                  user-id))
+    (if (-> (jdbc/execute! database (crate-user-queries/by-crate-and-user
+                                     (:crates/id crate)
+                                     user-id))
             first)
       true
       (throw (ex-info (format "user does not own the crate %s"
@@ -63,18 +61,18 @@
 (defn delete
   "Remove an user as a owner of a crate"
   [database crate-name user-name]
-  (jdbc/with-db-transaction [db-tx database]
+  (jdbc/with-transaction [db-tx database]
     (if-let [user (user-db/by-name database user-name)]
       (if-let [crate (crate/by-name db-tx crate-name)]
         (do
-          (when-not (by-id db-tx (:crate-id crate) (:user-id user))
+          (when-not (by-id db-tx (:crates/id crate) (:users/id user))
             (throw (ex-info (format "the user %s does not own the crate %s"
                                     user-name
                                     crate-name)
                             {:type :meuse.error/incorrect})))
           (jdbc/execute! db-tx (crate-user-queries/delete
-                                (:crate-id crate)
-                                (:user-id user))))
+                                (:crates/id crate)
+                                (:users/id user))))
         (throw (ex-info (format "the crate %s does not exist"
                                 crate-name)
                         {:type :meuse.error/not-found})))
@@ -85,6 +83,6 @@
 (defn delete-crate-users
   "Remove multiple users as owner of a crate"
   [database crate-name users]
-  (jdbc/with-db-transaction [db-tx database]
+  (jdbc/with-transaction [db-tx database]
     (doseq [user users]
       (delete db-tx crate-name user))))

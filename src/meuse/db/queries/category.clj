@@ -5,30 +5,30 @@
 
 (defn get-category
   [where-clause]
-  (-> (h/select [:c.id "category_id"]
-                [:c.name "category_name"]
-                [:c.description "category_description"])
+  (-> (h/select :c.id
+                :c.name
+                :c.description)
       (h/from [:categories :c])
       (h/where where-clause)
       sql/format))
 
 (defn get-categories
   []
-  (-> (h/select [:c.id "category_id"]
-                [:c.name "category_name"]
-                [:c.description "category_description"])
+  (-> (h/select :c.id
+                :c.name
+                :c.description)
       (h/from [:categories :c])
       sql/format))
 
 (defn by-name
   [category-name]
-  (get-category [:= :c.name category-name]))
+  (get-category [:= :c/name category-name]))
 
 (defn by-crate-id
   [crate-id]
-  (-> (h/select [:c.id "category_id"]
-                [:c.name "category_name"]
-                [:c.description "category_description"])
+  (-> (h/select :c.id
+                :c.name
+                :c.description)
       (h/from [:categories :c])
       (h/left-join [:crates_categories :cc]
                    [:and
@@ -56,8 +56,8 @@
 
 (defn count-crates-for-categories
   []
-  (-> (h/select [:%count.* "count"]
-                [:category_id "category_id"])
+  (-> (h/select :%count.*
+                :category_id)
       (h/from [:crates_categories :cc])
       (h/group :cc.category_id)
       sql/format))
