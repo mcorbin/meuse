@@ -19,11 +19,11 @@
      (for [crate crates]
        [:div {:class "row search-result-crate"}
         [:div {:class "col-7"}
-         [:p [:span {:class "bold"} (:crate-name crate)]]
-         "Last version: " [:span {:class "bold"} (:version-version crate)]
-         [:p (:version-description crate)]
-         [:a {:href (str "/front/crates/" (:crate-name crate))}
+         [:p [:span {:class "bold"} (:crates/name crate)]]
+         "Last version: " [:span {:class "bold"} (:crates_versions/version crate)]
+         [:p (:crates_versions/description crate)]
+         [:a {:href (str "/front/crates/" (:crates/name crate))}
           "More informations"]]
         [:div {:class "col-5"}
-         [:p "Created on " (:version-created-at crate)]
-         [:p "Last update " (:version-updated-at crate)]]])]))
+         [:p "Created on " (:crates_versions/created_at crate)]
+         [:p "Last update " (:crates_versions/updated_at crate)]]])]))

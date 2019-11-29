@@ -6,6 +6,6 @@
   (let [crate-name (get-in request [:route-params :name])
         crates-versions (->> (public-crate/get-crate-and-versions
                               crates-db crate-name)
-                             (sort-by :version-created-at)
+                             (sort-by :crates_versions/created_at)
                              reverse)]
-    [:h1 (:crate-name (first crates-versions))]))
+    [:h1 (:crates/name (first crates-versions))]))

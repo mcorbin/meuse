@@ -12,10 +12,10 @@
                        crate-version-db 10)]
      (for [crate-version last-updated]
        [:div {:class "index-last-updated-block"}
-        (:crate-name crate-version) " ("
+        (:crates/name crate-version) " ("
         [:span {:class "updated-crate-version"}
-         (:version-version crate-version)] ") "
-        [:a {:type "button" :class "btn btn-secondary btn-sm float-right" :role "button" :href (str "/front/crates/" (:crate-name crate-version))}
+         (:crates_versions/version crate-version)] ") "
+        [:a {:type "button" :class "btn btn-secondary btn-sm float-right" :role "button" :href (str "/front/crates/" (:crates/name crate-version))}
          "see"]]))])
 
 (defn index-page
@@ -43,16 +43,16 @@
      [:p "You can check the documentation to have more informations about "
       "this project."]]
     [:div {:class "col-5 "}
-     [:span {:class "stat-num"} (:crates-count
+     [:span {:class "stat-num"} (:count
                                  (public-crate/count-crates crate-db))]
      " Crates in stock"
      [:br]
-     [:span {:class "stat-num"} (:crates-versions-count
+     [:span {:class "stat-num"} (:count
                                  (public-crate-version/count-crates-versions
                                   crate-version-db))]
      " Crates versions uploaded"
      [:br]
-     [:span {:class "stat-num"} (:users-count
+     [:span {:class "stat-num"} (:count
                                  (public-user/count-users
                                   user-db))]
      " Users"]]

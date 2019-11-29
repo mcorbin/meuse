@@ -22,8 +22,8 @@
         start (get-in request [:route-params :start] 0)
         end (get-in request [:route-params :start] 10)
         crates (public-crate/get-crates-range crates-db start end letter)
-        nb-crates (:crates-count (public-crate/count-crates crates-db))
-        nb-crates-prefix (:crates-count (public-crate/count-crates-prefix crates-db letter))]
+        nb-crates (:count (public-crate/count-crates crates-db))
+        nb-crates-prefix (:count (public-crate/count-crates-prefix crates-db letter))]
     [:div {:id "crates"}
      [:h1 "All Crates"]
      letters
@@ -34,10 +34,10 @@
      (for [crate crates]
        [:div {:class "row search-result-crate"}
         [:div {:class "col-7"}
-         [:p [:span {:class "bold"} (:crate-name crate)]]
-         "ID: " [:span {:class "bold"} (:crate-id crate)]
-         [:p (:version-description crate)]
-         [:a {:href (str "/front/crates/" (:crate-name crate))}
+         [:p [:span {:class "bold"} (:crates/name crate)]]
+         "ID: " [:span {:class "bold"} (:crates/id crate)]
+         [:p (:crates_versions/description crate)]
+         [:a {:href (str "/front/crates/" (:crates/name crate))}
           "More informations"]]
         [:div {:class "col-5"}
-         [:p [:span {:class "stat-num"} (:crate-versions-count crate)] " Releases"]]])]))
+         [:p [:span {:class "stat-num"} (:count crate)] " Releases"]]])]))
