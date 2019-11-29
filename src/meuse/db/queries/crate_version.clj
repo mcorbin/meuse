@@ -113,3 +113,9 @@
   [crate-version-id]
   ["UPDATE crates_versions SET download_count = download_count + 1 WHERE id = ?"
    crate-version-id])
+
+(defn sum-download-count
+  []
+  (-> (h/select :%sum.download_count)
+      (h/from [:crates_versions :c])
+      sql/format))

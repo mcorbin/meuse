@@ -59,3 +59,13 @@
   (is (thrown-with-msg? ExceptionInfo
                         #"crate doesnotexist version 1.1.0 not found"
                         (inc-download database "doesnotexist" "1.1.0"))))
+
+(deftest sum-download-count-test
+  (is (= {:sum 0} (sum-download-count database)))
+  (inc-download database "crate1" "1.1.0")
+  (is (= {:sum 1} (sum-download-count database)))
+  (inc-download database "crate1" "1.1.0")
+  (inc-download database "crate1" "1.1.4")
+  (inc-download database "crate1" "1.1.4")
+  (is (= {:sum 4} (sum-download-count database))))
+

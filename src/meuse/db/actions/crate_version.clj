@@ -51,6 +51,7 @@
       first))
 
 (defn inc-download
+  "Increment the download count for a crate name and version"
   [database crate-name version]
   (if-let [crate (crate-db/by-name-and-version database crate-name version)]
     (-> (jdbc/execute! database (crate-version-queries/inc-download
@@ -59,3 +60,8 @@
                             crate-name version)
                     {:type :meuse.error/not-found}))))
 
+(defn sum-download-count
+  "Returns the number of total download."
+  [database]
+  (-> (jdbc/execute! database (crate-version-queries/sum-download-count))
+      first))

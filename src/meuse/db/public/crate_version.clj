@@ -4,21 +4,24 @@
             [mount.core :refer [defstate]]))
 
 (defprotocol ICrateVersionDB
+  (count-crates-versions [this])
   (inc-download [this crate-name version])
   (last-updated [this n])
   (update-yank [this crate-name crate-version yanked?])
-  (count-crates-versions [this]))
+  (sum-download-count [this]))
 
 (defrecord CrateVersionDB [database]
   ICrateVersionDB
+  (count-crates-versions [this]
+    (crate-version/count-crates-versions database))
   (inc-download [this crate-name version]
     (crate-version/inc-download database crate-name version))
   (last-updated [this n]
     (crate-version/last-updated database n))
   (update-yank [this crate-name crate-version yanked?]
     (crate-version/update-yank database crate-name crate-version yanked?))
-  (count-crates-versions [this]
-    (crate-version/count-crates-versions database)))
+  (sum-download-count [this]
+    (crate-version/sum-download-count database)))
 
 (defstate crate-version-db
   :start (CrateVersionDB. database))
