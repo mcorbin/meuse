@@ -49,3 +49,13 @@
   [database]
   (-> (jdbc/execute! database (crate-version-queries/count-crates-versions))
       first))
+
+(defn inc-download
+  [database crate-name version]
+  (if-let [crate (crate-db/by-name-and-version database crate-name version)]
+    (-> (jdbc/execute! database (crate-version-queries/inc-download
+                                 (:crates_versions/id crate))))
+    (throw (ex-info (format "crate %s version %s not found"
+                            crate-name version)
+                    {:type :meuse.error/not-found}))))
+

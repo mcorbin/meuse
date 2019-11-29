@@ -67,6 +67,7 @@
                     :updated_at
                     :crate_id
                     :metadata
+                    :download_count
                     :document_vectors)
          (h/values [[(UUID/randomUUID)
                      (:vers metadata)
@@ -76,6 +77,7 @@
                      now
                      crate-id
                      (jsonb metadata)
+                     0
                      (sql/raw tsvector)]])
          sql/format
          (conj (:name metadata)))
@@ -90,6 +92,7 @@
                 :v.id
                 :v.version
                 :v.description
+                :v.download_count
                 :v.yanked
                 :v.created_at
                 :v.updated_at)
@@ -105,3 +108,8 @@
   (-> (h/select :%count.*)
       (h/from [:crates_versions :c])
       sql/format))
+
+(defn inc-download
+  [crate-version-id]
+  ["UPDATE crates_versions SET download_count = download_count + 1 WHERE id = ?"
+   crate-version-id])

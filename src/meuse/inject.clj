@@ -109,7 +109,7 @@
 
     (defmethod crates-api! :download
       [request]
-      (download/download crate-file-store request))
+      (download/download crate-version-db crate-file-store request))
     ;; owner
 
     (defmethod crates-api! :add-owner

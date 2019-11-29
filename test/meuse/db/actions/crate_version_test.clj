@@ -1,5 +1,6 @@
 (ns meuse.db.actions.crate-version-test
   (:require [meuse.db.actions.crate-version :refer :all]
+            [meuse.db.actions.crate :as crate-db]
             [meuse.helpers.db-state :as db-state]
             [meuse.helpers.fixtures :refer :all]
             [clojure.test :refer :all]
@@ -43,3 +44,18 @@
 
 (deftest count-crates-versions-test
   (is (= {:count 5} (count-crates-versions database))))
+
+(deftest inc-download-test
+  (inc-download database "crate1" "1.1.0")
+  (is (= 1 (:crates_versions/download_count (crate-db/by-name-and-version
+                                             database
+                                             "crate1"
+                                             "1.1.0"))))
+  (inc-download database "crate1" "1.1.0")
+  (is (= 2 (:crates_versions/download_count (crate-db/by-name-and-version
+                                             database
+                                             "crate1"
+                                             "1.1.0"))))
+  (is (thrown-with-msg? ExceptionInfo
+                        #"crate doesnotexist version 1.1.0 not found"
+                        (inc-download database "doesnotexist" "1.1.0"))))

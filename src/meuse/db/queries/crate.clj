@@ -22,6 +22,7 @@
                 :v.description
                 :v.yanked
                 :v.created_at
+                :v.download_count
                 :v.updated_at
                 :v.document_vectors
                 :v.crate_id)
@@ -51,6 +52,7 @@
                 :v.id
                 :v.version
                 :v.description
+                :v.download_count
                 :v.yanked
                 :v.created_at
                 :v.updated_at)
@@ -66,6 +68,7 @@
                 :v.id
                 :v.version
                 :v.description
+                :v.download_count
                 :v.yanked
                 :v.created_at
                 :v.updated_at)
@@ -82,6 +85,7 @@
                 :v.id
                 :v.version
                 :v.description
+                :v.download_count
                 :v.yanked
                 :v.created_at
                 :v.updated_at)

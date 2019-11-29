@@ -14,14 +14,14 @@
 (deftest crate-api-download-test
   (testing "success"
     (store/write-file crate-file-store
-                      {:name "foo"
-                       :vers "1.0.0"}
+                      {:name "crate1"
+                       :vers "1.1.0"}
                       (.getBytes "file content")))
   (is (= (slurp (:body (crates-api!
                         (add-auth {:action :download
                                    :config {:crate {:path tmp-dir}}
-                                   :route-params {:crate-name "foo"
-                                                  :crate-version "1.0.0"}}))))
+                                   :route-params {:crate-name "crate1"
+                                                  :crate-version "1.1.0"}}))))
          "file content"))
   (testing "error"
     (is (thrown-with-msg?

@@ -11,6 +11,7 @@ logging:
   level: debug
   console: true
   overrides:
+    com.zaxxer.hikari.pool.HikariPool: info
     org.apache.http: error
     io.netty.buffer.PoolThreadCache: error
 metadata:
