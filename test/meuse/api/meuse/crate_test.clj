@@ -25,15 +25,17 @@
                       :yanked false
                       :description "desc1"
                       :created-at date-1
-                      :updated-at date-2}]}
+                      :updated-at date-2
+                      :download-count 2}]}
          (format-crate [crate-id-1
                         [{:crates/id crate-id-1
                           :crates/name "foo"
                           :crates_versions/description "desc1"
                           :crates_versions/version "1.1.0"
                           :crates_versions/yanked false
-                          :crates_versions/created-at date-1
-                          :crates_versions/updated-at date-2
+                          :crates_versions/created_at date-1
+                          :crates_versions/updated_at date-2
+                          :crates_versions/download_count 2
                           :foo "bar"}]])))
   (is (= {:id crate-id-1
           :name "foo"
@@ -41,69 +43,79 @@
                       :yanked false
                       :description "desc1"
                       :created-at date-1
-                      :updated-at date-2}
+                      :updated-at date-2
+                      :download-count 2}
                      {:version "1.1.8"
                       :yanked false
                       :description "desc2"
                       :created-at date-1
-                      :updated-at date-2}]}
+                      :updated-at date-2
+                      :download-count 2}]}
          (format-crate [crate-id-1
                         [{:crates/id crate-id-1
                           :crates/name "foo"
                           :crates_versions/description "desc1"
                           :crates_versions/version "1.1.0"
                           :crates_versions/yanked false
-                          :crates_versions/created-at date-1
-                          :crates_versions/updated-at date-2
+                          :crates_versions/created_at date-1
+                          :crates_versions/updated_at date-2
+                          :crates_versions/download_count 2
                           :foo "bar"}
                          {:crates/id crate-id-1
                           :crates/name "foo"
                           :crates_versions/description "desc2"
                           :crates_versions/version "1.1.8"
                           :crates_versions/yanked false
-                          :crates_versions/created-at date-1
-                          :crates_versions/updated-at date-2}]])))
+                          :crates_versions/created_at date-1
+                          :crates_versions/updated_at date-2
+                          :crates_versions/download_count 2}]])))
   (is (= [{:id crate-id-1
            :name "foo"
            :versions [{:version "1.1.0"
                        :yanked false
                        :description "desc1"
                        :created-at date-1
-                       :updated-at date-2}
+                       :updated-at date-2
+                       :download-count 2}
                       {:version "1.1.8"
                        :yanked false
                        :description "desc2"
                        :created-at date-1
-                       :updated-at date-2}]}
+                       :updated-at date-2
+                       :download-count 2}]}
           {:id crate-id-2
            :name "bar"
            :versions [{:version "3.0.0"
                        :yanked true
                        :description "desc3"
                        :created-at date-1
-                       :updated-at date-2}]}]
+                       :updated-at date-2
+                       :download-count 3}]}]
          (format-crates [{:crates/id crate-id-1
                           :crates/name "foo"
                           :crates_versions/description "desc1"
                           :crates_versions/version "1.1.0"
                           :crates_versions/yanked false
-                          :crates_versions/created-at date-1
-                          :crates_versions/updated-at date-2
+                          :crates_versions/created_at date-1
+                          :crates_versions/updated_at date-2
+                          :crates_versions/download_count 2
                           :foo "bar"}
                          {:crates/id crate-id-1
                           :crates/name "foo"
                           :crates_versions/description "desc2"
                           :crates_versions/version "1.1.8"
                           :crates_versions/yanked false
-                          :crates_versions/created-at date-1
-                          :crates_versions/updated-at date-2}
+                          :crates_versions/created_at date-1
+                          :crates_versions/updated_at date-2
+                          :crates_versions/download_count 2}
                          {:crates/id crate-id-2
                           :crates/name "bar"
                           :crates_versions/description "desc3"
                           :crates_versions/version "3.0.0"
                           :crates_versions/yanked true
-                          :crates_versions/created-at date-1
-                          :crates_versions/updated-at date-2}]))))
+                          :crates_versions/created_at date-1
+                          :crates_versions/updated_at date-2
+                          :crates_versions/download_count 3}]))))
 
 (deftest list-crates-test
   (testing "success"
@@ -130,7 +142,8 @@
       (is (= "crate1" (:name crate1)))
       (is (uuid? (:id crate1)))
       (is (= 1 (count crates)))
-      (is (= 3 (count (:versions crate1))))))
+      (is (= 3 (count (:versions crate1))))
+      (is (= 0 (:download-count (first (:versions crate1)))))))
   (testing "bad permissions"
     (is (thrown-with-msg?
          ExceptionInfo
@@ -155,6 +168,7 @@
       (is (= #{"email" "system"} (set (map :name (:categories body)))))
       (is (= #{"the email category" "the system category"}
              (set (map :description (:categories body)))))
+      (is (= 0 (:download-count (first (:versions body)))))
       (mapv #(is (uuid? (:id %))) (:categories body))))
   (testing "bad parameters"
     (is (thrown-with-msg?

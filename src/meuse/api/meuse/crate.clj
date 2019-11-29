@@ -15,11 +15,12 @@
                                                  :crates_versions/description :description
                                                  :crates_versions/yanked :yanked
                                                  :crates_versions/created_at :created-at
-                                                 :crates_versions/updated_at :updated-at})
+                                                 :crates_versions/updated_at :updated-at
+                                                 :crates_versions/download_count :download-count})
                             crate-versions)
                       (map #(select-keys %
                                          [:version :description :yanked
-                                          :created-at :updated-at])))]
+                                          :created-at :updated-at :download-count])))]
     {:id crate-id
      :name (-> crate-versions first :crates/name)
      :versions versions}))
