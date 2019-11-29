@@ -14,8 +14,8 @@
   (let [versions (->> (map  #(set/rename-keys % {:crates_versions/version :version
                                                  :crates_versions/description :description
                                                  :crates_versions/yanked :yanked
-                                                 :crates_versions/created-at :created-at
-                                                 :crates_versions/updated-at :updated-at})
+                                                 :crates_versions/created_at :created-at
+                                                 :crates_versions/updated_at :updated-at})
                             crate-versions)
                       (map #(select-keys %
                                          [:version :description :yanked
