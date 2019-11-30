@@ -622,7 +622,22 @@
        (client/post (str meuse-url "/api/v1/meuse/category/new_name")
                     {:content-type :json
                      :headers {"Authorization" token}
-                     :throw-exceptions false})))))
+                     :throw-exceptions false})))
+    (testing "statistics: success"
+      (test-http
+       {:status 200
+        :body (js {:crates 3 :crates-versions 5 :downloads 0 :users 8})}
+       (client/get (str meuse-url "/api/v1/meuse/statistics")
+                   {:content-type :json
+                    :throw-exceptions false
+                    :headers {"Authorization" integration-token}})))
+    (testing "statistics: no auth"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "token missing in the header"}]})}
+       (client/get (str meuse-url "/api/v1/meuse/statistics")
+                   {:content-type :json
+                    :throw-exceptions false})))))
 
 (deftest ^:integration crate-api-integration-test
   ;; create a token for an admin user

@@ -2,7 +2,6 @@
   (:require [meuse.api.meuse.crate :refer :all]
             [meuse.api.meuse.http :refer :all]
             [meuse.db.actions.crate :as crate-db]
-            [meuse.db :refer [database]]
             [meuse.helpers.fixtures :refer :all]
             [meuse.helpers.request :refer [add-auth]]
             [clojure.test :refer :all])

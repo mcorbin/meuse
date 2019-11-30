@@ -8,6 +8,7 @@
             [meuse.api.meuse.http :refer [meuse-api!]]
             [meuse.api.meuse.category :as category]
             [meuse.api.meuse.crate :as crate]
+            [meuse.api.meuse.statistics :as statistics]
             [meuse.api.meuse.token :as token]
             [meuse.api.meuse.user :as user]
             [meuse.api.mirror.http :refer [mirror-api!]]
@@ -88,7 +89,13 @@
 
     (defmethod meuse-api! :list-users
       [request]
-      (user/list-users user-db request))))
+      (user/list-users user-db request))
+
+    ;; statistics
+
+    (defmethod meuse-api! :statistics
+      [request]
+      (statistics/get-stats crate-db crate-version-db user-db request))))
 
 (defn inject-crate-api!
   "Inject multimethods to handle HTTP requests for the Crate API"

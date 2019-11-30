@@ -6,7 +6,6 @@
             meuse.db.public.crate
             meuse.db.public.crate-user
             meuse.db.public.crate-version
-            meuse.db.public.role
             meuse.db.public.search
             meuse.db.public.token
             meuse.db.public.user
