@@ -1,7 +1,6 @@
 (ns meuse.api.crate.search
   "Search API"
-  (:require [meuse.api.crate.http :refer (crates-api!)]
-            [meuse.api.params :as params]
+  (:require [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
             [meuse.db.public.search :as public-search]
             [meuse.semver :as semver]

@@ -1,6 +1,5 @@
 (ns meuse.api.meuse.category
-  (:require [meuse.api.meuse.http :refer [meuse-api!]]
-            [meuse.api.params :as params]
+  (:require [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
             [meuse.db.public.category :as public-category]
             [clojure.tools.logging :refer [debug info error]]))

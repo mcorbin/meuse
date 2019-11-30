@@ -1,6 +1,5 @@
 (ns meuse.api.crate.yank
-  (:require [meuse.api.crate.http :refer (crates-api!)]
-            [meuse.api.params :as params]
+  (:require [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
             [meuse.db.public.crate-user :as public-crate-user]
             [meuse.db.public.crate-version :as public-crate-version]

@@ -1,6 +1,5 @@
 (ns meuse.api.meuse.user
-  (:require [meuse.api.meuse.http :refer [meuse-api!]]
-            [meuse.api.params :as params]
+  (:require [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
             [meuse.db.public.user :as public-user]
             [clojure.tools.logging :refer [debug info error]]))

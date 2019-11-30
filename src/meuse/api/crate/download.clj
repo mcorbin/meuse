@@ -1,6 +1,5 @@
 (ns meuse.api.crate.download
-  (:require [meuse.api.crate.http :refer (crates-api!)]
-            [meuse.api.params :as params]
+  (:require [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
             [meuse.db.public.crate-version :as public-crate-version]
             [meuse.store.protocol :as store]

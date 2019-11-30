@@ -1,5 +1,5 @@
 (ns meuse.api.crate.new
-  (:require [meuse.api.crate.http :refer (crates-api!)]
+  (:require [meuse.api.crate.http :refer [crates-api!]]
             [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
             [meuse.crate :as crate]
