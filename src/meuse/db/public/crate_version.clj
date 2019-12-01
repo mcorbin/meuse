@@ -7,6 +7,7 @@
   (count-crates-versions [this])
   (inc-download [this crate-name version])
   (last-updated [this n])
+  (top-n-downloads [this n])
   (update-yank [this crate-name crate-version yanked?])
   (sum-download-count [this]))
 
@@ -18,6 +19,9 @@
     (crate-version/inc-download database crate-name version))
   (last-updated [this n]
     (crate-version/last-updated database n))
+  (top-n-downloads [this n]
+    (crate-version/top-n-downloads database n)
+    )
   (update-yank [this crate-name crate-version yanked?]
     (crate-version/update-yank database crate-name crate-version yanked?))
   (sum-download-count [this]

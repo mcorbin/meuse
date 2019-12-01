@@ -69,3 +69,32 @@
   (inc-download database "crate1" "1.1.4")
   (is (= {:sum 4} (sum-download-count database))))
 
+(deftest top-n-downloads-test
+  (inc-download database "crate1" "1.1.0")
+  (is (= [{:crates/name "crate1"
+           :crates_versions/version "1.1.0"
+           :crates_versions/download_count 1}]
+         (->> (top-n-downloads database 1)
+              (map #(select-keys % [:crates/name
+                                    :crates_versions/version
+                                    :crates_versions/download_count])))))
+  (inc-download database "crate1" "1.1.4")
+  (inc-download database "crate1" "1.1.4")
+  (is (= [{:crates/name "crate1"
+           :crates_versions/version "1.1.4"
+           :crates_versions/download_count 2}]
+         (->> (top-n-downloads database 1)
+              (map #(select-keys % [:crates/name
+                                    :crates_versions/version
+                                    :crates_versions/download_count])))))
+  (is (= [{:crates/name "crate1"
+           :crates_versions/version "1.1.4"
+           :crates_versions/download_count 2}
+          {:crates/name "crate1"
+           :crates_versions/version "1.1.0"
+           :crates_versions/download_count 1}]
+         (->> (top-n-downloads database 2)
+              (map #(select-keys % [:crates/name
+                                    :crates_versions/version
+                                    :crates_versions/download_count]))))))
+

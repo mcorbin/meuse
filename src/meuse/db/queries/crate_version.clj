@@ -85,24 +85,6 @@
       (seq keywords) (conj (string/join " " keywords))
       (seq categories) (conj (string/join " " categories)))))
 
-(defn last-updated
-  [n]
-  (-> (h/select :c.id
-                :c.name
-                :v.id
-                :v.version
-                :v.description
-                :v.download_count
-                :v.yanked
-                :v.created_at
-                :v.updated_at)
-      (h/from [:crates :c])
-      (h/join [:crates_versions :v]
-              [:= :c.id :v.crate_id])
-      (h/order-by [:v.updated_at :desc])
-      (h/limit n)
-      sql/format))
-
 (defn count-crates-versions
   []
   (-> (h/select :%count.*)
@@ -119,3 +101,29 @@
   (-> (h/select :%sum.download_count)
       (h/from [:crates_versions :c])
       sql/format))
+
+(defn first-n-order-by
+  [n order-by]
+  (-> (h/select :c.id
+                :c.name
+                :v.id
+                :v.version
+                :v.description
+                :v.download_count
+                :v.yanked
+                :v.created_at
+                :v.updated_at)
+      (h/from [:crates :c])
+      (h/join [:crates_versions :v]
+              [:= :c.id :v.crate_id])
+      (h/order-by order-by)
+      (h/limit n)
+      sql/format))
+
+(defn last-updated
+  [n]
+  (first-n-order-by n [:v.updated_at :desc]))
+
+(defn top-n-downloads
+  [n]
+  (first-n-order-by n [:v.download_count :desc]))
