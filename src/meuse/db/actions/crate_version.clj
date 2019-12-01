@@ -64,4 +64,5 @@
   "Returns the number of total download."
   [database]
   (-> (jdbc/execute! database (crate-version-queries/sum-download-count))
-      first))
+      first
+      (update :sum #(or % 0))))
