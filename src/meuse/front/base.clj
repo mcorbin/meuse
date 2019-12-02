@@ -25,7 +25,6 @@
      [:form {:action "/front/search" :method "get"}
       [:input {:type "text"
                :id "menu-search-input"
-               :autofocus "autofocus"
                :name "q"
                :placeholder "Search"}]]]
 

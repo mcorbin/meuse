@@ -17,13 +17,18 @@
      [:h1 (str "Category ") category]
      [:p [:span {:class "stat-num"} (count crates)] (str " " crate-w " in this category")]
      (for [crate crates]
-       [:div {:class "row search-result-crate"}
+       [:div {:class "row crate-list-element"}
         [:div {:class "col-7"}
-         [:p [:span {:class "bold"} (:crates/name crate)]]
-         "Last version: " [:span {:class "bold"} (:crates_versions/version crate)]
+         [:p [:span {:class "bold"} (:crates/name crate)]
+          [:br]
+          "Last version: " [:span {:class "bold"} (:crates_versions/version crate)]]
          [:p (:crates_versions/description crate)]
          [:a {:href (str "/front/crates/" (:crates/name crate))}
           "More informations"]]
         [:div {:class "col-5"}
-         [:p "Created on " (:crates_versions/created_at crate)]
-         [:p "Last update " (:crates_versions/updated_at crate)]]])]))
+         [:p [:span {:class "bold"} (:crates_versions/download_count crate)]
+          " downloads"
+          [:br]
+          "Created on " (:crates_versions/created_at crate)
+          [:br]
+          "Last update " (:crates_versions/updated_at crate)]]])]))

@@ -6,21 +6,34 @@
 
 (defn last-updated-crates
   [crate-version-db]
-  [:div {:class "col-4"}
-   [:h2 {:class "center"} "Just pushed"]
+  [:div {:class "col-6"}
+   [:h2 {:class "center"} "Last updated"]
    (let [last-updated (public-crate-version/last-updated
                        crate-version-db 10)]
      (for [crate-version last-updated]
-       [:div {:class "index-last-updated-block"}
+       [:div {:class "index-crate-block"}
         (:crates/name crate-version) " ("
-        [:span {:class "updated-crate-version"}
-         (:crates_versions/version crate-version)] ") "
+        (:crates_versions/version crate-version) ") "
+        [:a {:type "button" :class "btn btn-secondary btn-sm float-right" :role "button" :href (str "/front/crates/" (:crates/name crate-version))}
+         "see"]]))])
+
+(defn top-downloaded-crates
+  [crate-version-db]
+  [:div {:class "col-6"}
+   [:h2 {:class "center"} "Most downloaded"]
+   (let [top-n-downloads (public-crate-version/top-n-downloads
+                          crate-version-db 10)]
+     (for [crate-version top-n-downloads]
+       [:div {:class "index-crate-block"}
+        (:crates/name crate-version) " ("
+        (:crates_versions/version crate-version) ") "
+        ": " [:span {:class "bold"} (:crates_versions/download_count crate-version)]
         [:a {:type "button" :class "btn btn-secondary btn-sm float-right" :role "button" :href (str "/front/crates/" (:crates/name crate-version))}
          "see"]]))])
 
 (defn index-page
   [category-db crate-db crate-version-db user-db request]
-  [:div {:id "index"}
+  [:div {:id "page-index"}
 
    [:div {:class "row"}
     [:div {:class "col-12 center"}
@@ -52,10 +65,16 @@
                                   crate-version-db))]
      " Crates versions uploaded"
      [:br]
+     [:span {:class "stat-num"} (:sum
+                                 (public-crate-version/sum-download-count
+                                  crate-version-db))]
+     " Crates downloaded"
+     [:br]
      [:span {:class "stat-num"} (:count
                                  (public-user/count-users
                                   user-db))]
      " Users"]]
 
    [:div {:class "row"}
-    (last-updated-crates crate-version-db)]])
+    (last-updated-crates crate-version-db)
+    (top-downloaded-crates crate-version-db)]])

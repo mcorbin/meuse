@@ -138,11 +138,14 @@
                        :map (s/keys :req-un [::encoder])))
 (s/def ::logging (s/keys :req-un [::level ::console]))
 
+(s/def ::frontend boolean?)
+
 (s/def ::config (s/keys :req-un [:http/http
                                  :db/database
                                  :metadata/metadata
                                  :crate/crate
-                                 ::logging]))
+                                 ::logging
+                                 ::frontend]))
 
 ;; api
 

@@ -71,6 +71,7 @@
                 :v.download_count
                 :v.yanked
                 :v.created_at
+                :v.metadata
                 :v.updated_at)
       (h/from [:crates :c])
       (h/join [:crates_versions :v]

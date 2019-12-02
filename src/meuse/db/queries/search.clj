@@ -12,6 +12,7 @@
                 :v.yanked
                 :v.created_at
                 :v.updated_at
+                :v.download_count
                 :v.document_vectors
                 :v.crate_id)
       (h/from [:crates :c])

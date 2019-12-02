@@ -5,7 +5,7 @@
   [category-db request]
   (let [categories (public-category/get-categories category-db)
         count-crates (->> (public-category/count-crates category-db)
-                          (map (fn [c] [(:categories/id c)
+                          (map (fn [c] [(:crates_categories/category_id c)
                                         (:count c)]))
                           (into {}))]
     [:div {:class "categories"}

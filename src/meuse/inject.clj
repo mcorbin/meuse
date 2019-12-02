@@ -183,8 +183,9 @@
                                  request))))
 
 (defn inject!
-  []
+  [frontend-enabled?]
   (inject-crate-api!)
   (inject-meuse-api!)
   (inject-mirror-api!)
-  (inject-front-api!))
+  (when frontend-enabled?
+    (inject-front-api!)))

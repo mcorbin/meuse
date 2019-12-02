@@ -79,11 +79,13 @@
                   (auth-request/check-user token-db request))]
     (meuse-http/meuse-api! (-> (convert-body-edn request)))))
 
-(defmethod route! :meuse.front.http
-  [request]
-  {:status 200
-   :headers {"Content-Type" "text/html; charset=utf-8"}
-   :body (base-http/html (front-http/front-api! request))})
+(defn front-route!
+  []
+  (defmethod route! :meuse.front.http
+    [request]
+    {:status 200
+     :headers {"Content-Type" "text/html; charset=utf-8"}
+     :body (base-http/html (front-http/front-api! request))}))
 
 (defmethod route! :default
   [request]
@@ -131,7 +133,7 @@
            :body {:errors [{:detail err/default-msg}]}})))))
 
 (defn start-server
-  [http-config crate-config metadata-config]
+  [http-config crate-config metadata-config frontend-enabled?]
   (debug "starting http server")
   (let [ssl-context (when (:cacert http-config)
                       (JdkSslContext. (less-ssl/ssl-context (:key http-config)
@@ -144,7 +146,9 @@
                                          ^String (:address http-config)
                                          ^Integer (:port http-config))}
                  ssl-context (assoc :ssl-context ssl-context))]
-    (inject/inject!)
+    (inject/inject! frontend-enabled?)
+    (when frontend-enabled?
+      (front-route!))
     (http/start-server (-> (get-handler crate-config
                                         metadata-config)
                            (wrap-resource "public")
@@ -156,7 +160,8 @@
 (defstate http-server
   :start (start-server (:http config)
                        (:crate config)
-                       (:metadata config))
+                       (:metadata config)
+                       (:frontend config))
   :stop (do (debug "stopping http server")
             (.close ^Closeable http-server)
             (Thread/sleep 4)

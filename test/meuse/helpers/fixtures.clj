@@ -54,7 +54,7 @@
         mount/start)
     (reset! system-started? true))
   (reset! git-mock-state [])
-  (inject/inject!))
+  (inject/inject! true))
 
 (defn system-fixture
   [f]
@@ -76,7 +76,7 @@
   (mount/start-with-states {#'meuse.git/git {:start #(GitMock. (atom []) (java.lang.Object.))}})
   (meuse.helpers.db/clean! database)
   (helpers/load-test-db! database)
-  (inject/inject!)
+  (inject/inject! true)
   (f)
   (core/stop!)
   (Thread/sleep 2))

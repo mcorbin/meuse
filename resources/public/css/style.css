@@ -62,7 +62,6 @@ body {
 
 #menu #menu-search input {
     width: 90%;
-    
 }
 
 #menu #menu-links {
@@ -97,7 +96,7 @@ body {
     font-weight: 700;
 }
 
-.index-last-updated-block {
+.index-crate-block {
     margin-bottom: 20px;
     padding:10px;
     border-radius: 5px;
@@ -109,11 +108,18 @@ body {
     font-weight: bold;
 }
 
-/* search page */
+/* crates page */
 
-.search-result-crate {
+#letters {
+    margin-top: 20px;
     margin-bottom: 20px;
-    padding:10px;
+}
+
+/* common crate things */
+
+.crate-list-element {
+    margin-bottom: 20px;
+    padding:30px;
     border-radius: 5px;
     background-color: #faf0d7;
     border: 1px solid #ece2c8;

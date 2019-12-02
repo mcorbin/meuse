@@ -21,3 +21,4 @@ metadata:
 crate:
   store: "filesystem"
   path: "/home/mathieu/prog/rust/crates"
+frontend: false
