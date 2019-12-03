@@ -6,6 +6,7 @@
             [meuse.db.queries.crate-user :as crate-user-queries]
             [meuse.db.queries.user :as user-queries]
             [meuse.message :refer [yanked?->msg]]
+            [exoscale.ex :as ex]
             [next.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]
             [clojure.set :as set])
@@ -15,8 +16,7 @@
   "Takes an user from the database. Throws if the user is inactive."
   [user]
   (when-not (:active user)
-    (throw (ex-info (format "the user %s is inactive" (:name user))
-                    {:type :meuse.error/incorrect})))
+    (throw (ex/ex-incorrect (format "the user %s is inactive" (:name user)))))
   true)
 
 (defn by-name
@@ -31,13 +31,11 @@
   (jdbc/with-transaction [db-tx database]
     (if-let [role (role/by-name db-tx (:role user))]
       (if-let [user (by-name db-tx (:name user))]
-        (throw (ex-info (format "the user %s already exists"
-                                (:name user))
-                        {:type :meuse.error/incorrect}))
+        (throw (ex/ex-incorrect (format "the user %s already exists"
+                                        (:name user))))
         (jdbc/execute! db-tx (user-queries/create user (:roles/id role))))
-      (throw (ex-info (format "the role %s does not exist"
-                              (:role user))
-                      {:type :meuse.error/incorrect})))))
+      (throw (ex/ex-incorrect (format "the role %s does not exist"
+                                      (:role user)))))))
 
 (defn delete
   "Deletes an user."
@@ -47,9 +45,8 @@
       (do
         (jdbc/execute! db-tx (crate-user-queries/delete-for-user (:users/id user)))
         (jdbc/execute! db-tx (user-queries/delete (:users/id user))))
-      (throw (ex-info (format "the user %s does not exist"
-                              user-name)
-                      {:type :meuse.error/incorrect})))))
+      (throw (ex/ex-incorrect (format "the user %s does not exist"
+                                      user-name))))))
 
 (defn crate-owners
   "Get the owners of a crate, by crate name"
@@ -58,9 +55,8 @@
     (if-let [crate (crate/by-name db-tx crate-name)]
       (->> (jdbc/execute! db-tx (user-queries/users-join-crates-users
                                  (:crates/id crate))))
-      (throw (ex-info (format "the crate %s does not exist"
-                              crate-name)
-                      {:type :meuse.error/not-found})))))
+      (throw (ex/ex-not-found (format "the crate %s does not exist"
+                                      crate-name))))))
 
 (defn update-user
   "Updates an user."
@@ -79,9 +75,8 @@
                                     :password
                                     :active]))]
         (jdbc/execute! db-tx (user-queries/update-user (:users/id user) fields)))
-      (throw (ex-info (format "the user %s does not exist"
-                              user-name)
-                      {:type :meuse.error/not-found})))))
+      (throw (ex/ex-not-found (format "the user %s does not exist"
+                                      user-name))))))
 
 (defn get-users
   "get all existing users"

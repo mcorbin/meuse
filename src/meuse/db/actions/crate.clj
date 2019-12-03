@@ -5,6 +5,7 @@
             [meuse.db.queries.crate :as crate-queries]
             [meuse.db.queries.crate-user :as crate-user-queries]
             [meuse.db.queries.crate-version :as crate-version-queries]
+            [exoscale.ex :as ex]
             [next.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]])
   (:import java.util.UUID))
@@ -35,8 +36,7 @@
                                              crate-name)))]
     (if (seq result)
       result
-      (throw (ex-info (format "the crate %s does not exist" crate-name)
-                      {:type :meuse.error/not-found})))))
+      (throw (ex/ex-not-found (format "the crate %s does not exist" crate-name))))))
 
 (defn get-crates-for-category
   "Returns crates from a category."
@@ -45,8 +45,8 @@
     (if-let [category (category-db/by-name db-tx category-name)]
       (->> (jdbc/execute! database (crate-queries/get-crates-for-category
                                     (:categories/id category))))
-      (throw (ex-info (format "the category %s does not exist" category-name)
-                      {:type :meuse.error/not-found})))))
+      (throw (ex/ex-not-found
+              (format "the category %s does not exist" category-name))))))
 
 (defn create
   "Creates a crate in the database."
@@ -58,17 +58,15 @@
       ;; the crate exists, let's check the version
       (do
         (when (:crates_versions/version crate)
-          (throw (ex-info (format "release %s for crate %s already exists"
-                                  (:vers metadata)
-                                  (:name metadata))
-                          {:type :meuse.error/incorrect})))
+          (throw (ex/ex-incorrect (format "release %s for crate %s already exists"
+                                          (:vers metadata)
+                                          (:name metadata)))))
         ;; the user should own the crate
         (when-not (-> (jdbc/execute! db-tx (crate-user-queries/by-crate-and-user
                                             (:crates/id crate)
                                             user-id))
                       first)
-          (throw (ex-info "the user does not own the crate"
-                          {:type :meuse.error/forbidden})))
+          (throw (ex/ex-forbidden "the user does not own the crate")))
         ;; insert the new version
         (jdbc/execute! db-tx (crate-version-queries/create
                               metadata

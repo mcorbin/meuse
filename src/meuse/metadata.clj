@@ -2,6 +2,7 @@
   "Functions to interacts with the crate metadata file."
   (:require [meuse.path :as path]
             [cheshire.core :as json]
+            [exoscale.ex :as ex]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]
             [clojure.string :as string]))
@@ -29,10 +30,9 @@
         [dir metadata-path] (metadata-file-path base-path crate-name)]
     (when-not (.exists (io/file dir))
       (when-not (io/make-parents metadata-path)
-        (throw (ex-info "fail to create directory for crate"
-                        {:type :meuse.error/fault
-                         :crate {:name crate-name
-                                 :directory dir}}))))
+        (throw (ex/ex-fault "fail to create directory for crate"
+                            {:crate {:name crate-name
+                                     :directory dir}}))))
     (spit metadata-path
           (str (->> metadata
                     (remove #(nil? (second %)))

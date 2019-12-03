@@ -2,7 +2,7 @@
   (:require [meuse.metric :as metric]
             meuse.spec
             [cheshire.core :as json]
-            [qbits.ex :as ex]
+            [exoscale.ex :as ex]
             [clojure.spec.alpha :as s]
             [clojure.tools.logging :refer [error]]))
 
@@ -103,28 +103,28 @@
    (when-let [problems (get explain ::s/problems)]
      (problems->message problems problem-map))))
 
-(ex/derive ::unavailable ::user)
-(ex/derive ::interrupted ::user)
-(ex/derive ::incorrect ::user)
-(ex/derive ::forbidden ::user)
-(ex/derive ::unsupported ::user)
-(ex/derive ::not-found ::user)
-(ex/derive ::conflict ::user)
-(ex/derive ::fault ::user)
-(ex/derive ::busy ::user)
-(ex/derive ::unauthorized ::user)
+(ex/derive ::ex/unavailable ::user)
+(ex/derive ::ex/interrupted ::user)
+(ex/derive ::ex/incorrect ::user)
+(ex/derive ::ex/forbidden ::user)
+(ex/derive ::ex/unauthorized ::user)
+(ex/derive ::ex/unsupported ::user)
+(ex/derive ::ex/not-found ::user)
+(ex/derive ::ex/conflict ::user)
+(ex/derive ::ex/fault ::user)
+(ex/derive ::ex/busy ::user)
 
 (def ex-type->status
-  {::unavailable 500
-   ::interrupted 500
-   ::incorrect 400
-   ::forbidden 403
-   ::unauthorized 401
-   ::unsupported 400
-   ::not-found 404
-   ::conflict 500
-   ::fault 500
-   ::busy 500})
+  {::ex/unavailable 500
+   ::ex/interrupted 500
+   ::ex/incorrect 400
+   ::ex/forbidden 403
+   ::ex/unauthorized 401
+   ::ex/unsupported 400
+   ::ex/not-found 404
+   ::ex/conflict 500
+   ::ex/fault 500
+   ::ex/busy 500})
 
 (defn handle-user-error
   [request data]

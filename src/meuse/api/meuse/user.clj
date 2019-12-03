@@ -2,6 +2,7 @@
   (:require [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
             [meuse.db.public.user :as public-user]
+            [exoscale.ex :as ex]
             [clojure.tools.logging :refer [debug info error]]))
 
 (defn new-user
@@ -32,17 +33,14 @@
         fields (:body request)]
     (when (and (not (auth-request/admin? request))
                (contains? fields :role))
-      (throw (ex-info "only admins can update an user role"
-                      {:type :meuse.error/forbidden})))
+      (throw (ex/ex-forbidden "only admins can update an user role")))
     (when (and (not (auth-request/admin? request))
                (contains? fields :active))
-      (throw (ex-info "only admins can enable or disable an user"
-                      {:type :meuse.error/forbidden})))
+      (throw (ex/ex-forbidden "only admins can enable or disable an user")))
     (when (and (not (auth-request/admin? request))
                (not= (auth-request/user-name request)
                      user-name))
-      (throw (ex-info "bad permissions"
-                      {:type :meuse.error/forbidden})))
+      (throw (ex/ex-forbidden "bad permissions")))
     (info "update user" user-name)
     (public-user/update-user user-db
                              user-name

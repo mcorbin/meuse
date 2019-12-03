@@ -10,7 +10,6 @@
                   [com.amazonaws/aws-java-sdk
                    com.amazonaws/amazon-kinesis-client]]
                  [bidi "2.1.6"]
-                 [cc.qbits/ex "0.1.3"]
                  [cheshire "5.9.0"]
                  [clj-time "0.15.2"]
                  [com.amazonaws/aws-java-sdk-core "1.11.495"]
@@ -21,6 +20,7 @@
                  [crypto-random "1.2.0"]
                  [digest "1.4.9"]
                  [environ "1.1.0"]
+                 [exoscale/ex "0.3.3"]
                  [exoscale/yummy "0.2.8"]
                  [hiccup "1.0.5"]
                  [honeysql "0.9.8"]

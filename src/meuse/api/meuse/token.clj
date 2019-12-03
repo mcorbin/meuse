@@ -4,6 +4,7 @@
             [meuse.auth.request :as auth-request]
             [meuse.db.public.token :as public-token]
             [meuse.db.public.user :as public-user]
+            [exoscale.ex :as ex]
             [clojure.tools.logging :refer [debug info error]]))
 
 (defn delete-token
@@ -16,9 +17,8 @@
     (when-not (or (= (get-in request [:auth :user-name])
                      user-name)
                   (auth-request/admin? request))
-      (throw (ex-info
-              (format "user %s cannot delete token for %s" auth-user-name user-name)
-              {:type :meuse.error/forbidden})))
+      (throw (ex/ex-forbidden
+              (format "user %s cannot delete token for %s" auth-user-name user-name))))
     (info (format "deleting token %s for user %s" token-name user-name))
     (public-token/delete token-db
                          user-name
@@ -33,7 +33,7 @@
     (if-let [db-user (public-user/by-name user-db user)]
       (do (when-not (:users/active db-user)
             (throw (ex-info "user is not active"
-                            {:type :meuse.error/forbidden})))
+                            {:type :exoscale.ex/forbidden})))
           (auth-password/check password (:users/password db-user))
           (info (format "creating token %s for user %s"
                         name
@@ -43,8 +43,8 @@
                                               (select-keys
                                                (:body request)
                                                [:name :user :validity]))}})
-      (throw (ex-info (format "the user %s does not exist" user)
-                      {:type :meuse.error/not-found})))))
+      (throw (ex/ex-not-found
+              (format "the user %s does not exist" user))))))
 
 (defn list-tokens
   [token-db request]

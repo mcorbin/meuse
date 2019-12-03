@@ -3,6 +3,7 @@
   (:require [meuse.auth.token :as auth-token]
             [meuse.db.actions.user :as user-db]
             [meuse.db.queries.token :as token-queries]
+            [exoscale.ex :as ex]
             [next.jdbc :as jdbc]
             [clj-time.core :as t]
             [crypto.password.bcrypt :as bcrypt]
@@ -17,9 +18,8 @@
                               (:users/id user)
                               token-name))
         first)
-    (throw (ex-info (format "the user %s does not exist"
-                            user-name)
-                    {:type :meuse.error/not-found}))))
+    (throw (ex/ex-not-found (format "the user %s does not exist"
+                                    user-name)))))
 
 (defn create
   "Creates a new token for an user. `validity` is the number of days before the
@@ -30,10 +30,9 @@
     (if-let [user (user-db/by-name db-tx (:user token))]
       (do
         (when (by-user-and-name db-tx (:user token) (:name token))
-          (throw (ex-info (format "a token named %s already exists for user %s"
-                                  (:name token)
-                                  (:user token))
-                          {:type :meuse.error/incorrect})))
+          (throw (ex/ex-incorrect (format "a token named %s already exists for user %s"
+                                          (:name token)
+                                          (:user token)))))
         (let [generated-token (auth-token/generate-token)]
           (jdbc/execute! db-tx (token-queries/create
                                 (auth-token/extract-identifier generated-token)
@@ -42,9 +41,8 @@
                                 (:users/id user)
                                 (auth-token/expiration-date (:validity token))))
           generated-token))
-      (throw (ex-info (format "the user %s does not exist"
-                              (:user token))
-                      {:type :meuse.error/not-found})))))
+      (throw (ex/ex-not-found (format "the user %s does not exist"
+                                      (:user token)))))))
 
 (defn get-token-user-role
   "Get a token by value.
@@ -61,9 +59,8 @@
     (if-let [user (user-db/by-name db-tx user-name)]
       (->> (jdbc/execute! db-tx (token-queries/by-user
                                  (:users/id user))))
-      (throw (ex-info (format "the user %s does not exist"
-                              user-name)
-                      {:type :meuse.error/not-found})))))
+      (throw (ex/ex-not-found (format "the user %s does not exist"
+                                      user-name))))))
 
 (defn delete
   "Deletes a token for an user."
@@ -72,7 +69,6 @@
     (if-let [token (by-user-and-name db-tx user-name token-name)]
       (jdbc/execute! db-tx (token-queries/delete
                             (:tokens/id token)))
-      (throw (ex-info (format "the token %s does not exist for the user %s"
-                              token-name
-                              user-name)
-                      {:type :meuse.error/not-found})))))
+      (throw (ex/ex-not-found (format "the token %s does not exist for the user %s"
+                                      token-name
+                                      user-name))))))

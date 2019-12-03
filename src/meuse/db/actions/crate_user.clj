@@ -3,6 +3,7 @@
             [meuse.db.actions.role :as role]
             [meuse.db.actions.user :as user-db]
             [meuse.db.queries.crate-user :as crate-user-queries]
+            [exoscale.ex :as ex]
             [next.jdbc :as jdbc]
             [clojure.set :as set]
             [clojure.tools.logging :refer [debug info error]])
@@ -21,19 +22,16 @@
     (if-let [crate (crate/by-name db-tx crate-name)]
       (do
         (when (by-id db-tx (:crates/id crate) (:users/id user))
-          (throw (ex-info (format "the user %s already owns the crate %s"
-                                  user-name
-                                  crate-name)
-                          {:type :meuse.error/incorrect})))
+          (throw (ex/ex-incorrect (format "the user %s already owns the crate %s"
+                                          user-name
+                                          crate-name))))
         (jdbc/execute! db-tx (crate-user-queries/create
                               (:crates/id crate)
                               (:users/id user))))
-      (throw (ex-info (format "the crate %s does not exist"
-                              crate-name)
-                      {:type :meuse.error/not-found})))
-    (throw (ex-info (format "the user %s does not exist"
-                            user-name)
-                    {:type :meuse.error/not-found}))))
+      (throw (ex/ex-not-found (format "the crate %s does not exist"
+                                      crate-name))))
+    (throw (ex/ex-not-found (format "the user %s does not exist"
+                                    user-name)))))
 
 (defn create-crate-users
   "Add multiple users as owner of a crate"
@@ -51,12 +49,10 @@
                                      user-id))
             first)
       true
-      (throw (ex-info (format "user does not own the crate %s"
-                              crate-name)
-                      {:type :meuse.error/forbidden})))
-    (throw (ex-info (format "the crate %s does not exist"
-                            crate-name)
-                    {:type :meuse.error/not-found}))))
+      (throw (ex/ex-forbidden (format "user does not own the crate %s"
+                                      crate-name))))
+    (throw (ex/ex-not-found (format "the crate %s does not exist"
+                                    crate-name)))))
 
 (defn delete
   "Remove an user as a owner of a crate"
@@ -66,19 +62,16 @@
       (if-let [crate (crate/by-name db-tx crate-name)]
         (do
           (when-not (by-id db-tx (:crates/id crate) (:users/id user))
-            (throw (ex-info (format "the user %s does not own the crate %s"
-                                    user-name
-                                    crate-name)
-                            {:type :meuse.error/incorrect})))
+            (throw (ex/ex-incorrect (format "the user %s does not own the crate %s"
+                                            user-name
+                                            crate-name))))
           (jdbc/execute! db-tx (crate-user-queries/delete
                                 (:crates/id crate)
                                 (:users/id user))))
-        (throw (ex-info (format "the crate %s does not exist"
-                                crate-name)
-                        {:type :meuse.error/not-found})))
-      (throw (ex-info (format "the user %s does not exist"
-                              user-name)
-                      {:type :meuse.error/not-found})))))
+        (throw (ex/ex-not-found (format "the crate %s does not exist"
+                                        crate-name))))
+      (throw (ex/ex-not-found (format "the user %s does not exist"
+                                      user-name))))))
 
 (defn delete-crate-users
   "Remove multiple users as owner of a crate"

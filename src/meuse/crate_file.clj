@@ -4,6 +4,7 @@
             meuse.store.filesystem
             meuse.store.s3
             [meuse.path :as path]
+            [exoscale.ex :as ex]
             [mount.core :refer [defstate]])
   (:import [meuse.store.filesystem LocalCrateFile]
            [meuse.store.s3 S3CrateStore]))
@@ -23,8 +24,7 @@
                                                 :endpoint])
                            (:bucket config)
                            (when mirror? ".crates.io"))
-       (throw (ex-info (str "invalid crate store " store)
-                       {:type :meuse.error/incorrect}))))))
+       (throw (ex/ex-incorrect (str "invalid crate store " store)))))))
 
 (defstate crate-file-store
   :start

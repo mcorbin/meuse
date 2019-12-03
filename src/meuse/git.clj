@@ -1,6 +1,7 @@
 (ns meuse.git
   "Interacts with a git repository"
   (:require [meuse.config :refer [config]]
+            [exoscale.ex :as ex]
             [mount.core :refer [defstate]]
             [clojure.java.shell :as shell]
             [clojure.tools.logging :refer [debug info error]]
@@ -29,9 +30,8 @@
              "out=" (:out result)
              "err=" (:err result))
       (when-not (= 0 (:exit result))
-        (throw (ex-info "error executing git command"
-                        {:type :meuse.error/fault
-                         :exit-code (:exit result)
+        (throw (ex/ex-fault "error executing git command"
+                        {:exit-code (:exit result)
                          :stdout (:out result)
                          :stderr (:err result)
                          :command args})))))

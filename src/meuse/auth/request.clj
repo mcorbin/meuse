@@ -2,6 +2,7 @@
   (:require [meuse.auth.header :as header]
             [meuse.auth.token :as auth-token]
             [meuse.db.public.token :as public-token]
+            [exoscale.ex :as ex]
             [clojure.set :refer [rename-keys]]
             [clojure.tools.logging :refer [debug info error]]))
 
@@ -24,10 +25,10 @@
                        (rename-keys {:tokens/user_id :user-id
                                      :roles/name :role-name
                                      :users/name :user-name}))))
-          (throw (ex-info "invalid token" {:type :meuse.error/forbidden})))
-        (throw (ex-info "user is not active" {:type :meuse.error/forbidden})))
-      (throw (ex-info "token not found" {:type :meuse.error/forbidden})))
-    (throw (ex-info "token missing in the header" {:type :meuse.error/forbidden}))))
+          (throw (ex/ex-forbidden "invalid token")))
+        (throw (ex/ex-forbidden "user is not active")))
+      (throw (ex/ex-forbidden "token not found")))
+    (throw (ex/ex-forbidden "token missing in the header"))))
 
 (defn user-id
   [request]
@@ -49,16 +50,14 @@
   "Takes a request, verifies is the user is admin."
   [request]
   (when-not (admin? request)
-    (throw (ex-info "bad permissions"
-                    {:type :meuse.error/forbidden})))
+    (throw (ex/ex-forbidden "bad permissions")))
   true)
 
 (defn tech?-throw
   "Takes a request, verifies is the user is tech."
   [request]
   (when-not (tech? request)
-    (throw (ex-info "bad permissions"
-                    {:type :meuse.error/forbidden})))
+    (throw (ex/ex-forbidden "bad permissions")))
   true)
 
 (defn admin-or-tech?-throw
@@ -66,6 +65,5 @@
   [request]
   (when-not (or (admin? request)
                 (tech? request))
-    (throw (ex-info "bad permissions"
-                    {:type :meuse.error/forbidden})))
+    (throw (ex/ex-forbidden "bad permissions")))
   true)

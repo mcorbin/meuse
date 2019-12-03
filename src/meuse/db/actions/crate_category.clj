@@ -1,6 +1,7 @@
 (ns meuse.db.actions.crate-category
   (:require [meuse.db.actions.category :as category]
             [meuse.db.queries.crate-category :as crate-category-queries]
+            [exoscale.ex :as ex]
             [next.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]]))
 
@@ -23,9 +24,8 @@
       (jdbc/execute! db-tx (crate-category-queries/create
                             crate-id
                             (:categories/id category))))
-    (throw (ex-info (format "the category %s does not exist"
-                            category-name)
-                    {:type :meuse.error/not-found}))))
+    (throw (ex/ex-not-found (format "the category %s does not exist"
+                                    category-name)))))
 
 (defn create-categories
   "Creates categories for a crate."

@@ -2,6 +2,7 @@
   "Utility functions for requests."
   (:require [byte-streams :as bs]
             [cheshire.core :as json]
+            [exoscale.ex :as ex]
             [clojure.tools.logging :refer [debug info error]]))
 
 (defn convert-body-edn
@@ -15,6 +16,5 @@
                     (json/parse-string true))))
       (catch Exception e
         (error e "fail to convert the request body to json")
-        (throw (ex-info "fail to convert the request body to json"
-                        {:type :meuse.error/incorrect}))))
+        (throw (ex/ex-incorrect "fail to convert the request body to json"))))
     request))

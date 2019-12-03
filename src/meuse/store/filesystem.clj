@@ -2,6 +2,7 @@
   "Manipulates the crate files in the filesystem."
   (:require [meuse.path :as path]
             [meuse.store.protocol :refer [ICrateStore]]
+            [exoscale.ex :as ex]
             [clojure.java.io :as io]))
 
 (defn crate-file-path
@@ -50,11 +51,9 @@
                 version)
           file (io/file path)]
       (when-not (.exists file)
-        (throw (ex-info (format "the file %s does not exist" path)
-                        {:type :meuse.error/incorrect})))
+        (throw (ex/ex-incorrect (format "the file %s does not exist" path))))
       (when (.isDirectory file)
-        (throw (ex-info (format "the file %s is a directory" path)
-                        {:type :meuse.error/incorrect})))
+        (throw (ex/ex-incorrect (format "the file %s is a directory" path))))
       file))
   (versions [this crate-name]
     (filesystem-versions base-path crate-name))

@@ -2,6 +2,7 @@
   (:require [meuse.db.actions.crate :as crate-db]
             [meuse.db.queries.crate-version :as crate-version-queries]
             [meuse.message :refer [yanked?->msg]]
+            [exoscale.ex :as ex]
             [next.jdbc :as jdbc]
             [clojure.tools.logging :refer [debug info error]])
   (:import java.util.UUID))
@@ -15,29 +16,26 @@
       (do
         (when-not (:crates_versions/version crate)
           (throw
-           (ex-info
+           (ex/ex-not-found
             (format "cannot %s the crate: the version does not exist"
                     (yanked?->msg yanked?))
-            {:type :meuse.error/not-found
-             :crate-name crate-name
+            {:crate-name crate-name
              :crate-version crate-version})))
         (when (= yanked? (:crates_versions/yanked crate))
           (throw
-           (ex-info
+           (ex/ex-incorrect
             (format "cannot %s the crate: crate state is already %s"
                     (yanked?->msg yanked?)
                     (yanked?->msg yanked?))
-            {:type :meuse.error/incorrect
-             :crate-name crate-name
+            {:crate-name crate-name
              :crate-version crate-version})))
         (jdbc/execute! db-tx (crate-version-queries/update-yanked
                               (:crates_versions/id crate)
                               yanked?)))
-      (throw (ex-info (format "cannot %s the crate: the crate does not exist"
-                              (yanked?->msg yanked?))
-                      {:type :meuse.error/not-found
-                       :crate-name crate-name
-                       :crate-version crate-version})))))
+      (throw (ex/ex-not-found (format "cannot %s the crate: the crate does not exist"
+                                      (yanked?->msg yanked?))
+                              {:crate-name crate-name
+                               :crate-version crate-version})))))
 
 (defn last-updated
   "Get the last n updated versions"
@@ -56,9 +54,8 @@
   (if-let [crate (crate-db/by-name-and-version database crate-name version)]
     (-> (jdbc/execute! database (crate-version-queries/inc-download
                                  (:crates_versions/id crate))))
-    (throw (ex-info (format "crate %s version %s not found"
-                            crate-name version)
-                    {:type :meuse.error/not-found}))))
+    (throw (ex/ex-not-found (format "crate %s version %s not found"
+                                    crate-name version)))))
 
 (defn sum-download-count
   "Returns the number of total download."

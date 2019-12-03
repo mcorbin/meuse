@@ -1,12 +1,13 @@
 (ns meuse.crate
   "Crate utility functions"
-  (:require [byte-streams :as bs]
-            [cheshire.core :as json]
-            [digest :as digest]
-            [meuse.db.public.crate :as public-crate]
+  (:require [meuse.db.public.crate :as public-crate]
             [meuse.git :as git]
             [meuse.metadata :as metadata]
             [meuse.store.protocol :as store]
+            [byte-streams :as bs]
+            [cheshire.core :as json]
+            [digest :as digest]
+            [exoscale.ex :as ex]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]
             [clojure.set :as set]
@@ -18,9 +19,8 @@
   Throws an exception if the byte array size is lower than the size."
   [byte-array size]
   (when (< (alength #^bytes byte-array) size)
-    (throw (ex-info (format "invalid request size %d"
-                            (alength #^bytes byte-array))
-                    {:type :meuse.error/incorrect}))))
+    (throw (ex/ex-incorrect (format "invalid request size %d"
+                                    (alength #^bytes byte-array))))))
 
 (def git-metadata-keys [:name :vers :deps :cksum :features :yanked :links])
 (def deps-metadata-keys [:name :version_req :features :optional :default_features :target :kind :registry :explicit_name_in_toml])

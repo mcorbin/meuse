@@ -2,6 +2,7 @@
   "Manage the registry configuration file."
   (:require [meuse.path :as path]
             [cheshire.core :as json]
+            [exoscale.ex :as ex]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info error]]))
 
@@ -12,8 +13,7 @@
   [base-path registry-url]
   (let [config-path (path/new-path base-path "config.json")]
     (when-not (.exists (io/file config-path))
-      (throw (ex-info (str "the file " config-path " does not exist")
-                      {:type :meuse.error/fault})))
+      (throw (ex/ex-fault (str "the file " config-path " does not exist"))))
     (-> (slurp config-path)
         (json/parse-string true)
         (update :allowed-registries #(if (seq %)
@@ -32,7 +32,6 @@
   (doseq [dep (:deps metadata)]
     (when-let [registry (:registry dep)]
       (when-not ((set allowed-registries) registry)
-        (throw (ex-info (str "the registry " registry " is not allowed."
-                             " Please check https://github.com/rust-lang/rfcs/blob/master/text/2141-alternative-registries.md#registry-index-format-specification")
-                        {:type :meuse.error/unauthorized})))))
+        (throw (ex/ex-forbidden (str "the registry " registry " is not allowed."
+                                     " Please check https://github.com/rust-lang/rfcs/blob/master/text/2141-alternative-registries.md#registry-index-format-specification"))))))
   true)

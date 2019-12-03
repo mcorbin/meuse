@@ -2,6 +2,7 @@
   (:require [clj-time.core :as t]
             [crypto.password.bcrypt :as bcrypt]
             [crypto.random :as random]
+            [exoscale.ex :as ex]
             [clojure.tools.logging :refer [debug info error]])
   (:import org.joda.time.DateTime))
 
@@ -26,7 +27,7 @@
   [token]
   (if (> (count token) identifier-size)
     (subs token 0 identifier-size)
-    (throw (ex-info "invalid token" {:type :meuse.error/forbidden}))))
+    (throw (ex/ex-forbidden "invalid token"))))
 
 (defn valid?
   "Takes a token and a token encrypted with bcrypt.

@@ -27,7 +27,7 @@
             [hiccup.page :as page]
             [less.awful.ssl :as less-ssl]
             [mount.core :refer [defstate]]
-            [qbits.ex :as ex]
+            [exoscale.ex :as ex]
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.resource :refer [wrap-resource]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
@@ -121,9 +121,7 @@
                                                          name)]
             (ex/try+
              (route! request)
-             (catch-data
-              :meuse.error/user
-              data
+             (catch :meuse.error/user data
               (err/handle-user-error request data))
              (catch Exception e
                (err/handle-unexpected-error request e)))))
