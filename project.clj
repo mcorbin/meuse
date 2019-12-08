@@ -1,4 +1,4 @@
-(defproject meuse "0.2.0"
+(defproject meuse "0.3.0"
   :description "A free private Rust registry"
   :url "https://github.com/mcorbin/meuse"
   :license {:name "Eclipse Public License 1.0"}
