@@ -19,5 +19,4 @@ Documentation is available at https://meuse.mcorbin.fr/
 
 ## Plan
 
-- [ ] A CLI to interact with the project.
-- [ ] A read-only frontend.
+Take a look at https://meuse.mcorbin.fr/roadmap/.
