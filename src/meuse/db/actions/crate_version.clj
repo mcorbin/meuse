@@ -43,7 +43,7 @@
   (->> (jdbc/execute! database (crate-version-queries/last-updated n))))
 
 (defn count-crates-versions
-  "Count crates versions"
+  "Count crate versions"
   [database]
   (-> (jdbc/execute! database (crate-version-queries/count-crates-versions))
       first))
@@ -65,6 +65,6 @@
       (update :sum #(or % 0))))
 
 (defn top-n-downloads
-  "Returns crates versions which has been the most downloaded."
+  "Returns crate versions which has been the most downloaded."
   [database n]
   (jdbc/execute! database (crate-version-queries/top-n-downloads n)))

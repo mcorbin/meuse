@@ -9,9 +9,8 @@
    [:div {:class "col-12 center"}
     (for [letter ["A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P"
                   "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"]]
-      [:span
-       [:a {:href (str "/front/crates?letter=" letter)} letter]
-       (when-not (= "Z" letter) " - ")])]])
+      [:a {:href (str "/front/crates?letter=" letter)
+           :class "letter-link"} letter])]])
 
 (defn pages
   [letter nb-crates page]

@@ -4,55 +4,54 @@
 
 (def head
   [:head
-   [:meta {:content "text/html;charset=utf-8"}]
+   [:meta {:charset "utf-8"}]
    [:meta {:name "viewport"
            :content "width=device-width, initial-scale=1, shrink-to-fit=no"}]
    [:title "Meuse"]
+   [:meta {:name "description"
+           ;; todo: replace this with the crate's description on crate pages
+           :value "A private Rust crate registry"}]
+   (page/include-css "https://fonts.googleapis.com/css?family=Work+Sans:300,400,500,700&display=swap")
    (page/include-css "/css/bootstrap.min.css")
    (page/include-css "/css/style.css")])
 
 (def menu
-  [:div {:id "menu"
-         :class "container"}
+  [:div {:id "menu"}
    [:div {:class "row"}
 
-    [:div {:class "col-2"}
-     [:div
-      (link-to {} "/front"
-               [:h1 "Meuse"])]]
+    (link-to {:id "title"} "/front"
+             "Meuse")
 
-    [:div {:class "col-3" :id "menu-search"}
+    [:div {:id "menu-search"}
      [:form {:action "/front/search" :method "get"}
-      [:input {:type "text"
+      [:input {:type "search"
                :id "menu-search-input"
                :name "q"
-               :placeholder "Search"}]]]
+               :placeholder "Search"
+               :alt "Search"}]]]
 
-    [:div {:class "col-7" :id "menu-links"}
-     [:span {:class "menu-element"} [:a {:href "/front/crates"} "Browse All Crates"]]
-     [:span {:class "menu-element"} "|"]
-     [:span {:class "menu-element"} [:a {:href "/front/categories"} "Browse Categories"]]]]])
+    [:div {:id "menu-links"}
+     [:span {:class "menu-element"} [:a {:href "/front/crates"} "All Crates"]]
+     [:span {:class "menu-element"} "·"]
+     [:span {:class "menu-element"} [:a {:href "/front/categories"} "Categories"]]]]])
 
 (def footer
-  [:div {:id "footer"
-         :class "container"}
-   [:footer {:class "row"}
-    [:div {:class "col-12 center"}
-     [:p
-      [:a {:href "https://meuse.mcorbin.fr/"} "Documentation"] " | "
-      [:a {:href "https://github.com/mcorbin/meuse"} "Github"] " | "
-      "Made by " [:a {:href "https://mcorbin.fr"} "mcorbin"]]]]])
+  [:footer {:class "container"}
+   [:p
+    [:a {:href "https://meuse.mcorbin.fr/"} "Documentation"] " · "
+    [:a {:href "https://github.com/mcorbin/meuse"} "Github"] " · "
+    "Made by " [:a {:href "https://mcorbin.fr"} "mcorbin"]]])
 
 (defn html
   [body]
-  (page/html5
+  (page/html5 {:lang "en"}
    head
    [:body
-    menu
-    [:div {:id "core"
-           :class "container"}
-     body]
+    [:div {:id "content"}
+     menu
+     [:div {:id "core"}
+      body]
+     footer]
     (page/include-js "/js/jquery-3.3.1.slim.min.js")
     (page/include-js "/js/popper.min.js")
-    (page/include-js "/js/bootstrap.min.js")]
-   footer))
+    (page/include-js "/js/bootstrap.min.js")]))

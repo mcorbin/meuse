@@ -1,5 +1,5 @@
 (ns meuse.semver
-  "Functions to work on crates versions"
+  "Functions to work on crate versions"
   (:require [clojure.string :as string]))
 
 (defn valid?

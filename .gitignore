@@ -11,3 +11,6 @@ pom.xml.asc
 .hgignore
 .hg/
 test/resources/tmp
+dev/resources/config.yaml
+*.iml
+.idea/
