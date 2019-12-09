@@ -15,10 +15,10 @@ logging:
     org.apache.http: error
     io.netty.buffer.PoolThreadCache: error
 metadata:
-  path: "/home/ludwig/prog/rust/testregistry"
+  path: "/home/mathieu/prog/rust/testregistry"
   target: "origin/master"
   url: "https://github.com/mcorbin/testregistry"
 crate:
   store: "filesystem"
-  path: "/home/ludwig/prog/rust/crates"
-frontend: true
+  path: "/home/mathieu/prog/rust/crates"
+frontend: false

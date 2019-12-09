@@ -114,6 +114,3 @@ SELECT pg_catalog.setval('public.users_cargo_id_seq', 5, true);
 --
 -- PostgreSQL database dump complete
 --
-
-INSERT INTO users(id, name, password, description, active, role_id)
-VALUES ('f3e6888e-97f9-11e9-ae4e-ef296f05cd17', 'root_user', '$2a$11$PN29HCYWPjcHbC4cyLSrReMb2UKNGAAWMlaxEeMNNCVGz3pk/rNee', 'ludwig', true, '867428a0-69ba-11e9-a674-9f6c32022150');
