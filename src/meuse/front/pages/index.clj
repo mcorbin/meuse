@@ -6,7 +6,7 @@
 
 (defn last-updated-crates
   [crate-version-db]
-  [:div {:class "col-6"}
+  [:div {:class "col-12 col-md-6"}
    [:h2 {:class "center"} "Last updated"]
    (let [last-updated (public-crate-version/last-updated
                        crate-version-db 10)]
@@ -19,7 +19,7 @@
 
 (defn top-downloaded-crates
   [crate-version-db]
-  [:div {:class "col-6"}
+  [:div {:class "col-12 col-md-6"}
    [:h2 {:class "center"} "Most downloaded"]
    (let [top-n-downloads (public-crate-version/top-n-downloads
                           crate-version-db 10)]

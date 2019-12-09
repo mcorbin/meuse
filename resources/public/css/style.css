@@ -3,7 +3,7 @@ body {
     color: #222;
     background-color: #F5F5F5;
     font-family: 'Work Sans', sans-serif;
-    font-size: 19px;
+    font-size: 1.17rem;
 }
 
 #content {
@@ -179,17 +179,21 @@ a:not(.btn):focus {
 /* for mobile devices */
 
 @media (max-width: 800px) {
+    :root {
+        font-size: 95%;
+    }
+    
     #menu #title {
         font-size: 33px;
         padding: 3px 0 0 15px;
     }
 
     #menu #menu-search {
-        padding-top: 5px;
+        padding-top: 6px;
     }
 
     #menu #menu-links {
-        padding: 8px 15px 0;
+        padding: 10px 15px 0;
     }
 
     h1 {
