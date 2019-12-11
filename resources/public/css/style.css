@@ -156,7 +156,47 @@ footer {
 .letter-link {
     font-size: 1.2em;
     display: inline-block;
-    width: 1.6em;
+    width: 39px;
+    height: 44px;
+    line-height: 44px;
+}
+
+/* categories page */
+
+
+.category-row {
+    margin: 30px 0;
+}
+
+.row.category-row {
+    padding: 0;
+    margin: 30px 0;
+}
+
+.category {
+    padding: 0.4rem 0.7rem;
+}
+
+.category:not(:hover) {
+    color: inherit;
+}
+.category:hover {
+    text-decoration: none;
+    background-color: #f9f9f9;
+}
+
+.category h2,
+.category p {
+    margin: 0.2rem 0;
+}
+
+.category .description {
+    color: black;
+}
+
+.category .crate-count {
+    color: gray;
+    font-size: 90%;
 }
 
 /* common crate things */

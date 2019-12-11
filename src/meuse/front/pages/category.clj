@@ -8,20 +8,17 @@
                           (map (fn [c] [(:crates_categories/category_id c)
                                         (:count c)]))
                           (into {}))]
-    [:div {:class "categories"}
+    [:div.categories
      [:h1 "Categories"]
-     (for [category-partition (partition-all 3 categories)]
-       [:div {:class "row"}
-        (for [category category-partition]
-          [:div {:class "col-4"}
-           (let [count-crate (get count-crates (:categories/id category) 0)]
-             [:p [:b (:categories/name category)]
-              [:br]
-              (or (:categories/description category) "-")
-              [:br]
-              [:b count-crate]
-              (if (#{0 1} count-crate) " crate " " crates ")
-              " in this category"
-              [:br]
-              [:a {:href (str "/front/categories/" (:categories/name category))}
-               "List crates"]])])])]))
+     [:div.row.category-row
+      (for [category categories]
+        [:a.category.col-12.col-md-4.col-sm-6
+         {:href (str "/front/categories/" (:categories/name category))}
+         [:h2 (:categories/name category)]
+         [:p.description (or (:categories/description category) "-")]
+         (let [crate-count (get count-crates (:categories/id category) 0)]
+           [:p.crate-count
+            [:b crate-count]
+            (if (= 1 crate-count) " crate" " crates")
+            " in this category"])]
+        )]]))
