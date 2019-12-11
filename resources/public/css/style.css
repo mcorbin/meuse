@@ -1,4 +1,56 @@
 
+@font-face {
+    font-family: "Work Sans";
+    src: url("/fonts/Work Sans/300/300.eot"); /* IE9 Compat Modes */
+    src: url("/fonts/Work Sans/300/300.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+         url("/fonts/Work Sans/300/300.woff") format("woff"),
+         url("/fonts/Work Sans/300/300.woff2") format("woff2"),
+         url("/fonts/Work Sans/300/300.otf") format("opentype"),
+         url("/fonts/Work Sans/300/300.ttf") format("truetype"),
+         url("/fonts/Work Sans/300/300.svg") format("svg");
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Work Sans";
+    src: url("/fonts/Work Sans/400/400.eot"); /* IE9 Compat Modes */
+    src: url("/fonts/Work Sans/400/400.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+         url("/fonts/Work Sans/400/400.woff") format("woff"),
+         url("/fonts/Work Sans/400/400.woff2") format("woff2"),
+         url("/fonts/Work Sans/400/400.otf") format("opentype"),
+         url("/fonts/Work Sans/400/400.ttf") format("truetype"),
+         url("/fonts/Work Sans/400/400.svg") format("svg");
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Work Sans";
+    src: url("/fonts/Work Sans/600/600.eot"); /* IE9 Compat Modes */
+    src: url("/fonts/Work Sans/600/600.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+         url("/fonts/Work Sans/600/600.woff") format("woff"),
+         url("/fonts/Work Sans/600/600.woff2") format("woff2"),
+         url("/fonts/Work Sans/600/600.otf") format("opentype"),
+         url("/fonts/Work Sans/600/600.ttf") format("truetype"),
+         url("/fonts/Work Sans/600/600.svg") format("svg");
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Work Sans";
+    src: url("/fonts/Work Sans/600/600.eot"); /* IE9 Compat Modes */
+    src: url("/fonts/Work Sans/600/600.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+         url("/fonts/Work Sans/600/600.woff") format("woff"),
+         url("/fonts/Work Sans/600/600.woff2") format("woff2"),
+         url("/fonts/Work Sans/600/600.otf") format("opentype"),
+         url("/fonts/Work Sans/600/600.ttf") format("truetype"),
+         url("/fonts/Work Sans/600/600.svg") format("svg");
+    font-weight: 700;
+    font-style: normal;
+}
+
 body {
     color: #222;
     background-color: #F5F5F5;
