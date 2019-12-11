@@ -1,19 +1,79 @@
 
+@font-face {
+    font-family: "Work Sans";
+    src: url("/fonts/Work Sans/300/300.eot"); /* IE9 Compat Modes */
+    src: url("/fonts/Work Sans/300/300.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+         url("/fonts/Work Sans/300/300.woff") format("woff"),
+         url("/fonts/Work Sans/300/300.woff2") format("woff2"),
+         url("/fonts/Work Sans/300/300.otf") format("opentype"),
+         url("/fonts/Work Sans/300/300.ttf") format("truetype"),
+         url("/fonts/Work Sans/300/300.svg") format("svg");
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Work Sans";
+    src: url("/fonts/Work Sans/400/400.eot"); /* IE9 Compat Modes */
+    src: url("/fonts/Work Sans/400/400.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+         url("/fonts/Work Sans/400/400.woff") format("woff"),
+         url("/fonts/Work Sans/400/400.woff2") format("woff2"),
+         url("/fonts/Work Sans/400/400.otf") format("opentype"),
+         url("/fonts/Work Sans/400/400.ttf") format("truetype"),
+         url("/fonts/Work Sans/400/400.svg") format("svg");
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Work Sans";
+    src: url("/fonts/Work Sans/500/500.eot"); /* IE9 Compat Modes */
+    src: url("/fonts/Work Sans/500/500.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+         url("/fonts/Work Sans/500/500.woff") format("woff"),
+         url("/fonts/Work Sans/500/500.woff2") format("woff2"),
+         url("/fonts/Work Sans/500/500.otf") format("opentype"),
+         url("/fonts/Work Sans/500/500.ttf") format("truetype"),
+         url("/fonts/Work Sans/500/500.svg") format("svg");
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Work Sans";
+    src: url("/fonts/Work Sans/600/600.eot"); /* IE9 Compat Modes */
+    src: url("/fonts/Work Sans/600/600.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+         url("/fonts/Work Sans/600/600.woff") format("woff"),
+         url("/fonts/Work Sans/600/600.woff2") format("woff2"),
+         url("/fonts/Work Sans/600/600.otf") format("opentype"),
+         url("/fonts/Work Sans/600/600.ttf") format("truetype"),
+         url("/fonts/Work Sans/600/600.svg") format("svg");
+    font-weight: 700;
+    font-style: normal;
+}
+
 body {
     color: #222;
-    background-color: #F1F1F1;
-    font-family: serif, Arial;
-    font-size: 19px;
+    background-color: #F5F5F5;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 1.17rem;
+}
+
+#content {
+    background-color: white;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    max-width: 1140px;
+    margin: 0 auto;
 }
 
 #core {
-    padding-top: 30px;
-    background-color: #fefbf3;
+    padding: 30px 15px 15px;
 }
 
 
-#footer {
-    background-color: #fefbf3;
+footer {
+    padding: 30px 15px 1px 15px;
+    text-align: center;
 }
 
 
@@ -46,26 +106,54 @@ body {
 
 #menu {
     background-image: linear-gradient(to right, #336600, #59b300);
-    padding-bottom: 5px;
-    padding-top: 5px;
-    padding-bottom: 10px;
+    padding: 5px 0 10px 0;
+    text-shadow: 0 0 3px rgba(51, 102, 0, 0.5);
 }
 
-#menu h1 {
+#menu .row {
+    margin: 0;
+}
+
+#menu #title {
     display: inline;
     color: white;
+    font-weight: 500;
+    font-size: 40px;
+    padding: 2px 15px 0 30px;
+    line-height: 115%;
 }
 
 #menu #menu-search {
-    padding-top: 10px;
+    padding: 9px 15px 0;
+    flex-grow: 1;
+    flex-basis: 140px;
 }
 
 #menu #menu-search input {
-    width: 90%;
+    width: 100%;
+    margin: 0;
+    border: none;
+    padding: 3px 10px;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.8), white);
+    font-family: inherit;
+    transition: .2s;
+}
+
+#menu #menu-search input:hover,
+#menu #menu-search input:focus {
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.9), white);
+    outline: none;
+}
+
+#menu #menu-search input::placeholder {
+    color: rgba(0, 0, 0, 0.75);
 }
 
 #menu #menu-links {
-    padding-top: 10px;
+    padding: 12px 30px 0 15px;
 }
 
 #menu #menu-links a {
@@ -74,6 +162,11 @@ body {
 
 #menu #menu-links .menu-element {
     margin-right: 10px;
+    color: white;
+}
+
+#menu #menu-links .menu-element:last-child {
+    margin-right: 0;
 }
 
 /* index page */
@@ -84,11 +177,8 @@ body {
 
 .index-stats-row {
     margin: 10px;
-    border-top: 1px solid black;
-}
-
-.index-stats-row div {
-    margin-top: 10px;
+    padding: 10px 0;
+    border-top: 1px solid #ccc;
 }
 
 .stat-num {
@@ -115,6 +205,12 @@ body {
     margin-bottom: 20px;
 }
 
+.letter-link {
+    font-size: 1.2em;
+    display: inline-block;
+    width: 1.6em;
+}
+
 /* common crate things */
 
 .crate-list-element {
@@ -123,4 +219,44 @@ body {
     border-radius: 5px;
     background-color: #faf0d7;
     border: 1px solid #ece2c8;
+}
+
+/* general things */
+
+a:not(.btn):focus {
+    outline: none;
+    text-decoration: underline;
+}
+
+/* for mobile devices */
+
+@media (max-width: 800px) {
+    :root {
+        font-size: 95%;
+    }
+    
+    #menu #title {
+        font-size: 33px;
+        padding: 3px 0 0 15px;
+    }
+
+    #menu #menu-search {
+        padding-top: 6px;
+    }
+
+    #menu #menu-links {
+        padding: 10px 15px 0;
+    }
+
+    h1 {
+        font-size: 2.1rem;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+    }
+
+    .index-stats-row {
+        margin: 10px 0;
+    }
 }

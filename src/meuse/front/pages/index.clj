@@ -6,7 +6,7 @@
 
 (defn last-updated-crates
   [crate-version-db]
-  [:div {:class "col-6"}
+  [:div {:class "col-12 col-md-6"}
    [:h2 {:class "center"} "Last updated"]
    (let [last-updated (public-crate-version/last-updated
                        crate-version-db 10)]
@@ -14,12 +14,12 @@
        [:div {:class "index-crate-block"}
         (:crates/name crate-version) " ("
         (:crates_versions/version crate-version) ") "
-        [:a {:type "button" :class "btn btn-secondary btn-sm float-right" :role "button" :href (str "/front/crates/" (:crates/name crate-version))}
+        [:a {:class "btn btn-secondary btn-sm float-right" :role "button" :href (str "/front/crates/" (:crates/name crate-version))}
          "see"]]))])
 
 (defn top-downloaded-crates
   [crate-version-db]
-  [:div {:class "col-6"}
+  [:div {:class "col-12 col-md-6"}
    [:h2 {:class "center"} "Most downloaded"]
    (let [top-n-downloads (public-crate-version/top-n-downloads
                           crate-version-db 10)]
@@ -28,7 +28,7 @@
         (:crates/name crate-version) " ("
         (:crates_versions/version crate-version) ") "
         ": " [:span {:class "bold"} (:crates_versions/download_count crate-version)]
-        [:a {:type "button" :class "btn btn-secondary btn-sm float-right" :role "button" :href (str "/front/crates/" (:crates/name crate-version))}
+        [:a {:class "btn btn-secondary btn-sm float-right" :role "button" :href (str "/front/crates/" (:crates/name crate-version))}
          "see"]]))])
 
 (defn index-page
@@ -41,13 +41,13 @@
 
    [:div {:class "row"}
     [:div {:class "col-12 center index-links"}
-     [:a {:type "button" :class "btn btn-secondary btn-lg" :role "button" :href "https://meuse.mcorbin.fr/"}
+     [:a {:class "btn btn-secondary btn-lg" :role "button" :href "https://meuse.mcorbin.fr/"}
       "Documentation"]
-     [:a {:type "button" :class "btn btn-secondary btn-lg" :role "button" :href "https://github.com/mcorbin/meuse"}
+     [:a {:class "btn btn-secondary btn-lg" :role "button" :href "https://github.com/mcorbin/meuse"}
       "Github"]]]
 
    [:div {:class "row index-stats-row"}
-    [:div {:class "col-7"}
+    [:div {:class "col-12 col-md-7"}
      [:p "Meuse is a free private registry. It allows you to publish and "
       "share private crates."]
      [:p "You can interact with it using "
@@ -55,7 +55,7 @@
       "but it also provides an API to manage things like users, tokens, crates, categories..."]
      [:p "You can check the documentation to have more informations about "
       "this project."]]
-    [:div {:class "col-5 "}
+    [:div {:class "col-12 col-md-5"}
      [:span {:class "stat-num"} (:count
                                  (public-crate/count-crates crate-db))]
      " Crates in stock"
@@ -63,7 +63,7 @@
      [:span {:class "stat-num"} (:count
                                  (public-crate-version/count-crates-versions
                                   crate-version-db))]
-     " Crates versions uploaded"
+     " Crate versions uploaded"
      [:br]
      [:span {:class "stat-num"} (:sum
                                  (public-crate-version/sum-download-count

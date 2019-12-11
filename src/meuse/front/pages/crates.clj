@@ -4,14 +4,17 @@
 
 (def interval 15)
 
-(def letters
+(defn letters [request]
   [:div {:class "row" :id "letters"}
    [:div {:class "col-12 center"}
-    (for [letter ["A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P"
-                  "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"]]
-      [:span
-       [:a {:href (str "/front/crates?letter=" letter)} letter]
-       (when-not (= "Z" letter) " - ")])]])
+    (let [current (get-in request [:params :letter] "A")]
+      (for [letter ["A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P"
+                    "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"]]
+        (if (= letter current)
+          [:span {:class "letter-link"} letter]
+          [:a {:href (str "/front/crates?letter=" letter)
+               :class "letter-link"} letter])
+        ))]])
 
 (defn pages
   [letter nb-crates page]
@@ -42,7 +45,7 @@
         nb-crates-prefix (:count (public-crate/count-crates-prefix crates-db letter))]
     [:div {:id "crates"}
      [:h1 "All Crates"]
-     letters
+     (letters request)
      [:p [:span {:class "bold"} nb-crates-prefix] " crates starting by "
       [:span {:class "bold"} letter]
       " on a total of " [:span {:class "bold"} nb-crates] " crates"]
