@@ -1,6 +1,6 @@
 # Meuse
 
-A crate registry, written in Clojure.
+A free crate registry.
 
 It implements the [alternative registries](https://github.com/rust-lang/rfcs/blob/master/text/2141-alternative-registries.md) RFC and offers also various features (cf the `Features` section).
 
