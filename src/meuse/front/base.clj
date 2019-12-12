@@ -11,7 +11,6 @@
    [:meta {:name "description"
            ;; todo: replace this with the crate's description on crate pages
            :content "A private Rust crate registry"}]
-   (page/include-css "https://fonts.googleapis.com/css?family=Work+Sans:300,400,500,700&display=swap")
    (page/include-css "/css/bootstrap.min.css")
    (page/include-css "/css/style.css")])
 
