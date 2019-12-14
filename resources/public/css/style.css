@@ -67,7 +67,7 @@ body {
 }
 
 #core {
-    padding: 30px 15px 15px;
+    padding: 15px;
 }
 
 
@@ -208,7 +208,114 @@ footer {
 .letter-link {
     font-size: 1.2em;
     display: inline-block;
-    width: 1.6em;
+    width: 39px;
+    height: 44px;
+    line-height: 44px;
+}
+
+/* categories page */
+
+
+.category-row {
+    margin: 30px 0;
+}
+
+.row.category-row {
+    padding: 0;
+    margin: 30px 0;
+}
+
+.category {
+    padding: 0.4rem 0.7rem;
+}
+
+.category:not(:hover) {
+    color: inherit;
+}
+.category:hover {
+    text-decoration: none;
+    background-color: #f9f9f9;
+}
+
+.category h2,
+.category p {
+    margin: 0.2rem 0;
+}
+
+.category .description {
+    color: black;
+}
+
+.category .crate-count {
+    color: gray;
+    font-size: 90%;
+}
+
+/* crate page */
+
+.crate-header > div:first-child {
+    margin-bottom: 1rem;
+}
+
+span.categories:not(:empty) {
+    margin: 0 1.5rem 0 0;
+}
+
+span.categories span:not(:last-child) {
+    margin-right: 0.5rem;
+    padding-right: 0.5rem;
+    border-right: 1px solid gray;
+}
+
+span.keywords a,
+span.keywords span {
+    margin: 0 0.2rem;
+}
+
+span.keywords span {
+    color: gray;
+}
+
+.crate-version {
+    margin-left: 1.5rem;
+    font-size: 80%;
+    opacity: 0.6;
+}
+
+.doc-links {
+    margin: 0 0 1rem 0;
+}
+
+.doc-links a:not(:last-child) {
+    margin-right: 1rem;
+}
+
+.add-crate {
+    padding: 0;
+    margin: 0 0 1rem 0;
+    line-height: 3rem;
+}
+
+.add-crate div {
+    padding: 0 1rem 0 0;
+}
+
+.add-crate code {
+    display: block;
+    flex-grow: 1;
+    padding: 0 1rem;
+    background-color: #f4f4f4;
+    color: black;
+}
+
+.add-crate code .hl-string {
+    color: #cb2144;
+}
+
+.uuid {
+    color: gray;
+    font-size: 83%;
+    margin-bottom: 0.2rem;
 }
 
 /* common crate things */
