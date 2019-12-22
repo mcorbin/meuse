@@ -131,7 +131,7 @@
            :body {:errors [{:detail err/default-msg}]}})))))
 
 (defn start-server
-  [http-config crate-config metadata-config frontend-enabled?]
+  [http-config crate-config metadata-config frontend]
   (debug "starting http server")
   (let [ssl-context (when (:cacert http-config)
                       (JdkSslContext. (less-ssl/ssl-context (:key http-config)
@@ -144,8 +144,8 @@
                                          ^String (:address http-config)
                                          ^Integer (:port http-config))}
                  ssl-context (assoc :ssl-context ssl-context))]
-    (inject/inject! frontend-enabled?)
-    (when frontend-enabled?
+    (inject/inject! (:enabled frontend))
+    (when (:enabled frontend)
       (front-route!))
     (http/start-server (-> (get-handler crate-config
                                         metadata-config)

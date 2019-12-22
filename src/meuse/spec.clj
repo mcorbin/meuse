@@ -138,14 +138,20 @@
                        :map (s/keys :req-un [::encoder])))
 (s/def ::logging (s/keys :req-un [::level ::console]))
 
-(s/def ::frontend boolean?)
+(s/def :frontend/enabled boolean?)
+
+(def frontend-secret-min-size 20)
+(s/def :frontend/secret (s/and string? #(> (count %) frontend-secret-min-size)))
+
+(s/def :frontend/frontend (s/keys :req-un [:frontend/enabled
+                                           :frontend/secret]))
 
 (s/def ::config (s/keys :req-un [:http/http
                                  :db/database
                                  :metadata/metadata
                                  :crate/crate
                                  ::logging
-                                 ::frontend]))
+                                 :frontend/frontend]))
 
 ;; api
 

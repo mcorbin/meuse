@@ -17,6 +17,8 @@
    :meuse.spec/uuid "the value should be an uuid"
    :meuse.spec/pos-int "the value should be a positive integer"
    :meuse.spec/inst "the value should be a date"
+   :frontend/secret (str "the frontend secret should be a string with a"
+                         " minimum size of " meuse.spec/frontend-secret-min-size)
 
    :user/password "the password should have at least 8 characters"
    :user/role "the role should be 'admin' or 'tech'"
