@@ -51,6 +51,6 @@
      [:div {:id "core"}
       body]
      footer]
-    (page/include-js "/js/jquery-3.3.1.slim.min.js")
+    (page/include-js "/js/jquery-3.4.1.slim.min.js")
     (page/include-js "/js/popper.min.js")
     (page/include-js "/js/bootstrap.min.js")]))
