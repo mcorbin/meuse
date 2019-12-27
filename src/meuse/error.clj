@@ -129,19 +129,17 @@
    ::ex/busy 500})
 
 (defn handle-user-error
-  [request data]
-  (let [exception (-> data meta ::ex/exception)
-        message (.getMessage exception)
+  [request ^Exception e]
+  (let [message (.getMessage e)
+        data (ex-data e)
         ;; cargo expects a status 200 OK even for errors x_x
         status (if (= (:subsystem request) :meuse.api.crate.http)
                  200
                  (get ex-type->status (:type data) 500))]
-    (when (= 500 status)
-      (error "unknown error " (pr-str data)))
-    (error (:request-id request)
-           exception
+    (error (str (:id request))
+           e
            "http error"
-           (pr-str (ex-data exception))
+           (pr-str data)
            status)
     (metric/http-errors request status)
     {:status status
@@ -149,7 +147,7 @@
 
 (defn handle-unexpected-error
   [request ^Exception e]
-  (error (:request-id request) e "http error")
+  (error (str (:id request)) e "http error")
   (metric/http-errors request 500)
   {:status 500
    :body {:errors [{:detail default-msg}]}})
