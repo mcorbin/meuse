@@ -20,8 +20,7 @@
   (last-updated [this n]
     (crate-version/last-updated database n))
   (top-n-downloads [this n]
-    (crate-version/top-n-downloads database n)
-    )
+    (crate-version/top-n-downloads database n))
   (update-yank [this crate-name crate-version yanked?]
     (crate-version/update-yank database crate-name crate-version yanked?))
   (sum-download-count [this]

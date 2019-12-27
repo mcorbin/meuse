@@ -13,8 +13,8 @@
 (defn some-crate-version [version-number crate-versions]
   "Returns the first crate version that has the specified version number, or nil"
   (some
-    #(when (= (:crates_versions/version %) version-number) %)
-    crate-versions))
+   #(when (= (:crates_versions/version %) version-number) %)
+   crate-versions))
 
 (defn count-downloads [all-versions]
   (apply + (map #(:crates_versions/download_count %) all-versions)))
@@ -47,9 +47,9 @@
   [crates-db request]
   (let [crate-name (get-in request [:route-params :name])
         crate-versions (->> (public-crate/get-crate-and-versions
-                              crates-db crate-name)
-                             (sort-by :crates_versions/created_at)
-                             reverse)
+                             crates-db crate-name)
+                            (sort-by :crates_versions/created_at)
+                            reverse)
         latest-version (first crate-versions)
         version-param (get-in request [:params :version])
         version (if (nil? version-param)
@@ -67,8 +67,8 @@
          [:p.authors "By "                                  ; TODO: links to authors, contributors, owners
           (for [author authors]
             (list
-              [:span author]
-              (when-not (= (last authors) author) ", ")))])
+             [:span author]
+             (when-not (= (last authors) author) ", ")))])
        [:div.doc-links
         (when-let [documentation (:documentation metadata)]
           [:a {:href documentation} "API reference"])       ; documentation

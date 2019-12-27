@@ -43,7 +43,8 @@
 
 (defn html
   [body]
-  (page/html5 {:lang "en"}
+  (page/html5
+   {:lang "en"}
    head
    [:body
     [:div {:id "content"}

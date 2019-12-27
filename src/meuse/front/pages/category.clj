@@ -20,5 +20,4 @@
            [:p.crate-count
             [:b crate-count]
             (if (= 1 crate-count) " crate" " crates")
-            " in this category"])]
-        )]]))
+            " in this category"])])]]))

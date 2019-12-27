@@ -13,8 +13,7 @@
         (if (= letter current)
           [:span {:class "letter-link"} letter]
           [:a {:href (str "/front/crates?letter=" letter)
-               :class "letter-link"} letter])
-        ))]])
+               :class "letter-link"} letter])))]])
 
 (defn pages
   [letter nb-crates page]
