@@ -5,15 +5,15 @@
   :maintainer {:name "Mathieu Corbin"
                :website "https://meuse.mcorbin.fr"}
   :dependencies [[aleph "0.4.7-alpha5"]
-                 [amazonica "0.3.139"
+                 [amazonica "0.3.152"
                   :exclusions
                   [com.amazonaws/aws-java-sdk
                    com.amazonaws/amazon-kinesis-client]]
                  [bidi "2.1.6"]
                  [cheshire "5.9.0"]
                  [clj-time "0.15.2"]
-                 [com.amazonaws/aws-java-sdk-core "1.11.495"]
-                 [com.amazonaws/aws-java-sdk-s3 "1.11.495"]
+                 [com.amazonaws/aws-java-sdk-core "1.11.699"]
+                 [com.amazonaws/aws-java-sdk-s3 "1.11.699"]
                  [com.zaxxer/HikariCP "3.4.1"]
                  [commons-codec/commons-codec "1.13"]
                  [crypto-password "0.2.1"]
@@ -25,17 +25,17 @@
                  [exoscale/yummy "0.2.8"]
                  [hiccup "1.0.5"]
                  [honeysql "0.9.8"]
-                 [io.micrometer/micrometer-registry-prometheus "1.3.1"]
+                 [io.micrometer/micrometer-registry-prometheus "1.3.2"]
                  [less-awful-ssl "1.0.4"]
                  [metosin/spec-tools "0.10.0"]
                  [mount "0.1.16"]
                  [org.clojure/clojure "1.10.1"]
-                 [org.clojure/java.jdbc "0.7.10"]
-                 [seancorfield/next.jdbc "1.0.10"]
+                 [org.clojure/java.jdbc "0.7.11"]
+                 [seancorfield/next.jdbc "1.0.12"]
                  [org.clojure/tools.logging "0.5.0"]
-                 [org.postgresql/postgresql "42.2.8"]
+                 [org.postgresql/postgresql "42.2.9"]
                  [ragtime "0.8.0"]
-                 [ring/ring-core "1.7.1"]
+                 [ring/ring-core "1.8.0"]
                  [spootnik/signal "0.2.4"]
                  [spootnik/unilog "0.7.25"]]
   :main ^:skip-aot meuse.core
