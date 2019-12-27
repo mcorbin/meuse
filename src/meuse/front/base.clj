@@ -11,8 +11,8 @@
    [:meta {:name "description"
            ;; todo: replace this with the crate's description on crate pages
            :content "A private Rust crate registry"}]
-   (page/include-css "/css/bootstrap.min.css")
-   (page/include-css "/css/style.css")])
+   (page/include-css "/static/css/bootstrap.min.css")
+   (page/include-css "/static/css/style.css")])
 
 (def menu
   [:div {:id "menu"}
@@ -51,6 +51,6 @@
      [:div {:id "core"}
       body]
      footer]
-    (page/include-js "/js/jquery-3.4.1.slim.min.js")
-    (page/include-js "/js/popper.min.js")
-    (page/include-js "/js/bootstrap.min.js")]))
+    (page/include-js "/static/js/jquery-3.4.1.slim.min.js")
+    (page/include-js "/static/js/popper.min.js")
+    (page/include-js "/static/js/bootstrap.min.js")]))

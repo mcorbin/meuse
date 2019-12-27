@@ -4,7 +4,7 @@
 
 (defn not-found
   [request]
-  (info "public uri not found:" (:request-method request) (:uri request))
+  (info "uri not found:" (:request-method request) (:uri request))
   (metric/http-errors request 404)
   {:status 404
    :body {:errors
