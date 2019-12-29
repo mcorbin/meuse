@@ -53,12 +53,13 @@
 
 (defmacro with-time
   [n tags & body]
-  `(when (started?)
+  `(if (started?)
      (let [sample# (get-sample!)]
        (try
          (do ~@body)
          (finally
-           (stop-sample! sample# ~n ~tags))))))
+           (stop-sample! sample# ~n ~tags))))
+     (do ~@body)))
 
 (defn increment!
   "increments a counter"
