@@ -18,7 +18,7 @@
   (let [{:keys [git-metadata raw-metadata crate-file] :as crate}
         (crate/request->crate request)]
     (params/validate-params crate ::crate)
-    (auth-request/admin-or-tech?-throw request)
+    (auth-request/check-admin-tech request)
     ;; check if the dependencies registry is allowed
     (registry/allowed-registry? raw-metadata
                                 (get-in request

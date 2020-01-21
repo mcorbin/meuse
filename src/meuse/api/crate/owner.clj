@@ -53,7 +53,7 @@
 (defn list-owners
   [user-db request]
   (params/validate-params request ::list)
-  (auth-request/admin-or-tech?-throw request)
+  (auth-request/check-authenticated request)
   (let [crate-name (get-in request [:route-params
                                     :crate-name])
         users (public-user/crate-owners

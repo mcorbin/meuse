@@ -19,6 +19,7 @@
                   (auth-request/admin? request))
       (throw (ex/ex-forbidden
               (format "user %s cannot delete token for %s" auth-user-name user-name))))
+    (auth-request/check-authenticated request)
     (info (format "deleting token %s for user %s" token-name user-name))
     (public-token/delete token-db
                          user-name
@@ -51,8 +52,8 @@
   (params/validate-params request ::list)
   (let [request-user (get-in request [:params :user])]
     (if request-user
-      (auth-request/admin?-throw request)
-      (auth-request/admin-or-tech?-throw request))
+      (auth-request/check-admin request)
+      (auth-request/check-authenticated request))
     (info "list tokens")
     (let [user-name (or request-user (get-in request [:auth :user-name]))
           tokens (->> (public-token/by-user token-db user-name)

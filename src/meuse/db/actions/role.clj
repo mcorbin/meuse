@@ -9,6 +9,7 @@
 
 (def admin-role-name "admin")
 (def tech-role-name "tech")
+(def read-only-role-name "read-only")
 
 (defn by-name
   "Get a roles by name."
@@ -25,6 +26,11 @@
   (by-name db-tx admin-role-name))
 
 (defn get-tech-role
+  "Get the tech role."
+  [db-tx]
+  (by-name db-tx tech-role-name))
+
+(defn get-read-only-role
   "Get the tech role."
   [db-tx]
   (by-name db-tx tech-role-name))

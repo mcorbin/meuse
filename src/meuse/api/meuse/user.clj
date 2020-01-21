@@ -8,7 +8,7 @@
 (defn new-user
   [user-db request]
   (params/validate-params request ::new)
-  (auth-request/admin?-throw request)
+  (auth-request/check-admin request)
   (info "create user" (get-in request [:body :name]))
   (public-user/create user-db
                       (:body request))
@@ -18,7 +18,7 @@
 (defn delete-user
   [user-db request]
   (params/validate-params request ::delete)
-  (auth-request/admin?-throw request)
+  (auth-request/check-admin request)
   (info "delete user" (get-in request [:route-params :name]))
   (public-user/delete user-db
                       (get-in request [:route-params :name]))
@@ -28,7 +28,7 @@
 (defn update-user
   [user-db request]
   (params/validate-params request ::update)
-  (auth-request/admin-or-tech?-throw request)
+  (auth-request/check-authenticated request)
   (let [user-name (get-in request [:route-params :name])
         fields (:body request)]
     (when (and (not (auth-request/admin? request))
@@ -50,7 +50,7 @@
 
 (defn list-users
   [user-db request]
-  (auth-request/admin?-throw request)
+  (auth-request/check-admin request)
   (info "list users")
   {:status 200
    :body {:users (->> (public-user/get-users user-db)

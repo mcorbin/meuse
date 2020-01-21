@@ -62,36 +62,36 @@
            (check-user token-db
                        {:headers {"authorization" (str token "a")}}))))))
 
-(deftest admin?-throw-test
-  (is (admin?-throw {:auth {:role-name "admin"}}))
+(deftest check-admin-test
+  (is (check-admin {:auth {:role-name "admin"}}))
   (is (thrown-with-msg?
        ExceptionInfo
        #"bad permissions"
-       (admin?-throw {:auth {:role-name "tech"}})))
+       (check-admin {:auth {:role-name "tech"}})))
   (is (thrown-with-msg?
        ExceptionInfo
        #"bad permissions"
-       (admin?-throw {:auth {}}))))
+       (check-admin {:auth {}}))))
 
-(deftest tech?-throw-test
-  (is (tech?-throw {:auth {:role-name "tech"}}))
+(deftest check-tech-test
+  (is (check-tech {:auth {:role-name "tech"}}))
   (is (thrown-with-msg?
        ExceptionInfo
        #"bad permissions"
-       (tech?-throw {:auth {:role-name "admin"}})))
+       (check-tech {:auth {:role-name "admin"}})))
   (is (thrown-with-msg?
        ExceptionInfo
        #"bad permissions"
-       (tech?-throw {:auth {}}))))
+       (check-tech {:auth {}}))))
 
-(deftest admin-or-tech?-throw-test
-  (is (admin-or-tech?-throw {:auth {:role-name "tech"}}))
-  (is (admin-or-tech?-throw {:auth {:role-name "admin"}}))
+(deftest check-admin-tech-test
+  (is (check-admin-tech {:auth {:role-name "tech"}}))
+  (is (check-admin-tech {:auth {:role-name "admin"}}))
   (is (thrown-with-msg?
        ExceptionInfo
        #"bad permissions"
-       (admin-or-tech?-throw {:auth {:role-name "foo"}})))
+       (check-admin-tech {:auth {:role-name "foo"}})))
   (is (thrown-with-msg?
        ExceptionInfo
        #"bad permissions"
-       (admin-or-tech?-throw {:auth {}}))))
+       (check-admin-tech {:auth {}}))))

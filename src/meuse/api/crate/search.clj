@@ -36,7 +36,7 @@
   [search-db request]
   (params/validate-params request ::search)
   ;; todo: re enable ?
-  ;(auth-request/admin-or-tech?-throw request)
+  ;(auth-request/check-admin-tech request)
   (let [{query :q nb-results :per_page} (:params request)
         search-result (->> (public-search/search search-db query)
                            format-search-result

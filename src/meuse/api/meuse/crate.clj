@@ -34,7 +34,7 @@
 (defn list-crates
   [crate-db request]
   (params/validate-params request ::list)
-  (auth-request/admin-or-tech?-throw request)
+  (auth-request/check-authenticated request)
   (info "list crates")
   (let [crates (if-let [category (get-in request [:params :category])]
                  (public-crate/get-crates-for-category crate-db
@@ -46,7 +46,7 @@
 (defn get-crate
   [category-db crate-db request]
   (params/validate-params request ::get)
-  (auth-request/admin-or-tech?-throw request)
+  (auth-request/check-authenticated request)
   (let [crate-name (get-in request [:route-params :name])
         _ (info "get crate" crate-name)
         database (:database request)
@@ -65,7 +65,7 @@
 
 (defn check-crates
   [crate-db git-object crate-file-store request]
-  (auth-request/admin-or-tech?-throw request)
+  (auth-request/check-admin-tech request)
   (info "check crates")
   {:status 200
    :body (check crate-db git-object crate-file-store request)})

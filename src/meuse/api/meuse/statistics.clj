@@ -6,7 +6,7 @@
 
 (defn get-stats
   [crate-db crate-version-db user-db request]
-  (auth-request/admin-or-tech?-throw request)
+  (auth-request/check-authenticated request)
   (let [nb-crate (:count (public-crate/count-crates crate-db))
         nb-crate-version (:count (public-crate-version/count-crates-versions
                                   crate-version-db))

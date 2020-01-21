@@ -46,24 +46,37 @@
   [request]
   (= "tech" (get-in request [:auth :role-name])))
 
-(defn admin?-throw
+(defn read-only?
+  [request]
+  (= "read-only" (get-in request [:auth :role-name])))
+
+(defn check-admin
   "Takes a request, verifies is the user is admin."
   [request]
   (when-not (admin? request)
     (throw (ex/ex-forbidden "bad permissions")))
   true)
 
-(defn tech?-throw
+(defn check-tech
   "Takes a request, verifies is the user is tech."
   [request]
   (when-not (tech? request)
     (throw (ex/ex-forbidden "bad permissions")))
   true)
 
-(defn admin-or-tech?-throw
+(defn check-admin-tech
   "Takes a request, verifies is the user is admin or tech."
   [request]
   (when-not (or (admin? request)
                 (tech? request))
+    (throw (ex/ex-forbidden "bad permissions")))
+  true)
+
+(defn check-authenticated
+  "Takes a request, verifies is the user is authenticated"
+  [request]
+  (when-not (or (admin? request)
+                (tech? request)
+                (read-only? request))
     (throw (ex/ex-forbidden "bad permissions")))
   true)

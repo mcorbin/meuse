@@ -30,7 +30,7 @@
 ;; user
 
 (def min-password-size 8)
-(def user-roles #{"admin" "tech"})
+(def user-roles #{"admin" "tech" "read-only"})
 
 (s/def :user/name ::non-empty-string)
 (s/def :user/password (s/and ::non-empty-string

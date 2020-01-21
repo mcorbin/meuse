@@ -7,7 +7,7 @@
 (defn new-category
   [category-db request]
   (params/validate-params request ::new)
-  (auth-request/admin?-throw request)
+  (auth-request/check-admin request)
   (info "create category" (get-in request [:body :name]))
   (public-category/create category-db
                           (get-in request [:body :name])
@@ -17,7 +17,7 @@
 
 (defn list-categories
   [category-db request]
-  (auth-request/admin-or-tech?-throw request)
+  (auth-request/check-authenticated request)
   (info "get categories")
   {:status 200
    :body {:categories (->> (public-category/get-categories category-db)
@@ -28,7 +28,7 @@
 
 (defn update-category
   [category-db request]
-  (auth-request/admin?-throw request)
+  (auth-request/check-admin request)
   (params/validate-params request ::update)
   (info "update category")
   (let [category-name (get-in request [:route-params :name])]

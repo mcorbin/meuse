@@ -1,0 +1,1 @@
+INSERT INTO roles(id, name) VALUES ('5d98004a-3a21-11ea-950a-175410995a32', 'read-only') ON CONFLICT DO NOTHING;
