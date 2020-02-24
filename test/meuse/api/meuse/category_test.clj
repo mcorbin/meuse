@@ -6,6 +6,7 @@
             [meuse.db :refer [database]]
             [meuse.helpers.fixtures :refer :all]
             [meuse.helpers.request :refer [add-auth]]
+            [meuse.mocks.db :as mocks]
             [clojure.test :refer :all])
   (:import clojure.lang.ExceptionInfo))
 
@@ -64,6 +65,19 @@
       (is (= (dissoc email :id)
              {:name "email"
               :description "the email category"}))))
+  (testing "read-only"
+    (let [request (add-auth {:action :list-categories}
+                            "user1"
+                            "read-only")
+          category-mock (mocks/category-mock
+                         {:get-categories [{:categories/id #uuid "d22dffa8-5750-11ea-bb97-b34af80344d5"
+                                            :categories/name "foo"
+                                            :categories/description "bar"}]})]
+      (is (= {:status 200
+              :body {:categories [{:id #uuid "d22dffa8-5750-11ea-bb97-b34af80344d5"
+                                   :name "foo"
+                                   :description "bar"}]}}
+           (list-categories category-mock request)))))
   (testing "bad permissions"
     (is (thrown-with-msg?
          ExceptionInfo
