@@ -78,7 +78,7 @@
   (defmethod route! :meuse.front.http
     [request]
     (if (= (:action request) :static)
-      ;; to need to format to html static resources
+      ;; no need to format to html static resources
       (front-http/front-api! request)
       {:status 200
        :headers {"Content-Type" "text/html; charset=utf-8"}
