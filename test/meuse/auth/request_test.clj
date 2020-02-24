@@ -95,3 +95,23 @@
        ExceptionInfo
        #"bad permissions"
        (check-admin-tech {:auth {}}))))
+
+(deftest read-only?-test
+  (is (read-only? {:auth {:role-name "read-only"}}))
+  (is (not (read-only? {:auth {:role-name "tech"}})))
+  (is (not (read-only? {:auth {:role-name "admin"}})))
+  (is (not (read-only? {:auth {:role-name "foo"}})))
+  (is (not (read-only? {:auth {}}))))
+
+(deftest check-authenticated-test
+  (is (check-authenticated {:auth {:role-name "read-only"}}))
+  (is (check-authenticated {:auth {:role-name "tech"}}))
+  (is (check-authenticated {:auth {:role-name "admin"}}))
+  (is (thrown-with-msg?
+       ExceptionInfo
+       #"bad permissions"
+       (check-authenticated {:auth {:role-name "foo"}})))
+  (is (thrown-with-msg?
+       ExceptionInfo
+       #"bad permissions"
+       (check-authenticated {:auth {}}))))
