@@ -65,6 +65,6 @@
                     (fn [u]
                       {:login (:users/name u)
                        :name (:users/name u)
-                       :id (rand-int 100)})
+                       :id (:users/cargo_id u)})
                     users)}}))
 

@@ -6,10 +6,14 @@
             [meuse.db.actions.user :as user-db]
             [meuse.db.actions.crate-user :as crate-user-db]
             [meuse.helpers.fixtures :refer :all]
+            [meuse.mocks.db :as mocks]
             [cheshire.core :as json]
+            [spy.assert :as assert]
+            [spy.protocol :as protocol]
             [clojure.string :as string]
             [clojure.test :refer :all])
-  (:import clojure.lang.ExceptionInfo))
+  (:import clojure.lang.ExceptionInfo
+           java.util.UUID))
 
 (use-fixtures :once system-fixture)
 (use-fixtures :each db-clean-fixture table-fixture)
@@ -201,6 +205,26 @@
                                    :name "user2"}
                                   {:login "user3"
                                    :name "user3"}])}}))))
+  (testing "success: read-only user"
+    (let [user-mock (mocks/user-mock {:crate-owners [{:users/name "user1"
+                                                      :users/cargo_id 1}
+                                                     {:users/name "user2"
+                                                      :users/cargo_id 2}]})]
+      (is (= {:status 200
+              :body {:users [{:login "user1"
+                              :name "user1"
+                              :id 1}
+                             {:login "user2"
+                              :name "user2"
+                              :id 2}]}}
+             (list-owners user-mock
+                          {:action :list-owners
+                           :auth {:user-id (UUID/randomUUID)
+                                  :role-name "read-only"}
+                           :route-params {:crate-name "crate1"}})))
+      (assert/called-once-with? (:crate-owners (protocol/spies user-mock))
+                                user-mock
+                                "crate1")))
   (testing "invalid parameters"
     (is (thrown-with-msg?
          ExceptionInfo
