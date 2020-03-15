@@ -21,13 +21,15 @@
             [meuse.db.public.search :refer [search-db]]
             [meuse.db.public.token :refer [token-db]]
             [meuse.db.public.user :refer [user-db]]
-            [meuse.front.http :refer [front-api!]]
+            [meuse.front.http :refer [front-api! front-page!]]
+            [meuse.front.login :as login]
             [meuse.front.pages.category :as category-page]
             [meuse.front.pages.crates-category :as crates-category-page]
             [meuse.front.pages.crate :as crate-page]
             [meuse.front.pages.crates :as crates-page]
             [meuse.front.pages.index :as index-page]
             [meuse.front.pages.search :as search-page]
+            [meuse.front.pages.login :as login-page]
             [meuse.git :refer [git]]
             [meuse.mirror :refer [mirror-store]]))
 
@@ -147,9 +149,9 @@
 
 (defn inject-front-api!
   "Inject multimethods to handle HTTP requests for the front API"
-  []
+  [key-spec]
   (do
-    (defmethod front-api! :index
+    (defmethod front-page! :index
       [request]
       (index-page/index-page category-db
                              crate-db
@@ -157,35 +159,39 @@
                              user-db
                              request))
 
-    (defmethod front-api! :search
+    (defmethod front-page! :search
       [request]
       (search-page/page search-db
                         request))
 
-    (defmethod front-api! :crate
+    (defmethod front-page! :crate
       [request]
       (crate-page/page crate-db
                        request))
 
-    (defmethod front-api! :crates
+    (defmethod front-page! :crates
       [request]
       (crates-page/page crate-db
                         request))
 
-    (defmethod front-api! :categories
+    (defmethod front-page! :categories
       [request]
       (category-page/page category-db
                           request))
 
-    (defmethod front-api! :crates-category
+    (defmethod front-page! :crates-category
       [request]
       (crates-category-page/page crate-db
-                                 request))))
+                                 request))
+
+    (defmethod front-api! :login
+      [request]
+      (login/login! request user-db key-spec))))
 
 (defn inject!
-  [frontend-enabled?]
+  [frontend-enabled? key-spec]
   (inject-crate-api!)
   (inject-meuse-api!)
   (inject-mirror-api!)
   (when frontend-enabled?
-    (inject-front-api!)))
+    (inject-front-api! key-spec)))

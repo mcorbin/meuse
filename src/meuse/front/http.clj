@@ -1,5 +1,7 @@
 (ns meuse.front.http
   (:require [meuse.api.default :as default]
+            [meuse.front.base :as base-http]
+            [meuse.front.pages.login :as login-page]
             [ring.middleware.head :as head]
             [ring.util.codec :as codec]
             [ring.util.request :as request]
@@ -8,6 +10,9 @@
 
 (def front-routes
   {#"/?" {:get ::index}
+   #"/login/?" {:get ::loginpage}
+   #"/logout/?" {:post ::logout}
+   #"/login/?" {:post ::login}
    #"/search" {:get ::search}
    #"/categories" {:get ::categories}
    #"/crates" {:get ::crates}
@@ -18,9 +23,34 @@
   "Handle crates API calls"
   :action)
 
+(defmulti front-page!
+  "Handle crates calls for HTML pages"
+  :action)
+
+(defmethod front-page! :default
+  [request]
+  {:status 404
+   :headers {"Content-Type" "text/html; charset=utf-8"}
+   :body ["NOT FOUND"]})
+
 (defmethod front-api! :default
   [request]
-  [:p "NOT FOUND"])
+  {:status 200
+   :headers {"Content-Type" "text/html; charset=utf-8"}
+   :body (base-http/html (front-page! request))})
+
+(defmethod front-api! :logout
+  [request]
+  {:status 302
+   :headers {"Location" "/front/login"}
+   :cookies {"session-token" {:value "logout"
+                              :max-age 1}}})
+
+(defmethod front-api! :loginpage
+  [request]
+  {:status 200
+   :headers {"Content-Type" "text/html; charset=utf-8"}
+   :body (login-page/page request)})
 
 (defmethod front-api! :static
   [request]

@@ -1,7 +1,10 @@
 (ns meuse.auth.frontend
   (:require [clj-time.core :as time]
             [clj-time.coerce :as coerce]
-            [crypto.random :as random])
+            [crypto.random :as random]
+            [exoscale.ex :as ex]
+            [meuse.db.public.user :as db-user]
+            [meuse.error :as error])
   (:import java.util.Base64
            java.util.UUID
            javax.crypto.Cipher
@@ -10,7 +13,7 @@
 (def random-str-byte-size 15)
 (def uuid-size 36)
 (def timestamp-size 13)
-(def expired-hours 24)
+(def expired-hours 240)
 
 (defn secret-key-spec
   "Creates SecretKeySpec instance from a secret key."
@@ -53,3 +56,15 @@
                                                 (time/hours expired-hours))
                                     (time/now))
                      timestamp)))
+
+(defn valid-cookie?
+  [user-db key-spec request]
+  (if-let [token (get-in request [:cookies "session-token" :value])]
+    (let [decrypted (-> (decrypt token key-spec) extract-data)
+          user (db-user/by-id user-db (:user/id decrypted))]
+      (when-not user
+        (throw (error/ex-redirect-login "invalid token" {})))
+      (when (expired? decrypted)
+        (throw (error/ex-redirect-login "token has expired" {})))
+      true)
+    (throw (error/ex-redirect-login "invalid token" {}))))

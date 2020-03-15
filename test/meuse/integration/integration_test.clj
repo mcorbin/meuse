@@ -1016,3 +1016,40 @@
                    {:content-type :json
                     :headers {}
                     :throw-exceptions false})))))
+
+(deftest ^:integration front-api-integration-test
+  ;; create a token for an admin user
+  (let [token (token-db/create database {:user "user1"
+                                         :validity 10
+                                         :name "integration_token"})
+        _ (testing "creating user: success"
+            (test-http
+             {:status 200
+              :body (js {:ok true})}
+             (client/post (str meuse-url "/api/v1/meuse/user")
+                          {:headers {"Authorization" token}
+                           :content-type :json
+                           :body (js {:description "integration test user"
+                                      :password "azertyui"
+                                      :name "integration"
+                                      :active true
+                                      :role "tech"})
+                           :throw-exceptions false})))]
+    (testing "no auth needed for some pages"
+      (let [result (client/get (str meuse-url "/front/login")
+                               {})]
+        (is (= 200 (:status result)))
+        (is (.contains (:body result) "menu-username-input")))
+
+      (let [result (client/get (str meuse-url "/static/css/style.css")
+                               {})]
+        (is (= 200 (:status result)))
+        (is (.contains (:body result) ".crate-list-element")))
+      (let [result (client/post (str meuse-url "/front/logout")
+                                {})]
+        (is (= 302 (:status result)))))
+    (testing "auth failure: redirect"
+      (let [result (client/get (str meuse-url "/front/crates")
+                               {})]
+        (is (= 200 (:status result)))
+        (is (.contains (:body result) "menu-username-input"))))))

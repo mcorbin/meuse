@@ -11,5 +11,5 @@
   "Verifies is a password is valid."
   [password encrypted]
   (when-not (bcrypt/check password encrypted)
-    (throw (ex/ex-forbidden "invalid password")))
+    (throw (ex/ex-forbidden "invalid password" {})))
   true)

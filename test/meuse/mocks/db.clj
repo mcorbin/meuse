@@ -69,9 +69,10 @@
                   (get-token-user-role [this token] get-token-user-role))))
 
 (defn user-mock
-  [{:keys [by-name crate-owners create delete get-users update-user count-users]}]
+  [{:keys [by-name crate-owners create delete get-users update-user count-users by-id]}]
   (protocol/spy IUserDB
                 (reify IUserDB
+                  (by-id [this user-id] by-id)
                   (by-name [this user-name] by-name)
                   (crate-owners [this crate-name] crate-owners)
                   (create [this user] create)

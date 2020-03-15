@@ -9,9 +9,12 @@
             meuse.api.public.me
             meuse.api.public.metric
             [meuse.auth.request :as auth-request]
+            [meuse.auth.frontend :as auth-frontend]
             [meuse.db.public.token :refer [token-db]]
+            [meuse.db.public.user :refer [user-db]]
             [meuse.front.base :as base-http]
             [meuse.front.http :as front-http]
+            [meuse.front.login :as front-login]
             [meuse.metric :as metric]
             [meuse.request :as req]
             [bidi.bidi :refer [match-route*]]
@@ -36,7 +39,6 @@
    :enter
    (fn [{:keys [request] :as ctx}]
      (let [uri (:uri request)]
-       (clojure.tools.logging/info "uri is " uri)
        (assoc ctx :request (match-route* routes uri request))))})
 
 (def subsystem
@@ -58,9 +60,7 @@
 
 (defmethod route! :meuse.api.mirror.http
   [request]
-  (mirror-http/mirror-api!
-   ;;(auth-request/check-user token-db request)
-   request))
+  (mirror-http/mirror-api! request))
 
 (defmethod route! :meuse.api.public.http
   [request]
@@ -68,21 +68,13 @@
 
 (defmethod route! :meuse.api.meuse.http
   [request]
-  (let [request (if (meuse-http/skip-auth (:action request))
-                  request
-                  (auth-request/check-user token-db request))]
-    (meuse-http/meuse-api! (-> (req/convert-body-edn request)))))
+  (meuse-http/meuse-api! (-> (req/convert-body-edn request))))
 
 (defn front-route!
-  []
+  [{:keys [key-spec]}]
   (defmethod route! :meuse.front.http
     [request]
-    (if (= (:action request) :static)
-      ;; no need to format to html static resources
-      (front-http/front-api! request)
-      {:status 200
-       :headers {"Content-Type" "text/html; charset=utf-8"}
-       :body (base-http/html (front-http/front-api! request))})))
+    (front-http/front-api! request)))
 
 (defmethod route! :default
   [request]

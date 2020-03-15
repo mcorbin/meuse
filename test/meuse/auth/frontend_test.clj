@@ -31,3 +31,4 @@
                                        (time/hours 1))}))
   (is (not (expired? {:timestamp (time/minus (time/now)
                                              (time/hours (dec expired-hours)))}))))
+
