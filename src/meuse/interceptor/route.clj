@@ -9,12 +9,8 @@
             meuse.api.public.me
             meuse.api.public.metric
             [meuse.auth.request :as auth-request]
-            [meuse.auth.frontend :as auth-frontend]
             [meuse.db.public.token :refer [token-db]]
-            [meuse.db.public.user :refer [user-db]]
-            [meuse.front.base :as base-http]
             [meuse.front.http :as front-http]
-            [meuse.front.login :as front-login]
             [meuse.metric :as metric]
             [meuse.request :as req]
             [bidi.bidi :refer [match-route*]]

@@ -5,8 +5,7 @@
             [next.jdbc.prepare :as p]
             [next.jdbc.result-set :as rs]
             [clojure.string :as string])
-  (:import java.nio.charset.Charset
-           java.util.Date
+  (:import java.util.Date
            java.util.UUID
            java.sql.PreparedStatement
            java.sql.Timestamp

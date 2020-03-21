@@ -1,6 +1,6 @@
 (ns meuse.api.default
   (:require [meuse.metric :as metric]
-            [clojure.tools.logging :refer [info warn error]]))
+            [clojure.tools.logging :refer [info]]))
 
 (defn not-found
   [request]

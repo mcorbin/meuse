@@ -6,8 +6,7 @@
             [meuse.db.queries.crate-user :as crate-user-queries]
             [meuse.db.queries.crate-version :as crate-version-queries]
             [exoscale.ex :as ex]
-            [next.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]])
+            [next.jdbc :as jdbc])
   (:import java.util.UUID))
 
 (defn by-name

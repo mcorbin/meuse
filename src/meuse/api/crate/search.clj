@@ -1,10 +1,9 @@
 (ns meuse.api.crate.search
   "Search API"
   (:require [meuse.api.params :as params]
-            [meuse.auth.request :as auth-request]
             [meuse.db.public.search :as public-search]
             [meuse.semver :as semver]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.tools.logging :refer [info]]))
 
 (def default-nb-results "10")
 

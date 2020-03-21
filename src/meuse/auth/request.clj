@@ -4,7 +4,7 @@
             [meuse.db.public.token :as public-token]
             [exoscale.ex :as ex]
             [clojure.set :refer [rename-keys]]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.tools.logging :refer [info]]))
 
 ;; todo: clean
 (defn check-user

@@ -1,12 +1,11 @@
 (ns meuse.api.meuse.crate
   (:require [meuse.api.params :as params]
-            [meuse.auth.password :as auth-password]
             [meuse.auth.request :as auth-request]
             [meuse.db.public.category :as public-category]
             [meuse.db.public.crate :as public-crate]
             [meuse.crate :refer [check]]
             [clojure.set :as set]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.tools.logging :refer [info]]))
 
 (defn format-crate
   [[crate-id crate-versions]]

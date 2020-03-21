@@ -2,7 +2,7 @@
   (:require [meuse.db.public.category :as public-category]))
 
 (defn page
-  [category-db request]
+  [category-db _]
   (let [categories (public-category/get-categories category-db)
         count-crates (->> (public-category/count-crates category-db)
                           (map (fn [c] [(:crates_categories/category_id c)

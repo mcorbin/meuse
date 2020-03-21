@@ -4,8 +4,7 @@
             [meuse.message :refer [yanked?->msg]]
             [exoscale.ex :as ex]
             [next.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]])
-  (:import java.util.UUID))
+            [clojure.tools.logging :refer [info]]))
 
 (defn update-yank
   "Updates the `yanked` field in the database for a crate version."

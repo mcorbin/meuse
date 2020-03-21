@@ -2,7 +2,8 @@
   (:require [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
             [meuse.db.public.category :as public-category]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.set :as set]
+            [clojure.tools.logging :refer [info]]))
 
 (defn new-category
   [category-db request]
@@ -21,7 +22,7 @@
   (info "get categories")
   {:status 200
    :body {:categories (->> (public-category/get-categories category-db)
-                           (map #(clojure.set/rename-keys
+                           (map #(set/rename-keys
                                   % {:categories/id :id
                                      :categories/name :name
                                      :categories/description :description})))}})

@@ -29,7 +29,6 @@
             [meuse.front.pages.crates :as crates-page]
             [meuse.front.pages.index :as index-page]
             [meuse.front.pages.search :as search-page]
-            [meuse.front.pages.login :as login-page]
             [meuse.git :refer [git]]
             [meuse.mirror :refer [mirror-store]]))
 

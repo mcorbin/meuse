@@ -3,7 +3,7 @@
   (:require [meuse.db.queries.category :as queries]
             [exoscale.ex :as ex]
             [next.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.tools.logging :refer [info]]))
 
 (defn by-name
   "Takes a db transaction and a category name, and get this category

@@ -1,9 +1,7 @@
 (ns meuse.middleware
   "HTTP middlewares"
-  (:require [meuse.auth.header :as h]
-            [cheshire.core :as json]
-            [manifold.deferred :as d]
-            [clojure.tools.logging :refer [debug info error]]))
+  (:require [cheshire.core :as json]
+            [manifold.deferred :as d]))
 
 (defn wrap-json
   "converts the response body into json and set the content type as

@@ -3,7 +3,7 @@
             [meuse.auth.request :as auth-request]
             [meuse.db.public.user :as public-user]
             [exoscale.ex :as ex]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.tools.logging :refer [info]]))
 
 (defn new-user
   [user-db request]

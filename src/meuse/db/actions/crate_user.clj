@@ -1,13 +1,9 @@
 (ns meuse.db.actions.crate-user
   (:require [meuse.db.actions.crate :as crate]
-            [meuse.db.actions.role :as role]
             [meuse.db.actions.user :as user-db]
             [meuse.db.queries.crate-user :as crate-user-queries]
             [exoscale.ex :as ex]
-            [next.jdbc :as jdbc]
-            [clojure.set :as set]
-            [clojure.tools.logging :refer [debug info error]])
-  (:import java.util.UUID))
+            [next.jdbc :as jdbc]))
 
 (defn by-id
   "Get the crate/user relation for a crate and an user."

@@ -1,9 +1,6 @@
 (ns meuse.db.queries.crate
   (:require [honeysql.core :as sql]
-            [honeysql.helpers :as h])
-  (:import java.util.Date
-           java.util.UUID
-           java.sql.Timestamp))
+            [honeysql.helpers :as h]))
 
 (defn get-crate
   [where-clause]

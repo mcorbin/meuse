@@ -18,12 +18,11 @@
             [exoscale.interceptor :as interceptor]
             [less.awful.ssl :as less-ssl]
             [mount.core :refer [defstate]]
-            [clojure.tools.logging :refer [debug info error]])
+            [clojure.tools.logging :refer [debug]])
   (:import io.netty.handler.ssl.ClientAuth
            io.netty.handler.ssl.JdkSslContext
            java.io.Closeable
-           java.net.InetSocketAddress
-           java.util.UUID))
+           java.net.InetSocketAddress))
 
 (defn interceptor-handler
   [crate-config metadata-config token-db user-db key-spec]

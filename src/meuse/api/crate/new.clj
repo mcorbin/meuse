@@ -10,7 +10,7 @@
             [meuse.registry :as registry]
             [meuse.store.protocol :as store]
             [clojure.java.io :as io]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.tools.logging :refer [info]]))
 
 (defn new
   [crate-db git-object crate-file-store request]

@@ -5,10 +5,7 @@
             [meuse.db.queries.token :as token-queries]
             [exoscale.ex :as ex]
             [next.jdbc :as jdbc]
-            [clj-time.core :as t]
-            [crypto.password.bcrypt :as bcrypt]
-            [clojure.tools.logging :refer [debug info error]])
-  (:import java.util.UUID))
+            [crypto.password.bcrypt :as bcrypt]))
 
 (defn by-user-and-name
   "Get a token by name for an user."

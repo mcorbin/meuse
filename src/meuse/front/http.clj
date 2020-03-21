@@ -1,12 +1,10 @@
 (ns meuse.front.http
-  (:require [meuse.api.default :as default]
-            [meuse.front.base :as base-http]
+  (:require [meuse.front.base :as base-http]
             [meuse.front.pages.login :as login-page]
             [ring.middleware.head :as head]
             [ring.util.codec :as codec]
             [ring.util.request :as request]
-            [ring.util.response :as response]
-            [clojure.tools.logging :as log]))
+            [ring.util.response :as response]))
 
 (def front-routes
   {#"/?" {:get ::index}

@@ -1,11 +1,8 @@
 (ns meuse.api.crate.download
   (:require [meuse.api.params :as params]
-            [meuse.auth.request :as auth-request]
             [meuse.db.public.crate-version :as public-crate-version]
             [meuse.store.protocol :as store]
-            [clojure.java.io :as io]
-            [clojure.tools.logging :refer [debug info error]])
-  (:import java.io.File))
+            [clojure.tools.logging :refer [info]]))
 
 (defn download
   [crate-version-db crate-file-store request]

@@ -5,7 +5,7 @@
             [meuse.db.public.crate-user :as public-crate-user]
             [meuse.db.public.user :as public-user]
             [meuse.request :refer [convert-body-edn]]
-            [clojure.tools.logging :refer [debug info error]]
+            [clojure.tools.logging :refer [info]]
             [clojure.string :as string]))
 
 (defn add-owner

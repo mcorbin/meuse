@@ -1,7 +1,6 @@
 (ns meuse.front.pages.crates-category
   (:require [meuse.api.crate.search :as api-search]
-            [meuse.db.public.crate :as public-crate]
-            [clojure.string :as string]))
+            [meuse.db.public.crate :as public-crate]))
 
 (defn format-result
   [result]

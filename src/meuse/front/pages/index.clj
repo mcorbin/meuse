@@ -1,6 +1,5 @@
 (ns meuse.front.pages.index
-  (:require [meuse.db.public.category :as public-category]
-            [meuse.db.public.crate :as public-crate]
+  (:require [meuse.db.public.crate :as public-crate]
             [meuse.db.public.crate-version :as public-crate-version]
             [meuse.db.public.user :as public-user]))
 

@@ -5,8 +5,7 @@
             [mount.core :refer [defstate]]
             [unilog.config :refer [start-logging!]]
             [yummy.config :as yummy]
-            [clojure.java.io :as io]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.tools.logging :refer [debug error]]))
 
 (defn stop!
   "Stop the application."

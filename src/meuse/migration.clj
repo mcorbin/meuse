@@ -1,7 +1,6 @@
 (ns meuse.migration
   (:require [ragtime.core :as ragtime]
-            [ragtime.jdbc :as jdbc]
-            [clojure.tools.logging :as log]))
+            [ragtime.jdbc :as jdbc]))
 
 (def migrations-table "database_migrations")
 (def migrations-path "migrations")

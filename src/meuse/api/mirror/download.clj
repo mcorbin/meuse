@@ -1,12 +1,8 @@
 (ns meuse.api.mirror.download
-  (:require [meuse.api.crate.http :refer (crates-api!)]
-            [meuse.api.params :as params]
-            [meuse.auth.request :as auth-request]
+  (:require [meuse.api.params :as params]
             [meuse.mirror :as mirror]
             [meuse.store.protocol :as store]
-            [clojure.java.io :as io]
-            [clojure.tools.logging :refer [infof]])
-  (:import java.io.File))
+            [clojure.tools.logging :refer [infof]]))
 
 (defn download
   [mirror-store request]

@@ -1,7 +1,5 @@
 (ns meuse.api.public.http
-  (:require [meuse.api.default :as default]
-            [meuse.metric :as metric]
-            [clojure.tools.logging :refer [info warn error]]))
+  (:require [meuse.api.default :as default]))
 
 (defmulti public-api!
   "Handle meuse API calls"

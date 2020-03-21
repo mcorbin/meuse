@@ -5,12 +5,8 @@
             [meuse.db.actions.role :as role]
             [meuse.db.queries.crate-user :as crate-user-queries]
             [meuse.db.queries.user :as user-queries]
-            [meuse.message :refer [yanked?->msg]]
             [exoscale.ex :as ex]
-            [next.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]]
-            [clojure.set :as set])
-  (:import java.util.UUID))
+            [next.jdbc :as jdbc]))
 
 (defn check-active!
   "Takes an user from the database. Throws if the user is inactive."

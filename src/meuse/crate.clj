@@ -8,10 +8,7 @@
             [cheshire.core :as json]
             [digest :as digest]
             [exoscale.ex :as ex]
-            [clojure.java.io :as io]
-            [clojure.tools.logging :refer [debug info error]]
-            [clojure.set :as set]
-            [clojure.string :as string])
+            [clojure.set :as set])
   (:import java.util.Arrays))
 
 (defn check-size

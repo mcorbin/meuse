@@ -4,7 +4,6 @@
             [cheshire.core :as json]
             [exoscale.ex :as ex]
             [clojure.java.io :as io]
-            [clojure.tools.logging :refer [debug info error]]
             [clojure.string :as string]))
 
 (defn metadata-dir

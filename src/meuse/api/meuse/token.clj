@@ -5,7 +5,8 @@
             [meuse.db.public.token :as public-token]
             [meuse.db.public.user :as public-user]
             [exoscale.ex :as ex]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.set :as set]
+            [clojure.tools.logging :refer [info]]))
 
 (defn delete-token
   [token-db request]
@@ -30,7 +31,7 @@
 (defn create-token
   [user-db token-db request]
   (params/validate-params request ::create)
-  (let [{:keys [name user password] :as body} (:body request)]
+  (let [{:keys [name user password]} (:body request)]
     (if-let [db-user (public-user/by-name user-db user)]
       (do (when-not (:users/active db-user)
             (throw (ex-info "user is not active"
@@ -61,7 +62,7 @@
                                             :tokens/name
                                             :tokens/created_at
                                             :tokens/expired_at]))
-                      (map #(clojure.set/rename-keys
+                      (map #(set/rename-keys
                              %
                              {:tokens/id :id
                               :tokens/name :name

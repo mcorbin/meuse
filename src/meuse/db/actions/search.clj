@@ -2,8 +2,7 @@
   "Search crates in the database."
   (:require [meuse.db.queries.search :as search-queries]
             [next.jdbc :as jdbc]
-            [clojure.string :as string]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.string :as string]))
 
 (defn format-query-string
   "Takes a string, format it to be usable for search."

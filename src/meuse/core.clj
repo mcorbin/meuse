@@ -1,6 +1,5 @@
 (ns meuse.core
   (:require [meuse.auth.password :as password]
-            [meuse.http :as http]
             [mount.core :as mount]
             [signal.handler :refer [with-handler]]
             [clojure.tools.logging :refer [info error]])

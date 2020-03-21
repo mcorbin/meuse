@@ -2,11 +2,9 @@
   (:require [clj-time.core :as time]
             [clj-time.coerce :as coerce]
             [crypto.random :as random]
-            [exoscale.ex :as ex]
             [meuse.db.public.user :as db-user]
             [meuse.error :as error])
   (:import java.util.Base64
-           java.util.UUID
            javax.crypto.Cipher
            javax.crypto.spec.SecretKeySpec))
 

@@ -2,8 +2,7 @@
   (:require [clj-time.core :as t]
             [crypto.password.bcrypt :as bcrypt]
             [crypto.random :as random]
-            [exoscale.ex :as ex]
-            [clojure.tools.logging :refer [debug info error]])
+            [exoscale.ex :as ex])
   (:import org.joda.time.DateTime))
 
 (def token-byte-size 32)

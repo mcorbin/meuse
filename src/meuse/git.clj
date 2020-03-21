@@ -5,7 +5,7 @@
             [exoscale.ex :as ex]
             [mount.core :refer [defstate]]
             [clojure.java.shell :as shell]
-            [clojure.tools.logging :refer [debug info error]]
+            [clojure.tools.logging :refer [debug]]
             [clojure.string :as string]))
 
 (defprotocol Git

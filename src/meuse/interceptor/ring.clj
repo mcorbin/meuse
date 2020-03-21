@@ -1,9 +1,7 @@
 (ns meuse.interceptor.ring
-  (:require [ring.middleware.content-type :as content-type]
-            [ring.middleware.cookies :as cookies]
+  (:require [ring.middleware.cookies :as cookies]
             [ring.middleware.params :as params]
-            [ring.middleware.keyword-params :as keyword-params]
-            [ring.middleware.resource :as resource]))
+            [ring.middleware.keyword-params :as keyword-params]))
 
 (def keyword-params
   {:name ::keyword-params

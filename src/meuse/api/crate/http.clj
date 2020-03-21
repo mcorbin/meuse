@@ -1,6 +1,5 @@
 (ns meuse.api.crate.http
-  (:require [meuse.api.default :as default]
-            [clojure.tools.logging :refer [info debug error]]))
+  (:require [meuse.api.default :as default]))
 
 (def skip-auth
   "Skip token auth for these calls."

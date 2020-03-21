@@ -1,7 +1,6 @@
 (ns meuse.spec
   "Specs of the project"
   (:require [meuse.semver :as semver]
-            [spec-tools.swagger.core :as swagger]
             [clojure.java.io :as io]
             [clojure.spec.alpha :as s]))
 
@@ -128,7 +127,7 @@
 
 (defmethod crate-store :default
   [_]
-  (throw (ex-info "invalid crate store configuration")))
+  (throw (ex-info "invalid crate store configuration" {})))
 
 (s/def :crate/crate (s/multi-spec crate-store :store))
 

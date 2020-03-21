@@ -6,7 +6,7 @@
             [meuse.git :as git]
             [meuse.metadata :as metadata]
             [meuse.message :as msg]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.tools.logging :refer [info]]))
 
 (defn update-yank
   [crate-user-db crate-version-db git-object request yanked?]

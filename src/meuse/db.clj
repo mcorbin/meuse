@@ -3,10 +3,8 @@
   (:require [meuse.config :refer [config]]
             [meuse.metric :as metric]
             [meuse.migration :as migration]
-            [aleph.http :as http]
             [mount.core :refer [defstate]]
-            [next.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]])
+            [clojure.tools.logging :refer [debug info]])
   (:import com.zaxxer.hikari.HikariConfig
            com.zaxxer.hikari.HikariDataSource))
 

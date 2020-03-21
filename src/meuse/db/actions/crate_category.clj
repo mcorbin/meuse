@@ -2,8 +2,7 @@
   (:require [meuse.db.actions.category :as category]
             [meuse.db.queries.crate-category :as crate-category-queries]
             [exoscale.ex :as ex]
-            [next.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]]))
+            [next.jdbc :as jdbc]))
 
 (defn by-crate-and-category
   "Get the crate/category relation for a crate and a category."

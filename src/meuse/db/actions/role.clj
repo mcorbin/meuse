@@ -1,11 +1,8 @@
 (ns meuse.db.actions.role
   "Manage roles in the database"
   (:require [meuse.db.queries.role :as role-queries]
-            [meuse.message :refer [yanked?->msg]]
             [exoscale.ex :as ex]
-            [next.jdbc :as jdbc]
-            [clojure.tools.logging :refer [debug info error]])
-  (:import java.util.UUID))
+            [next.jdbc :as jdbc]))
 
 (def admin-role-name "admin")
 (def tech-role-name "tech")

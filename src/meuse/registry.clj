@@ -3,8 +3,7 @@
   (:require [meuse.path :as path]
             [cheshire.core :as json]
             [exoscale.ex :as ex]
-            [clojure.java.io :as io]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.java.io :as io]))
 
 (defn read-registry-config
   "Read the `config.json` file in the crate git registry.

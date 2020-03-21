@@ -3,7 +3,7 @@
   (:require [byte-streams :as bs]
             [cheshire.core :as json]
             [exoscale.ex :as ex]
-            [clojure.tools.logging :refer [debug info error]]))
+            [clojure.tools.logging :refer [error]]))
 
 (defn convert-body-edn
   "Takes a request, tries to convert the body in edn."
