@@ -1,5 +1,6 @@
 (ns meuse.helpers.fixtures
-  (:require [meuse.core :as core]
+  (:require [meuse.auth.frontend :as auth-frontend]
+            [meuse.core :as core]
             meuse.crate-file
             [meuse.db :refer [database]]
             meuse.db.public.category
@@ -24,6 +25,8 @@
 (def tmp-dir "test/resources/tmp/")
 (def system-started? (atom false))
 (def git-mock-state (atom []))
+(def default-key-spec (auth-frontend/secret-key-spec
+                       "uJo8QrRAANokteN_xVxpP75lc_A5Sw6t"))
 
 (defn tmp-fixture
   [f]
@@ -54,7 +57,7 @@
         mount/start)
     (reset! system-started? true))
   (reset! git-mock-state [])
-  (inject/inject! true))
+  (inject/inject! true default-key-spec))
 
 (defn system-fixture
   [f]
@@ -76,7 +79,7 @@
   (mount/start-with-states {#'meuse.git/git {:start #(GitMock. (atom []) (java.lang.Object.))}})
   (meuse.helpers.db/clean! database)
   (helpers/load-test-db! database)
-  (inject/inject! true)
+  (inject/inject! true default-key-spec)
   (f)
   (core/stop!)
   (Thread/sleep 2))

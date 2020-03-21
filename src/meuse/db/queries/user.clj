@@ -31,6 +31,10 @@
   [user-name]
   (get-user [:= :u.name user-name]))
 
+(defn by-id
+  [user-id]
+  (get-user [:= :u.id (UUID/fromString user-id)]))
+
 (defn create
   [user role-id]
   (-> (h/insert-into :users)

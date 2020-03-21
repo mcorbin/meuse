@@ -145,9 +145,22 @@
     {:status status
      :body {:errors [{:detail message}]}}))
 
+(defn ex-redirect-login
+  ([message] (ex-redirect-login message {}))
+  ([message data]
+   (throw (ex-info message (assoc data :type ::redirect-login)))))
+
 (defn handle-unexpected-error
   [request ^Exception e]
   (error (str (:id request)) e "http error")
   (metric/http-errors request 500)
   {:status 500
    :body {:errors [{:detail default-msg}]}})
+
+(defn redirect-login-error
+  [request ^Exception e]
+  (error (str (:id request)) e "authentication error")
+  (metric/http-errors request 302)
+  {:status 302
+   :headers {"Location" "/front/login"}
+   :body {:errors [{:detail (.getMessage e)}]}})

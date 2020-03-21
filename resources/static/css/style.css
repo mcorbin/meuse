@@ -104,6 +104,12 @@ footer {
 
 /* index Menu */
 
+#logout {
+         display:inline;
+         margin:0px;
+         padding:0px;
+}
+
 #menu {
     background-image: linear-gradient(to right, #336600, #59b300);
     padding: 5px 0 10px 0;
@@ -341,7 +347,7 @@ a:not(.btn):focus {
     :root {
         font-size: 95%;
     }
-    
+
     #menu #title {
         font-size: 33px;
         padding: 3px 0 0 15px;

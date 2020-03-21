@@ -5,6 +5,7 @@
 
 (defprotocol IUserDB
   (by-name [this user-name])
+  (by-id [this user-id])
   (crate-owners [this crate-name])
   (create [this user])
   (delete [this user-name])
@@ -16,6 +17,8 @@
   IUserDB
   (by-name [this user-name]
     (user/by-name database user-name))
+  (by-id [this user-id]
+    (user/by-id database user-id))
   (crate-owners [this crate-name]
     (user/crate-owners database crate-name))
   (create [this user]

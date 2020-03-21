@@ -25,6 +25,12 @@
   (-> (jdbc/execute! database (user-queries/by-name user-name))
       first))
 
+(defn by-id
+  "Get an user by id."
+  [database user-id]
+  (-> (jdbc/execute! database (user-queries/by-id user-id))
+      first))
+
 (defn create
   "Crates an user."
   [database user]

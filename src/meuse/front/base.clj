@@ -32,7 +32,14 @@
     [:div {:id "menu-links"}
      [:span {:class "menu-element"} [:a {:href "/front/crates"} "All Crates"]]
      [:span {:class "menu-element"} "·"]
-     [:span {:class "menu-element"} [:a {:href "/front/categories"} "Categories"]]]]])
+     [:span {:class "menu-element"} [:a {:href "/front/categories"} "Categories"]]
+     [:span {:class "menu-element"} "·"]
+     [:span {:class "menu-element"} [:form {:id "logout"
+                                            :action "/front/logout"
+                                            :method "post"}
+                                     [:a {:href "javascript:{}"
+                                          :onclick "document.getElementById('logout').submit(); return false;"}
+                                      "Logout"]]]]]])
 
 (def footer
   [:footer {:class "container"}
