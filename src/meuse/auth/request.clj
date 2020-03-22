@@ -2,9 +2,9 @@
   (:require [meuse.auth.header :as header]
             [meuse.auth.token :as auth-token]
             [meuse.db.public.token :as public-token]
+            [meuse.log :as log]
             [exoscale.ex :as ex]
-            [clojure.set :refer [rename-keys]]
-            [clojure.tools.logging :refer [info]]))
+            [clojure.set :refer [rename-keys]]))
 
 ;; todo: clean
 (defn check-user
@@ -16,7 +16,7 @@
       (if (:users/active db-token)
         (if (auth-token/valid? token db-token)
           (do
-            (info "user" (:users/name db-token) "authenticated")
+            (log/info (log/req-ctx request) "user" (:users/name db-token) "authenticated")
             (assoc request
                    :auth
                    (-> (select-keys db-token [:roles/name

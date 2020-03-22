@@ -4,9 +4,9 @@
             [meuse.db.public.crate-user :as public-crate-user]
             [meuse.db.public.crate-version :as public-crate-version]
             [meuse.git :as git]
+            [meuse.log :as log]
             [meuse.metadata :as metadata]
-            [meuse.message :as msg]
-            [clojure.tools.logging :refer [info]]))
+            [meuse.message :as msg]))
 
 (defn update-yank
   [crate-user-db crate-version-db git-object request yanked?]
@@ -16,7 +16,9 @@
       (public-crate-user/owned-by? crate-user-db
                                    crate-name
                                    (auth-request/user-id request)))
-    (info (msg/yanked?->msg yanked?) "crate" crate-name "version" crate-version)
+    (log/info
+     (log/req-ctx request)
+     (msg/yanked?->msg yanked?) "crate" crate-name "version" crate-version)
     (public-crate-version/update-yank crate-version-db
                                       crate-name
                                       crate-version yanked?)

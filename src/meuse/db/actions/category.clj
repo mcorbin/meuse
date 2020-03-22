@@ -2,8 +2,7 @@
   "Manage categories in the database"
   (:require [meuse.db.queries.category :as queries]
             [exoscale.ex :as ex]
-            [next.jdbc :as jdbc]
-            [clojure.tools.logging :refer [info]]))
+            [next.jdbc :as jdbc]))
 
 (defn by-name
   "Takes a db transaction and a category name, and get this category
@@ -16,9 +15,8 @@
   "Takes a database and a category name, and creates this category
   if it does not already exists."
   [database category-name description]
-  (info "create category" category-name)
   (jdbc/with-transaction [db-tx database]
-    (if-let [category (by-name db-tx category-name)]
+    (if (by-name db-tx category-name)
       (throw (ex/ex-incorrect (format "the category %s already exists"
                                       category-name)))
       (jdbc/execute! db-tx (queries/create category-name description)))))

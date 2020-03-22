@@ -1,15 +1,15 @@
 (ns meuse.db.actions.crate-version
   (:require [meuse.db.actions.crate :as crate-db]
             [meuse.db.queries.crate-version :as crate-version-queries]
+            [meuse.log :as log]
             [meuse.message :refer [yanked?->msg]]
             [exoscale.ex :as ex]
-            [next.jdbc :as jdbc]
-            [clojure.tools.logging :refer [info]]))
+            [next.jdbc :as jdbc]))
 
 (defn update-yank
   "Updates the `yanked` field in the database for a crate version."
   [database crate-name crate-version yanked?]
-  (info (yanked?->msg yanked?) "crate" crate-name crate-version)
+  (log/info {} (yanked?->msg yanked?) "crate" crate-name crate-version)
   (jdbc/with-transaction [db-tx database]
     (if-let [crate (crate-db/by-name-and-version db-tx crate-name crate-version)]
       (do

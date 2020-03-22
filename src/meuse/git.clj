@@ -1,11 +1,11 @@
 (ns meuse.git
   "Interacts with a git repository"
   (:require [meuse.config :refer [config]]
+            [meuse.log :as log]
             [meuse.metric :as metric]
             [exoscale.ex :as ex]
             [mount.core :refer [defstate]]
             [clojure.java.shell :as shell]
-            [clojure.tools.logging :refer [debug]]
             [clojure.string :as string]))
 
 (defprotocol Git
@@ -25,12 +25,12 @@
   (get-lock [this]
     lock)
   (git-cmd [this args]
-    (debug "git command" (string/join " " args))
+    (log/debug {} "git command" (string/join " " args))
     (metric/with-time :git.local ["command" (first args)]
       (let [result (apply shell/sh "git" "-C" path args)]
-        (debug "git command status code=" (:exit result)
-               "out=" (:out result)
-               "err=" (:err result))
+        (log/debug {} "git command status code=" (:exit result)
+                   "out=" (:out result)
+                   "err=" (:err result))
         (when-not (= 0 (:exit result))
           (throw (ex/ex-fault "error executing git command"
                               {:exit-code (:exit result)

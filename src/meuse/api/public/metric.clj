@@ -3,6 +3,6 @@
             [meuse.metric :as metric]))
 
 (defmethod public-api! :metrics
-  [request]
+  [_]
   {:status 200
    :body (.getBytes (.scrape metric/registry))})

@@ -1,9 +1,9 @@
 (ns meuse.api.public.healthz
   (:require [meuse.api.public.http :refer [public-api!]]))
 
-(def healthz-msg "Maizey is running.")
+(def healthz-msg "Meuse is running.")
 
 (defmethod public-api! :healthz
-  [request]
+  [_]
   {:status 200
    :body healthz-msg})

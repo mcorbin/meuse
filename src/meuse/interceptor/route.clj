@@ -11,10 +11,10 @@
             [meuse.auth.request :as auth-request]
             [meuse.db.public.token :refer [token-db]]
             [meuse.front.http :as front-http]
+            [meuse.log :as log]
             [meuse.metric :as metric]
             [meuse.request :as req]
-            [bidi.bidi :refer [match-route*]]
-            [clojure.tools.logging :as log]))
+            [bidi.bidi :refer [match-route*]]))
 
 (def routes
   ["/"
@@ -80,7 +80,8 @@
   {:name ::route
    :enter
    (fn [{:keys [request] :as ctx}]
-     (log/debug "request" (str (:id request))
+     (log/debug {}
+                "request" (str (:id request))
                 "uri" (:uri request)
                 "method" (:request-method request))
      (metric/with-time :http.requests ["uri" (:uri request)

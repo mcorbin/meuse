@@ -2,11 +2,11 @@
   "The store for the crates.io mirror."
   (:require [meuse.config :as config]
             [meuse.crate-file :refer [->CrateStore]]
+            [meuse.log :as log]
             [meuse.store.protocol :as store]
             [aleph.http :as http]
             [byte-streams :as bs]
-            [mount.core :refer [defstate]]
-            [clojure.tools.logging :refer [infof]]))
+            [mount.core :refer [defstate]]))
 
 (defstate mirror-store
   :start
@@ -27,7 +27,7 @@
   "Download a crate file, save it in the crate mirror store, and return the
   file content."
   [mirror-store crate-name version]
-  (infof "mirror: cache crate %s %s" crate-name version)
+  (log/infof {} "mirror: cache crate %s %s" crate-name version)
   (let [crate-file (download-crate crate-name version)]
     (store/write-file mirror-store
                       {:name crate-name

@@ -13,12 +13,12 @@
             [meuse.interceptor.ring :as itc-ring]
             [meuse.interceptor.response :as itc-response]
             [meuse.interceptor.route :as itc-route]
+            [meuse.log :as log]
             [aleph.http :as http]
             [aleph.netty :as netty]
             [exoscale.interceptor :as interceptor]
             [less.awful.ssl :as less-ssl]
-            [mount.core :refer [defstate]]
-            [clojure.tools.logging :refer [debug]])
+            [mount.core :refer [defstate]])
   (:import io.netty.handler.ssl.ClientAuth
            io.netty.handler.ssl.JdkSslContext
            java.io.Closeable
@@ -50,7 +50,7 @@
    frontend
    token-db
    user-db]
-  (debug "starting http server")
+  (log/debug {} "starting http server")
   (let [ssl-context (when (:cacert http-config)
                       (JdkSslContext. (less-ssl/ssl-context (:key http-config)
                                                             (:cert http-config)
@@ -81,10 +81,10 @@
                        (:frontend config)
                        token-db/token-db
                        user-db/user-db)
-  :stop (do (debug "stopping http server")
+  :stop (do (log/debug {} "stopping http server")
             (.close ^Closeable http-server)
             (Thread/sleep 4)
             (netty/wait-for-close http-server)
             (Thread/sleep 2)
-            (debug "http server stopped")))
+            (log/debug {} "http server stopped")))
 

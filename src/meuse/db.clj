@@ -1,10 +1,10 @@
 (ns meuse.db
   "The database component"
   (:require [meuse.config :refer [config]]
+            [meuse.log :as log]
             [meuse.metric :as metric]
             [meuse.migration :as migration]
-            [mount.core :refer [defstate]]
-            [clojure.tools.logging :refer [debug info]])
+            [mount.core :refer [defstate]])
   (:import com.zaxxer.hikari.HikariConfig
            com.zaxxer.hikari.HikariDataSource))
 
@@ -13,7 +13,7 @@
 
 (defn pool
   [{:keys [user password host port name max-pool-size key cert cacert ssl-password ssl-mode]}]
-  (debug "starting database connection pool")
+  (log/debug {} "starting database connection pool")
   (let [url (format "jdbc:postgresql://%s:%d/%s"
                     host port name)
         config (doto (HikariConfig.)
@@ -23,7 +23,7 @@
                  (.addDataSourceProperty "password" password)
                  (.setMaximumPoolSize (or max-pool-size default-pool-size)))]
     (when key
-      (info "ssl enabled for the database")
+      (log/info {} "ssl enabled for the database")
       (.addDataSourceProperty config "ssl" true)
       (.addDataSourceProperty config
                               "sslfactory"
@@ -39,6 +39,6 @@
   :start (let [db-pool (pool (:database config))]
            (migration/migrate! db-pool)
            db-pool)
-  :stop (do (debug "stopping db pool")
+  :stop (do (log/debug {} "stopping db pool")
             (.close ^HikariDataSource (:datasource database))
-            (debug "db pool stopped")))
+            (log/debug {} "db pool stopped")))

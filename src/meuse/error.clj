@@ -1,10 +1,10 @@
 (ns meuse.error
-  (:require [meuse.metric :as metric]
+  (:require [meuse.log :as log]
+            [meuse.metric :as metric]
             meuse.spec
             [cheshire.core :as json]
             [exoscale.ex :as ex]
-            [clojure.spec.alpha :as s]
-            [clojure.tools.logging :refer [error]]))
+            [clojure.spec.alpha :as s]))
 
 (def default-msg
   "Internal error. Please checks the logs.")
@@ -136,11 +136,12 @@
         status (if (= (:subsystem request) :meuse.api.crate.http)
                  200
                  (get ex-type->status (:type data) 500))]
-    (error (str (:id request))
-           e
-           "http error"
-           (pr-str data)
-           status)
+    (log/error (merge (log/req-ctx request)
+                      data)
+               (str (:id request))
+               e
+               "http error"
+               status)
     (metric/http-errors request status)
     {:status status
      :body {:errors [{:detail message}]}}))
@@ -152,14 +153,18 @@
 
 (defn handle-unexpected-error
   [request ^Exception e]
-  (error (str (:id request)) e "http error")
+  (log/error (merge (log/req-ctx request)
+                    (ex-data e))
+             e "http error")
   (metric/http-errors request 500)
   {:status 500
    :body {:errors [{:detail default-msg}]}})
 
 (defn redirect-login-error
   [request ^Exception e]
-  (error (str (:id request)) e "authentication error")
+  (log/error (merge (log/req-ctx request)
+                (ex-data e))
+         e "authentication error")
   (metric/http-errors request 302)
   {:status 302
    :headers {"Location" "/front/login"}

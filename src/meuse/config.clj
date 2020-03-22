@@ -1,11 +1,11 @@
 (ns meuse.config
   "Load the project configuration."
-  (:require [meuse.spec :as spec]
+  (:require [meuse.log :as log]
+            [meuse.spec :as spec]
             [environ.core :refer [env]]
             [mount.core :refer [defstate]]
             [unilog.config :refer [start-logging!]]
-            [yummy.config :as yummy]
-            [clojure.tools.logging :refer [debug error]]))
+            [yummy.config :as yummy]))
 
 (defn stop!
   "Stop the application."
@@ -26,10 +26,10 @@
                                         "\n"
                                         "config path = "
                                         path)]
-                     (error e error-msg)
+                     (log/error {} e error-msg)
                      (stop!)))})]
     (start-logging! (:logging config))
-    (debug "config loaded, logger started !")
+    (log/info {} "config loaded, logger started !")
     config))
 
 (defstate config

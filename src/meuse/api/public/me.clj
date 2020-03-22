@@ -4,6 +4,6 @@
 (def me-msg "Please consult the documentation to find how to generate a token. https://meuse.mcorbin.fr/")
 
 (defmethod public-api! :me
-  [request]
+  [_]
   {:status 200
    :body me-msg})
