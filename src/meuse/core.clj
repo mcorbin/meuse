@@ -1,6 +1,7 @@
 (ns meuse.core
   (:require [meuse.auth.password :as password]
             [mount.core :as mount]
+            meuse.http
             [meuse.log :as log]
             [signal.handler :refer [with-handler]])
   (:gen-class))
