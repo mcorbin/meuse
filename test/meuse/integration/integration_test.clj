@@ -960,7 +960,7 @@
                                             {:content-type :json
                                              :throw-exceptions false})]
       (is (= 200 status))
-      (is (.contains body "http_requests_seconds_max")))))
+      (is (.contains body "jvm_buffer_memory_used_bytes")))))
 
 (deftest ^:integration mirror-api-integration-test
   ;; create a token for an admin user

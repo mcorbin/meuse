@@ -8,8 +8,6 @@
             meuse.api.public.healthz
             meuse.api.public.me
             meuse.api.public.metric
-            [meuse.auth.request :as auth-request]
-            [meuse.db.public.token :refer [token-db]]
             [meuse.front.http :as front-http]
             [meuse.log :as log]
             [meuse.metric :as metric]
@@ -47,16 +45,22 @@
 
 (defmulti route! :subsystem)
 
+(defn https-tags
+  [request]
+  ["uri" (:uri request)
+   "method" (-> request
+                :request-method
+                name)])
+
 (defmethod route! :meuse.api.crate.http
   [request]
-  (let [request (if (crate-http/skip-auth (:action request))
-                  request
-                  (auth-request/check-user token-db request))]
+  (metric/with-time :http.requests (https-tags request)
     (crate-http/crates-api! request)))
 
 (defmethod route! :meuse.api.mirror.http
   [request]
-  (mirror-http/mirror-api! request))
+  (metric/with-time :http.requests (https-tags request)
+    (mirror-http/mirror-api! request)))
 
 (defmethod route! :meuse.api.public.http
   [request]
@@ -64,7 +68,8 @@
 
 (defmethod route! :meuse.api.meuse.http
   [request]
-  (meuse-http/meuse-api! (-> (req/convert-body-edn request))))
+  (metric/with-time :http.requests (https-tags request)
+    (meuse-http/meuse-api! (-> (req/convert-body-edn request)))))
 
 (defn front-route!
   [_]
@@ -84,8 +89,4 @@
                 "request" (str (:id request))
                 "uri" (:uri request)
                 "method" (:request-method request))
-     (metric/with-time :http.requests ["uri" (:uri request)
-                                       "method" (-> request
-                                                    :request-method
-                                                    name)]
-       (assoc ctx :response (route! request))))})
+     (assoc ctx :response (route! request)))})
