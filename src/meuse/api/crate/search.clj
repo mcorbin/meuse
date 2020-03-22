@@ -2,8 +2,9 @@
   "Search API"
   (:require [meuse.api.params :as params]
             [meuse.db.public.search :as public-search]
+            [meuse.log :as log]
             [meuse.semver :as semver]
-            [clojure.tools.logging :refer [info]]))
+            [clojure.set :as set]))
 
 (def default-nb-results "10")
 
@@ -18,9 +19,9 @@
 (defn format-version
   "Updates and selects a crate version for the Cargo API."
   [version]
-  (-> (clojure.set/rename-keys version {:crates/name :name
-                                        :crates_versions/version :max_version
-                                        :crates_versions/description :description})
+  (-> (set/rename-keys version {:crates/name :name
+                                :crates_versions/version :max_version
+                                :crates_versions/description :description})
       (select-keys [:name :max_version :description])
       (update :description #(if % % ""))))
 
@@ -41,7 +42,8 @@
                            format-search-result
                            (take (Integer/parseInt
                                   (or nb-results default-nb-results))))]
-    (info "search crates with query" query)
+    (log/info (log/req-ctx request)
+              "search crates with query" query)
     {:status 200
      :body {:crates search-result
             :meta {:total (count search-result)}}}))

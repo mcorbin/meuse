@@ -5,12 +5,12 @@
             [meuse.crate :as crate]
             [meuse.db.public.crate :as public-crate]
             [meuse.git :as git]
+            [meuse.log :as log]
             [meuse.metadata :as metadata]
             [meuse.message :as msg]
             [meuse.registry :as registry]
             [meuse.store.protocol :as store]
-            [clojure.java.io :as io]
-            [clojure.tools.logging :refer [info]]))
+            [clojure.java.io :as io]))
 
 (defn new
   [crate-db git-object crate-file-store request]
@@ -24,8 +24,8 @@
                                 (get-in request
                                         [:registry-config
                                          :allowed-registries]))
-    (info "publishing crate" (:name raw-metadata)
-          "version" (:vers raw-metadata))
+    (log/info (log/req-ctx request) "publishing crate" (:name raw-metadata)
+              "version" (:vers raw-metadata))
     ;; create the crate in the db
     (locking (git/get-lock git-object)
       (public-crate/create crate-db

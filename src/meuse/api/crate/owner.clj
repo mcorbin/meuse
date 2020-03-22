@@ -4,8 +4,8 @@
             [meuse.auth.request :as auth-request]
             [meuse.db.public.crate-user :as public-crate-user]
             [meuse.db.public.user :as public-user]
+            [meuse.log :as log]
             [meuse.request :refer [convert-body-edn]]
-            [clojure.tools.logging :refer [info]]
             [clojure.string :as string]))
 
 (defn add-owner
@@ -19,7 +19,8 @@
       (public-crate-user/owned-by? crate-user-db
                                    crate-name
                                    (auth-request/user-id request)))
-    (info "add owners" (string/join ", " users) "to crate" crate-name)
+    (log/info (log/req-ctx request)
+              "add owners" (string/join ", " users) "to crate" crate-name)
     (public-crate-user/create-crate-users crate-user-db
                                           crate-name
                                           users)
@@ -40,7 +41,8 @@
       (public-crate-user/owned-by? crate-user-db
                                    crate-name
                                    (auth-request/user-id request)))
-    (info "remove owners" (string/join ", " users) "to crate" crate-name)
+    (log/info (log/req-ctx request)
+              "remove owners" (string/join ", " users) "to crate" crate-name)
     (public-crate-user/delete-crate-users crate-user-db
                                           crate-name
                                           users)
@@ -59,7 +61,8 @@
         users (public-user/crate-owners
                user-db
                crate-name)]
-    (info "list owners for crate" crate-name)
+    (log/info (log/req-ctx request)
+              "list owners for crate" crate-name)
     {:status 200
      :body {:users (map
                     (fn [u]

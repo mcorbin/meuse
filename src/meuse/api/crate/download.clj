@@ -1,8 +1,8 @@
 (ns meuse.api.crate.download
   (:require [meuse.api.params :as params]
             [meuse.db.public.crate-version :as public-crate-version]
-            [meuse.store.protocol :as store]
-            [clojure.tools.logging :refer [info]]))
+            [meuse.log :as log]
+            [meuse.store.protocol :as store]))
 
 (defn download
   [crate-version-db crate-file-store request]
@@ -12,9 +12,10 @@
         bin-file (store/get-file crate-file-store
                                  crate-name
                                  crate-version)]
-    (info (format "serving crate file for crate %s version %s"
-                  crate-name
-                  crate-version))
+    (log/info (log/req-ctx request)
+              (format "serving crate file for crate %s version %s"
+                      crate-name
+                      crate-version))
     (public-crate-version/inc-download crate-version-db crate-name crate-version)
     {:status 200
      :body bin-file}))
