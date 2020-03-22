@@ -4,9 +4,9 @@
             [meuse.auth.request :as auth-request]
             [meuse.db.public.token :as public-token]
             [meuse.db.public.user :as public-user]
+            [meuse.log :as log]
             [exoscale.ex :as ex]
-            [clojure.set :as set]
-            [clojure.tools.logging :refer [info]]))
+            [clojure.set :as set]))
 
 (defn delete-token
   [token-db request]
@@ -21,7 +21,7 @@
       (throw (ex/ex-forbidden
               (format "user %s cannot delete token for %s" auth-user-name user-name))))
     (auth-request/check-authenticated request)
-    (info (format "deleting token %s for user %s" token-name user-name))
+    (log/info (log/req-ctx request) (format "deleting token %s for user %s" token-name user-name))
     (public-token/delete token-db
                          user-name
                          token-name)
@@ -37,9 +37,10 @@
             (throw (ex-info "user is not active"
                             {:type :exoscale.ex/forbidden})))
           (auth-password/check password (:users/password db-user))
-          (info (format "creating token %s for user %s"
-                        name
-                        user))
+          (log/info (log/req-ctx request)
+                    (format "creating token %s for user %s"
+                            name
+                            user))
           {:status 200
            :body {:token (public-token/create token-db
                                               (select-keys
@@ -55,7 +56,7 @@
     (if request-user
       (auth-request/check-admin request)
       (auth-request/check-authenticated request))
-    (info "list tokens")
+    (log/info (log/req-ctx request) "list tokens")
     (let [user-name (or request-user (get-in request [:auth :user-name]))
           tokens (->> (public-token/by-user token-db user-name)
                       (map #(select-keys % [:tokens/id

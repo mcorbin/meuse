@@ -2,14 +2,14 @@
   (:require [meuse.api.params :as params]
             [meuse.auth.request :as auth-request]
             [meuse.db.public.user :as public-user]
-            [exoscale.ex :as ex]
-            [clojure.tools.logging :refer [info]]))
+            [meuse.log :as log]
+            [exoscale.ex :as ex]))
 
 (defn new-user
   [user-db request]
   (params/validate-params request ::new)
   (auth-request/check-admin request)
-  (info "create user" (get-in request [:body :name]))
+  (log/info (log/req-ctx request) "create user" (get-in request [:body :name]))
   (public-user/create user-db
                       (:body request))
   {:status 200
@@ -19,7 +19,7 @@
   [user-db request]
   (params/validate-params request ::delete)
   (auth-request/check-admin request)
-  (info "delete user" (get-in request [:route-params :name]))
+  (log/info (log/req-ctx request) "delete user" (get-in request [:route-params :name]))
   (public-user/delete user-db
                       (get-in request [:route-params :name]))
   {:status 200
@@ -41,7 +41,7 @@
                (not= (auth-request/user-name request)
                      user-name))
       (throw (ex/ex-forbidden "bad permissions")))
-    (info "update user" user-name)
+    (log/info (log/req-ctx request) "update user" user-name)
     (public-user/update-user user-db
                              user-name
                              fields)
@@ -51,7 +51,7 @@
 (defn list-users
   [user-db request]
   (auth-request/check-admin request)
-  (info "list users")
+  (log/info (log/req-ctx request) "list users")
   {:status 200
    :body {:users (->> (public-user/get-users user-db)
                       (map #(clojure.set/rename-keys
