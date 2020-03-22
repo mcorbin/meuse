@@ -27,7 +27,6 @@
                  [honeysql "0.9.8"]
                  [io.micrometer/micrometer-registry-prometheus "1.4.0"]
                  [less-awful-ssl "1.0.6"]
-                 [metosin/spec-tools "0.10.1"]
                  [mount "0.1.16"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/java.jdbc "0.7.11"]

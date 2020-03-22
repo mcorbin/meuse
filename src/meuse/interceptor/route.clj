@@ -67,7 +67,7 @@
   (meuse-http/meuse-api! (-> (req/convert-body-edn request))))
 
 (defn front-route!
-  [{:keys [key-spec]}]
+  [_]
   (defmethod route! :meuse.front.http
     [request]
     (front-http/front-api! request)))
