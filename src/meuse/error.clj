@@ -138,7 +138,6 @@
                  (get ex-type->status (:type data) 500))]
     (log/error (merge (log/req-ctx request)
                       data)
-               (str (:id request))
                e
                "http error"
                status)
