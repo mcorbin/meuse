@@ -35,30 +35,24 @@
   []
   (instance? MeterRegistry registry))
 
-(defn get-sample!
-  "creates a sample"
-  []
-  (when (started?)
-    (Timer/start registry)))
-
-(defn stop-sample!
-  "takes a sample, its name and a list of tags.
-  Stop the sample."
-  [sample n tags]
-  (when (started?)
-    (.stop sample
-           (.timer registry
-                   (name n)
-                   (into-array tags)))))
+(defn get-timer!
+  "get a timer by name and tags"
+  [n tags]
+  (.register (doto (Timer/builder (name n))
+               (.publishPercentiles (double-array [0.5 0.75 0.98 0.99]))
+               (.tags (into-array tags)))
+             registry))
 
 (defmacro with-time
   [n tags & body]
   `(if (started?)
-     (let [sample# (get-sample!)]
+     (let [timer# (get-timer! ~n ~tags)
+           current# (java.time.Instant/now)]
        (try
          (do ~@body)
          (finally
-           (stop-sample! sample# ~n ~tags))))
+           (let [end# (java.time.Instant/now)]
+             (.record timer# (java.time.Duration/between current# end#))))))
      (do ~@body)))
 
 (defn increment!
