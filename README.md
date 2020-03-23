@@ -16,6 +16,7 @@ Documentation is available at https://meuse.mcorbin.fr/
 - [x] Manage crates.
 - [x] Security: HTTPS support, TLS support for the PostgreSQL client.
 - [x] Monitoring: Meuse exposes a Prometheus endpoint with various metrics (HTTP server, database pool, JVM metrics...).
+- [x] Small frontend to explore crates.
 
 ## Plan
 
