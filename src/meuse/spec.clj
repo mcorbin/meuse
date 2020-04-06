@@ -142,8 +142,15 @@
 (def frontend-secret-min-size 20)
 (s/def :frontend/secret (s/and string? #(> (count %) frontend-secret-min-size)))
 
-(s/def :frontend/frontend (s/keys :req-un [:frontend/enabled
-                                           :frontend/secret]))
+(defmulti frontend :public)
+(defmethod frontend true [_]
+  (s/keys :req-un [:frontend/enabled]))
+(defmethod frontend :default [_]
+  (s/keys :req-un [:frontend/enabled
+                   :frontend/secret]))
+
+(s/def :frontend/frontend
+   (s/multi-spec frontend :public))
 
 (s/def ::config (s/keys :req-un [:http/http
                                  :db/database

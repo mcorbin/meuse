@@ -40,5 +40,6 @@
            (migration/migrate! db-pool)
            db-pool)
   :stop (do (log/debug {} "stopping db pool")
-            (.close ^HikariDataSource (:datasource database))
+            (when (:datasource database)
+              (.close ^HikariDataSource (:datasource database)))
             (log/debug {} "db pool stopped")))

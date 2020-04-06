@@ -21,6 +21,7 @@
             [meuse.db.public.search :refer [search-db]]
             [meuse.db.public.token :refer [token-db]]
             [meuse.db.public.user :refer [user-db]]
+            [meuse.front.base :as base-http]
             [meuse.front.http :refer [front-api! front-page!]]
             [meuse.front.login :as login]
             [meuse.front.pages.category :as category-page]
@@ -148,7 +149,7 @@
 
 (defn inject-front-api!
   "Inject multimethods to handle HTTP requests for the front API"
-  [key-spec]
+  [key-spec public-frontend]
   (do
     (defmethod front-page! :index
       [request]
@@ -183,14 +184,21 @@
       (crates-category-page/page crate-db
                                  request))
 
-    (defmethod front-api! :login
+    (defmethod front-api! :default
       [request]
-      (login/login! request user-db key-spec))))
+      {:status 200
+       :headers {"Content-Type" "text/html; charset=utf-8"}
+       :body (base-http/html (front-page! request) public-frontend)})
+
+    (when-not public-frontend
+      (defmethod front-api! :login
+        [request]
+        (login/login! request user-db key-spec)))))
 
 (defn inject!
-  [frontend-enabled? key-spec]
+  [frontend-enabled? key-spec public-frontend]
   (inject-crate-api!)
   (inject-meuse-api!)
   (inject-mirror-api!)
   (when frontend-enabled?
-    (inject-front-api! key-spec)))
+    (inject-front-api! key-spec public-frontend)))

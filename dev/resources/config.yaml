@@ -24,3 +24,4 @@ crate:
 frontend:
   enabled: true
   secret: uJo8QrRAANokteN_xVxpP75lc_A5Sw6t
+  public: false

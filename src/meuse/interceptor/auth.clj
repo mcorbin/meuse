@@ -29,21 +29,25 @@
 (def front-actions-no-cookie #{:loginpage :login :static :logout})
 
 (defmethod check-auth! :meuse.front.http
-  [request {:keys [token-db user-db key-spec]}]
+  [request {:keys [_ user-db key-spec public-frontend]}]
   (cond
     (front-actions-no-cookie (:action request))
     request
 
     :else
-    (do (auth-frontend/valid-cookie? user-db key-spec request)
+    (do (when-not public-frontend
+          ;; users can disable frontend authentication through the
+          ;; public flag in the frontend configuration
+          (auth-frontend/valid-cookie? user-db key-spec request))
         request)))
 
 (defn auth-request
-  [token-db user-db key-spec]
+  [token-db user-db key-spec public-frontend]
   {:name ::auth-request
    :enter
    (fn [{:keys [request] :as ctx}]
      (assoc ctx :request (check-auth! request
                                       {:token-db token-db
                                        :user-db user-db
-                                       :key-spec key-spec})))})
+                                       :key-spec key-spec
+                                       :public-frontend public-frontend})))})

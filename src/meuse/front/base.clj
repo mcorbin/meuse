@@ -14,7 +14,8 @@
    (page/include-css "/static/css/bootstrap.min.css")
    (page/include-css "/static/css/style.css")])
 
-(def menu
+(defn menu
+  [public-frontend]
   [:div {:id "menu"}
    [:div {:class "row"}
 
@@ -33,13 +34,15 @@
      [:span {:class "menu-element"} [:a {:href "/front/crates"} "All Crates"]]
      [:span {:class "menu-element"} "·"]
      [:span {:class "menu-element"} [:a {:href "/front/categories"} "Categories"]]
-     [:span {:class "menu-element"} "·"]
-     [:span {:class "menu-element"} [:form {:id "logout"
-                                            :action "/front/logout"
-                                            :method "post"}
-                                     [:a {:href "javascript:{}"
-                                          :onclick "document.getElementById('logout').submit(); return false;"}
-                                      "Logout"]]]]]])
+     (when-not public-frontend
+       [:span {:class "menu-element"} "·"]
+       [:span {:class "menu-element"}
+        [:form {:id "logout"
+                :action "/front/logout"
+                :method "post"}
+         [:a {:href "javascript:{}"
+              :onclick "document.getElementById('logout').submit(); return false;"}
+          "Logout"]]])]]])
 
 (def footer
   [:footer {:class "container"}
@@ -49,13 +52,13 @@
     "Made by " [:a {:href "https://mcorbin.fr"} "mcorbin"]]])
 
 (defn html
-  [body]
+  [body public-frontend]
   (page/html5
    {:lang "en"}
    head
    [:body
     [:div {:id "content"}
-     menu
+     (menu public-frontend)
      [:div {:id "core"}
       body]
      footer]

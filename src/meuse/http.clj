@@ -25,7 +25,7 @@
            java.net.InetSocketAddress))
 
 (defn interceptor-handler
-  [crate-config metadata-config token-db user-db key-spec]
+  [crate-config metadata-config token-db user-db key-spec public-frontend]
   (let [interceptors
         [itc-response/response ;;leave
          itc-json/json ;; leave
@@ -37,7 +37,7 @@
          (itc-config/config crate-config metadata-config) ;;enter
          itc-route/match-route ;; enter
          itc-route/subsystem  ;; enter
-         (itc-auth/auth-request token-db user-db key-spec)  ;; enter
+         (itc-auth/auth-request token-db user-db key-spec public-frontend)  ;; enter
          itc-route/route ;; enter
          ]]
     (fn handler [request]
@@ -62,16 +62,21 @@
                                          ^String (:address http-config)
                                          ^Integer (:port http-config))}
                  ssl-context (assoc :ssl-context ssl-context))
-        front-config (assoc frontend :key-spec (auth-frontend/secret-key-spec
-                                                (:secret frontend)))]
-    (inject/inject! (:enabled frontend) (:key-spec front-config))
+        key-spec (when-not (:public frontend)
+                   (auth-frontend/secret-key-spec
+                    (:secret frontend)))
+        front-config (assoc frontend :key-spec key-spec)]
+    (inject/inject! (:enabled frontend)
+                    (:key-spec front-config)
+                    (:public front-config))
     (when (:enabled frontend)
       (itc-route/front-route! front-config))
     (http/start-server (interceptor-handler crate-config
                                             metadata-config
                                             token-db
                                             user-db
-                                            (:key-spec front-config))
+                                            (:key-spec front-config)
+                                            (:public front-config))
                        config)))
 
 (defstate http-server
