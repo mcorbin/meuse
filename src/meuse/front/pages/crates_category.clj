@@ -23,7 +23,7 @@
           "Last version: " [:span {:class "bold"} (:crates_versions/version crate)]]
          [:p (:crates_versions/description crate)]
          [:a {:href (str "/front/crates/" (:crates/name crate))}
-          "More informations"]]
+          "More information"]]
         [:div {:class "col-5"}
          [:p [:span {:class "bold"} (:crates_versions/download_count crate)]
           " downloads"

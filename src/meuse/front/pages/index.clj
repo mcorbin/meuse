@@ -52,7 +52,7 @@
      [:p "You can interact with it using "
       [:a {:href "https://github.com/rust-lang/cargo"} "Cargo"] ", "
       "but it also provides an API to manage things like users, tokens, crates, categories..."]
-     [:p "You can check the documentation to have more informations about "
+     [:p "You can check the documentation to have more information about "
       "this project."]]
     [:div {:class "col-12 col-md-5"}
      [:span {:class "stat-num"} (:count

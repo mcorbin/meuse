@@ -56,6 +56,6 @@
          "ID: " [:span {:class "bold"} (:crates/id crate)]
          [:p (:crates_versions/description crate)]
          [:a {:href (str "/front/crates/" (:crates/name crate))}
-          "More informations"]]
+          "More information"]]
         [:div {:class "col-5"}
          [:p [:span {:class "stat-num"} (:count crate)] " Releases"]]])]))
