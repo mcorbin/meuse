@@ -9,8 +9,8 @@ Documentation is available at https://meuse.mcorbin.fr/
 ## Features
 
 - [x] Complete implementation of the alternative registries RFC (including search).
-- [x] crates.io mirroring (beta)
-- [x] Multiple backends for crates files: filesystem, S3 (beta)
+- [x] crates.io mirroring.
+- [x] Multiple backends for crates files: filesystem, S3.
 - [x] Manage categories.
 - [x] Manage users, roles, and tokens.
 - [x] Manage crates.
