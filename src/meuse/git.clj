@@ -12,35 +12,36 @@
   (add [this])
   (commit [this msg-header msg-body])
   (get-lock [this])
-  (git-cmd [this args])
   (pull [this])
   (push [this]))
+
+(defn git-cmd
+  [path args]
+  (log/debug {} "git command" (string/join " " args))
+  (metric/with-time :git.local ["command" (first args)]
+    (let [result (apply shell/sh "git" "-C" path args)]
+      (log/debug {} "git command status code=" (:exit result)
+                 "out=" (:out result)
+                 "err=" (:err result))
+      (when-not (= 0 (:exit result))
+        (throw (ex/ex-fault "error executing git command"
+                            {:exit-code (:exit result)
+                             :stdout (:out result)
+                             :stderr (:err result)
+                             :command args}))))))
 
 (defrecord LocalRepository [path target lock]
   Git
   (add [this]
-    (git-cmd this ["add" "."]))
+    (git-cmd path ["add" "."]))
   (commit [this msg-header msg-body]
-    (git-cmd this ["commit" "-m" msg-header "-m" msg-body]))
+    (git-cmd path ["commit" "-m" msg-header "-m" msg-body]))
   (get-lock [this]
     lock)
-  (git-cmd [this args]
-    (log/debug {} "git command" (string/join " " args))
-    (metric/with-time :git.local ["command" (first args)]
-      (let [result (apply shell/sh "git" "-C" path args)]
-        (log/debug {} "git command status code=" (:exit result)
-                   "out=" (:out result)
-                   "err=" (:err result))
-        (when-not (= 0 (:exit result))
-          (throw (ex/ex-fault "error executing git command"
-                              {:exit-code (:exit result)
-                               :stdout (:out result)
-                               :stderr (:err result)
-                               :command args}))))))
   (push [this]
-    (git-cmd this (concat ["push"] (string/split target #"/"))))
+    (git-cmd path (concat ["push"] (string/split target #"/"))))
   (pull [this]
-    (git-cmd this ["pull" target])))
+    (git-cmd path ["pull" target])))
 
 (defstate git
   :start (map->LocalRepository (merge (:metadata config)

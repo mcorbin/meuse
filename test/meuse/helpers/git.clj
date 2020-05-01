@@ -10,9 +10,6 @@
                        :args [msg-header msg-body]}))
   (get-lock [this]
     lock)
-  (git-cmd [this args]
-    (swap! state conj {:cmd "git-cmd"
-                       :args [args]}))
   (push [this]
     (swap! state conj {:cmd "push"}))
   (pull [this]

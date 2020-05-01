@@ -18,10 +18,6 @@
                             #"error executing git command"
                             (add git))))
     (with-redefs [clojure.java.shell/sh (spy/spy (spy/stub {:exit 0}))]
-      (git-cmd git ["foo" "bar"])
-      (assert/called-once-with? clojure.java.shell/sh
-                                "git" "-C" tmp-dir "foo" "bar"))
-    (with-redefs [clojure.java.shell/sh (spy/spy (spy/stub {:exit 0}))]
       (commit git "msg header" "msg-body")
       (assert/called-once-with? clojure.java.shell/sh
                                 "git" "-C" tmp-dir "commit"
