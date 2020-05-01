@@ -32,6 +32,7 @@
                  [org.clojure/java.jdbc "0.7.11"]
                  [seancorfield/next.jdbc "1.0.409"]
                  [org.clojure/tools.logging "1.0.0"]
+                 [org.eclipse.jgit/org.eclipse.jgit "5.7.0.202003110725-r"]
                  [org.postgresql/postgresql "42.2.11"]
                  [ragtime "0.8.0"]
                  [ring/ring-core "1.8.0"]

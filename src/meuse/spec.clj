@@ -98,12 +98,36 @@
                                    :http/cert
                                    :http/cacert]))
 
+(defmulti metadata :type)
+
 (s/def :metadata/path ::directory)
 (s/def :metadata/target ::non-empty-string)
 (s/def :metadata/url ::non-empty-string)
-(s/def :metadata/metadata (s/keys :req-un [:metadata/path
-                                           :metadata/target
-                                           :metadata/url]))
+
+(defmethod metadata "shell"
+  [_]
+  (s/keys :req-un [:metadata/path
+                   :metadata/target
+                   :metadata/url]))
+
+(s/def :metadata/username ::non-empty-string)
+(s/def :metadata/password ::non-empty-string)
+
+(defmethod metadata "jgit"
+  [_]
+  (s/keys :req-un [:metadata/path
+                   :metadata/target
+                   :metadata/url
+                   :metadata/username
+                   :metadata/password]))
+
+(defmethod metadata :default
+  [_]
+  (s/keys :req-un [:metadata/path
+                   :metadata/target
+                   :metadata/url]))
+
+(s/def :metadata/metadata (s/multi-spec metadata :type))
 
 (s/def :crate/path ::directory)
 
