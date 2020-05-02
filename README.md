@@ -1,8 +1,10 @@
 # Meuse
 
-A free crate registry.
+A free crate registry for the Rust programming language.
 
 It implements the [alternative registries](https://github.com/rust-lang/rfcs/blob/master/text/2141-alternative-registries.md) RFC and offers also various features (cf the `Features` section).
+
+You can use Meuse to store your private crates, configure it to mirror crates.io...
 
 Documentation is available at https://meuse.mcorbin.fr/
 
