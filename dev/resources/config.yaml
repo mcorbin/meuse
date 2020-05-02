@@ -14,7 +14,9 @@ logging:
     com.zaxxer.hikari.pool.HikariPool: info
     org.apache.http: error
     io.netty.buffer.PoolThreadCache: error
+    org.eclipse.jgit.internal.storage.file.FileSnapshot: info
 metadata:
+  type: "shell"
   path: "/home/mathieu/prog/rust/testregistry"
   target: "origin/master"
   url: "https://github.com/mcorbin/testregistry"

@@ -1,8 +1,8 @@
 (ns meuse.helpers.git
-  (:require [meuse.git :refer [Git]]))
+  (:require [meuse.git :refer [IGit]]))
 
 (defrecord GitMock [state lock]
-  Git
+  IGit
   (add [this]
     (swap! state conj {:cmd "add"}))
   (commit [this msg-header msg-body]
