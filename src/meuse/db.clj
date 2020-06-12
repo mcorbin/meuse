@@ -12,7 +12,7 @@
 (def default-ssl-mode "verify-full")
 
 (defn pool
-  [{:keys [user password host port name max-pool-size key cert cacert ssl-password ssl-mode]}]
+  [{:keys [user password host port name max-pool-size key cert cacert ssl-password ssl-mode schema]}]
   (log/debug {} "starting database connection pool")
   (let [url (format "jdbc:postgresql://%s:%d/%s"
                     host port name)
@@ -22,6 +22,8 @@
                  (.addDataSourceProperty "user" user)
                  (.addDataSourceProperty "password" password)
                  (.setMaximumPoolSize (or max-pool-size default-pool-size)))]
+    (when schema
+        (.addDataSourceProperty config "currentSchema" schema))
     (when key
       (log/info {} "ssl enabled for the database")
       (.addDataSourceProperty config "ssl" true)
