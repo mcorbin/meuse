@@ -67,6 +67,7 @@
 (s/def :db/cert ::file)
 (s/def :db/cacert ::file)
 (s/def :db/ssl-mode ::non-empty-string)
+(s/def :db/schema ::non-empty-string)
 
 (s/def :db/database (s/keys :req-un [:db/user
                                      :db/password
@@ -77,7 +78,8 @@
                                      :db/key
                                      :db/cert
                                      :db/cacert
-                                     :db/ssl-mode]))
+                                     :db/ssl-mode
+                                     :db/schema]))
 
 (s/def :http/port ::pos-int)
 (s/def :http/address ::non-empty-string)
