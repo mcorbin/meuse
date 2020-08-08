@@ -14,15 +14,10 @@
             [meuse.interceptor.response :as itc-response]
             [meuse.interceptor.route :as itc-route]
             [meuse.log :as log]
-            [aleph.http :as http]
-            [aleph.netty :as netty]
             [exoscale.interceptor :as interceptor]
             [less.awful.ssl :as less-ssl]
-            [mount.core :refer [defstate]])
-  (:import io.netty.handler.ssl.ClientAuth
-           io.netty.handler.ssl.JdkSslContext
-           java.io.Closeable
-           java.net.InetSocketAddress))
+            [mount.core :refer [defstate]]
+            [ring.adapter.jetty :as jetty]))
 
 (defn interceptor-handler
   [crate-config metadata-config token-db user-db key-spec public-frontend]
@@ -52,16 +47,18 @@
    user-db]
   (log/debug {} "starting http server")
   (let [ssl-context (when (:cacert http-config)
-                      (JdkSslContext. (less-ssl/ssl-context (:key http-config)
-                                                            (:cert http-config)
-                                                            (:cacert http-config))
-                                      false
-                                      ClientAuth/REQUIRE))
-        config (cond-> {:epoll true
-                        :socket-address (InetSocketAddress.
-                                         ^String (:address http-config)
-                                         ^Integer (:port http-config))}
-                 ssl-context (assoc :ssl-context ssl-context))
+                      (less-ssl/ssl-context (:key http-config)
+                                            (:cert http-config)
+                                            (:cacert http-config)))
+        config (cond-> {:join? false
+                        :host (:address http-config)}
+                 (not ssl-context) (assoc :port (:port http-config))
+                 ssl-context
+                 (assoc :ssl? true
+                        :http? false
+                        :ssl-port (:port http-config)
+                        :ssl-context ssl-context
+                        :client-auth :none))
         key-spec (when-not (:public frontend)
                    (auth-frontend/secret-key-spec
                     (:secret frontend)))
@@ -71,13 +68,13 @@
                     (:public front-config))
     (when (:enabled frontend)
       (itc-route/front-route! front-config))
-    (http/start-server (interceptor-handler crate-config
-                                            metadata-config
-                                            token-db
-                                            user-db
-                                            (:key-spec front-config)
-                                            (:public front-config))
-                       config)))
+    (jetty/run-jetty (interceptor-handler crate-config
+                                          metadata-config
+                                          token-db
+                                          user-db
+                                          (:key-spec front-config)
+                                          (:public front-config))
+                     config)))
 
 (defstate http-server
   :start (start-server (:http config)
@@ -87,9 +84,6 @@
                        token-db/token-db
                        user-db/user-db)
   :stop (do (log/debug {} "stopping http server")
-            (.close ^Closeable http-server)
-            (Thread/sleep 4)
-            (netty/wait-for-close http-server)
-            (Thread/sleep 2)
+            (.stop http-server)
             (log/debug {} "http server stopped")))
 
