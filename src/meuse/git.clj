@@ -55,30 +55,34 @@
                                ^CredentialsProvider credentials]
   IGit
   (add [this]
-    (doto (.add git)
-      (.addFilepattern ".")
-      (.call)))
+    (metric/with-time :git.jgit ["command" "add"]
+      (doto (.add git)
+        (.addFilepattern ".")
+        (.call))))
   (commit [this msg-header msg-body]
-    (doto (.commit git)
-      (.setMessage (str msg-header "\n\n" msg-body))
-      (.call)))
+    (metric/with-time :git.jgit ["command" "commit"]
+      (doto (.commit git)
+        (.setMessage (str msg-header "\n\n" msg-body))
+        (.call))))
   (get-lock [this]
     lock)
   (pull [this]
-    (let [[remote branch] (string/split target #"/")]
-      (doto (.pull git)
-        (.setCredentialsProvider credentials)
-        (.setRemote remote)
-        (.setRemoteBranchName branch)
-        (.call))))
+    (metric/with-time :git.jgit ["command" "pull"]
+      (let [[remote branch] (string/split target #"/")]
+        (doto (.pull git)
+          (.setCredentialsProvider credentials)
+          (.setRemote remote)
+          (.setRemoteBranchName branch)
+          (.call)))))
   (push [this]
-    (let [[remote branch] (string/split target #"/")
-          ref-spec (RefSpec. branch)]
-      (doto (.push git)
-        (.setCredentialsProvider credentials)
-        (.setRemote remote)
-        (.setRefSpecs (into-array [ref-spec]))
-        (.call)))))
+    (metric/with-time :git.jgit ["command" "push"]
+      (let [[remote branch] (string/split target #"/")
+            ref-spec (RefSpec. branch)]
+        (doto (.push git)
+          (.setCredentialsProvider credentials)
+          (.setRemote remote)
+          (.setRefSpecs (into-array [ref-spec]))
+          (.call))))))
 
 (defn build-jgit
   [config]
