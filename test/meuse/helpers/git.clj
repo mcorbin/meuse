@@ -13,4 +13,8 @@
   (push [this]
     (swap! state conj {:cmd "push"}))
   (pull [this]
-    (swap! state conj {:cmd "pull"})))
+    (swap! state conj {:cmd "pull"}))
+  (reset-hard [this]
+    (swap! state conj {:cmd "reset"}))
+  (clean [this]
+    (swap! state conj {:cmd "clean"})))

@@ -9,7 +9,7 @@
             [clojure.java.shell :as shell]
             [clojure.string :as string])
   (:import (org.eclipse.jgit.api Git)
-           (org.eclipse.jgit.storage.file FileRepositoryBuilder)
+           (org.eclipse.jgit.api ResetCommand$ResetType)
            (org.eclipse.jgit.transport CredentialsProvider
                                        RefSpec
                                        UsernamePasswordCredentialsProvider)))
@@ -19,6 +19,8 @@
   (commit [this msg-header msg-body])
   (get-lock [this])
   (pull [this])
+  (reset-hard [this])
+  (clean [this])
   (push [this]))
 
 (defn git-cmd
@@ -30,7 +32,10 @@
                  "out=" (:out result)
                  "err=" (:err result))
       (when-not (= 0 (:exit result))
-        (throw (ex/ex-fault "error executing git command"
+        (throw (ex/ex-fault (format "error executing git command %s: %s %s"
+                                    (first args)
+                                    (:out result)
+                                    (:err result))
                             {:exit-code (:exit result)
                              :stdout (:out result)
                              :stderr (:err result)
@@ -46,8 +51,12 @@
     lock)
   (push [this]
     (git-cmd path (concat ["push"] (string/split target #"/"))))
+  (reset-hard [this]
+    (git-cmd path (concat ["reset"] (string/split target #"/"))))
+  (clean [this]
+    (git-cmd path ["clean" "-f" "-d"]))
   (pull [this]
-    (git-cmd path ["pull" target])))
+    (git-cmd path (concat ["pull"] (string/split target #"/")))))
 
 (defrecord JGitFileRepository [target
                                lock
@@ -74,6 +83,16 @@
           (.setRemote remote)
           (.setRemoteBranchName branch)
           (.call)))))
+  (reset-hard [this]
+    (metric/with-time :git.jgit ["command" "reset"]
+      (doto (.reset git)
+        (.setMode ResetCommand$ResetType/HARD)
+        (.call))))
+  (clean [this]
+    (metric/with-time :git.jgit ["command" "clean"]
+      (doto (.clean git)
+        (.setCleanDirectories true)
+        (.call))))
   (push [this]
     (metric/with-time :git.jgit ["command" "push"]
       (let [[remote branch] (string/split target #"/")

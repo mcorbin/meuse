@@ -11,26 +11,26 @@
   [database crate-name crate-version yanked?]
   (log/info {} (yanked?->msg yanked?) "crate" crate-name crate-version)
   (jdbc/with-transaction [db-tx database]
-    (if-let [crate (crate-db/by-name-and-version db-tx crate-name crate-version)]
-      (do
-        (when-not (:crates_versions/version crate)
-          (throw
-           (ex/ex-not-found
-            (format "cannot %s the crate: the version does not exist"
-                    (yanked?->msg yanked?))
-            {:crate-name crate-name
-             :crate-version crate-version})))
-        (when (= yanked? (:crates_versions/yanked crate))
-          (throw
-           (ex/ex-incorrect
-            (format "cannot %s the crate: crate state is already %s"
-                    (yanked?->msg yanked?)
-                    (yanked?->msg yanked?))
-            {:crate-name crate-name
-             :crate-version crate-version})))
-        (jdbc/execute! db-tx (crate-version-queries/update-yanked
-                              (:crates_versions/id crate)
-                              yanked?)))
+    (if (crate-db/by-name db-tx crate-name)
+      (if-let [crate-version (crate-db/by-name-and-version db-tx crate-name crate-version)]
+        (do
+          (when (= yanked? (:crates_versions/yanked crate-version))
+            (throw
+             (ex/ex-incorrect
+              (format "cannot %s the crate: crate state is already %s"
+                      (yanked?->msg yanked?)
+                      (yanked?->msg yanked?))
+              {:crate-name crate-name
+               :crate-version crate-version})))
+          (jdbc/execute! db-tx (crate-version-queries/update-yanked
+                                (:crates_versions/id crate-version)
+                                yanked?)))
+        (throw
+             (ex/ex-not-found
+              (format "cannot %s the crate: the version does not exist"
+                      (yanked?->msg yanked?))
+              {:crate-name crate-name
+               :crate-version crate-version})))
       (throw (ex/ex-not-found (format "cannot %s the crate: the crate does not exist"
                                       (yanked?->msg yanked?))
                               {:crate-name crate-name
@@ -67,3 +67,10 @@
   "Returns crate versions which has been the most downloaded."
   [database n]
   (jdbc/execute! database (crate-version-queries/top-n-downloads n)))
+
+(defn delete
+  "Deletes a crate version in the database."
+  [database crate-name version]
+  (jdbc/with-transaction [db-tx database]
+    (when-let [crate-version (crate-db/by-name-and-version db-tx crate-name version)]
+      (jdbc/execute! db-tx (crate-version-queries/delete (:crates_versions/id crate-version))))))

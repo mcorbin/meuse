@@ -75,4 +75,8 @@
                       (:name raw-metadata)
                       (:vers raw-metadata)
                       crate-file
-                      prefix)))
+                      prefix))
+  (delete-file [this crate-name version]
+    (s3/delete-object credentials
+                      :bucket-name bucket
+                      :key (file-key crate-name version prefix))))

@@ -9,7 +9,8 @@
   (last-updated [this n])
   (top-n-downloads [this n])
   (update-yank [this crate-name crate-version yanked?])
-  (sum-download-count [this]))
+  (sum-download-count [this])
+  (delete [this crate-name version]))
 
 (defrecord CrateVersionDB [database]
   ICrateVersionDB
@@ -24,7 +25,9 @@
   (update-yank [this crate-name crate-version yanked?]
     (crate-version/update-yank database crate-name crate-version yanked?))
   (sum-download-count [this]
-    (crate-version/sum-download-count database)))
+    (crate-version/sum-download-count database))
+  (delete [this crate-name version]
+    (crate-version/delete database crate-name version)))
 
 (defstate crate-version-db
   :start (CrateVersionDB. database))

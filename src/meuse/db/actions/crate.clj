@@ -42,8 +42,8 @@
   [database category-name]
   (jdbc/with-transaction [db-tx database]
     (if-let [category (category-db/by-name db-tx category-name)]
-      (->> (jdbc/execute! database (crate-queries/get-crates-for-category
-                                    (:categories/id category))))
+      (->> (jdbc/execute! db-tx (crate-queries/get-crates-for-category
+                                 (:categories/id category))))
       (throw (ex/ex-not-found
               (format "the category %s does not exist" category-name))))))
 
@@ -51,42 +51,44 @@
   "Creates a crate in the database."
   [database metadata user-id]
   (jdbc/with-transaction [db-tx database]
-    (if-let [crate (by-name-and-version db-tx
-                                        (:name metadata)
-                                        (:vers metadata))]
-      ;; the crate exists, let's check the version
-      (do
-        (when (:crates_versions/version crate)
-          (throw (ex/ex-incorrect (format "release %s for crate %s already exists"
-                                          (:vers metadata)
-                                          (:name metadata)))))
-        ;; the user should own the crate
-        (when-not (-> (jdbc/execute! db-tx (crate-user-queries/by-crate-and-user
-                                            (:crates/id crate)
-                                            user-id))
-                      first)
-          (throw (ex/ex-forbidden "the user does not own the crate")))
-        ;; insert the new version
-        (jdbc/execute! db-tx (crate-version-queries/create
-                              metadata
-                              (:crates/id crate)))
-        (crate-category/create-categories db-tx
-                                          (:crates/id crate)
-                                          (:categories metadata)))
-      ;; the crate does not exist
-      (let [crate-id (UUID/randomUUID)
-            created-crate (crate-queries/create metadata crate-id)
-            created-version (crate-version-queries/create metadata
-                                                          crate-id)]
-        (jdbc/execute! db-tx created-crate)
-        (jdbc/execute! db-tx created-version)
-        (crate-category/create-categories db-tx
-                                          crate-id
-                                          (:categories metadata))
-        ;; the user should own the crate
-        (jdbc/execute! db-tx (crate-user-queries/create
-                              crate-id
-                              user-id))))))
+    (let [crate (by-name db-tx (:name metadata))
+          crate-version (by-name-and-version db-tx
+                                             (:name metadata)
+                                             (:vers metadata))]
+      (if crate
+          ;; the crate exists, let's check the version
+          (do
+            (when crate-version
+              (throw (ex/ex-incorrect (format "release %s for crate %s already exists"
+                                              (:vers metadata)
+                                              (:name metadata)))))
+            ;; the user should own the crate
+            (when-not (-> (jdbc/execute! db-tx (crate-user-queries/by-crate-and-user
+                                                (:crates/id crate)
+                                                user-id))
+                          first)
+              (throw (ex/ex-forbidden "the user does not own the crate")))
+            ;; insert the new version
+            (jdbc/execute! db-tx (crate-version-queries/create
+                                  metadata
+                                  (:crates/id crate)))
+            (crate-category/create-categories db-tx
+                                              (:crates/id crate)
+                                              (:categories metadata)))
+        ;; the crate does not exist
+        (let [crate-id (UUID/randomUUID)
+              created-crate (crate-queries/create metadata crate-id)
+              created-version (crate-version-queries/create metadata
+                                                            crate-id)]
+          (jdbc/execute! db-tx created-crate)
+          (jdbc/execute! db-tx created-version)
+          (crate-category/create-categories db-tx
+                                            crate-id
+                                            (:categories metadata))
+          ;; the user should own the crate
+          (jdbc/execute! db-tx (crate-user-queries/create
+                                crate-id
+                                user-id)))))))
 
 (defn get-crates-range
   "Get crates with the number of versions per crates. The crates will start

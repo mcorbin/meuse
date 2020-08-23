@@ -58,4 +58,9 @@
   (versions [this crate-name]
     (filesystem-versions base-path crate-name))
   (write-file [this raw-metadata crate-file]
-    (write base-path raw-metadata crate-file)))
+    (write base-path raw-metadata crate-file))
+  (delete-file [this crate-name version]
+    (io/delete-file (crate-file-path base-path
+                                     crate-name
+                                     version)
+                    true)))

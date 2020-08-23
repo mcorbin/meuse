@@ -33,6 +33,12 @@
                           #"the version does not exist$"
                           (update-yank database "crate1" "0.1.4" false)))))
 
+(deftest delete-test
+  (testing "success"
+    (is (crate-db/by-name-and-version database "crate1" "1.1.0"))
+    (delete database "crate1" "1.1.0")
+    (is (nil? (crate-db/by-name-and-version database "crate1" "1.1.0")))))
+
 (deftest last-updated-test
   (let [crates (last-updated database 1)]
     (is (= 1 (count crates)))
