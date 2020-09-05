@@ -1,5 +1,6 @@
 (ns meuse.front.http
   (:require [meuse.front.pages.login :as login-page]
+            [ring.middleware.content-type :as ct]
             [ring.middleware.head :as head]
             [ring.util.codec :as codec]
             [ring.util.request :as request]
@@ -48,4 +49,5 @@
   (when (#{:head :get} (:request-method request))
     (let [path (subs (codec/url-decode (request/path-info request)) 1)]
       (-> (response/resource-response path {})
+          (ct/content-type-response request)
           (head/head-response request)))))
