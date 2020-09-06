@@ -168,12 +168,14 @@
             db-token-2 (first (filter #(= (:name %) "token2") tokens))]
         (is (uuid? (:id db-token-1)))
         (is (inst? (:created-at db-token-1)))
+        (is (nil? (:last-used-at db-token-1)))
         (is (inst? (:expired-at db-token-1)))
-        (is (= 4 (count (keys db-token-1))))
+        (is (= 5 (count (keys db-token-1))))
         (is (uuid? (:id db-token-2)))
         (is (inst? (:created-at db-token-2)))
+        (is (nil? (:last-used-at db-token-2)))
         (is (inst? (:expired-at db-token-2)))
-        (is (= 4 (count (keys db-token-2))))))
+        (is (= 5 (count (keys db-token-2))))))
     (testing "admin user can retrieve tokens for another user"
       (is (= 2 (count tokens)))
       (let [db-token-1 (first (filter #(= (:name %) "token1") tokens-admin))
@@ -181,11 +183,19 @@
         (is (uuid? (:id db-token-1)))
         (is (inst? (:created-at db-token-1)))
         (is (inst? (:expired-at db-token-1)))
-        (is (= 4 (count (keys db-token-1))))
+        (is (= 5 (count (keys db-token-1))))
         (is (uuid? (:id db-token-2)))
         (is (inst? (:created-at db-token-2)))
         (is (inst? (:expired-at db-token-2)))
-        (is (= 4 (count (keys db-token-2))))))
+        (is (= 5 (count (keys db-token-2))))))
+    (testing "last-used-at is returned"
+      (let [db-token-1 (first (filter #(= (:name %) "token1") tokens))]
+        (token-db/set-last-used database (:id db-token-1))
+        (let [tokens (get-in (meuse-api! (add-auth {:action :list-tokens}
+                                                   "user2"
+                                                   "tech"))
+                             [:body :tokens])]
+          (is (inst? (:last-used-at (first (filter #(= (:name %) "token1") tokens))))))))
     (testing "non-admin cannot retrieve the tokens for another user"
       (is (thrown-with-msg?
            ExceptionInfo

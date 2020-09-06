@@ -61,6 +61,7 @@
           tokens (->> (public-token/by-user token-db user-name)
                       (map #(select-keys % [:tokens/id
                                             :tokens/name
+                                            :tokens/last_used_at
                                             :tokens/created_at
                                             :tokens/expired_at]))
                       (map #(set/rename-keys
@@ -68,6 +69,7 @@
                              {:tokens/id :id
                               :tokens/name :name
                               :tokens/created_at :created-at
+                              :tokens/last_used_at :last-used-at
                               :tokens/expired_at :expired-at})))]
       {:status 200
        :body {:tokens tokens}})))

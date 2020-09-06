@@ -51,6 +51,7 @@
                 :t.identifier
                 :t.token
                 :t.name
+                :t.last_used_at
                 :t.created_at
                 :t.expired_at
                 :t.user_id)
@@ -81,4 +82,11 @@
       (h/join [:users :u] [:= :t.user_id :u.id]
               [:roles :r] [:= :u.role_id :r.id])
       (h/where [:= :t.identifier identifier])
+      sql/format))
+
+(defn set-last-used
+  [token-id]
+  (-> (h/update :tokens)
+      (h/sset {:last_used_at (new Timestamp (.getTime (new Date)))})
+      (h/where [:= :id token-id])
       sql/format))

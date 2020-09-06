@@ -69,3 +69,9 @@
       (throw (ex/ex-not-found (format "the token %s does not exist for the user %s"
                                       token-name
                                       user-name))))))
+
+(defn set-last-used
+  "Set the last used value for a token."
+  [database token-id]
+  (jdbc/with-transaction [db-tx database]
+    (jdbc/execute! db-tx (token-queries/set-last-used token-id))))

@@ -509,7 +509,8 @@
         (is (= "integration_token_user" (:name (first tokens))))
         (is (string? (:created-at (first tokens))))
         (is (string? (:expired-at (first tokens))))
-        (is (= 4 (count (keys (first tokens)))))))
+        (is (string? (:last-used-at (first tokens))))
+        (is (= 5 (count (keys (first tokens)))))))
     (testing "list tokens: admin can list tokens for another user"
       (let [response (client/get (str meuse-url "/api/v1/meuse/token?user=integration")
                                  {:content-type :json
@@ -526,7 +527,8 @@
         (is (= "integration_token_user" (:name (first tokens))))
         (is (string? (:created-at (first tokens))))
         (is (string? (:expired-at (first tokens))))
-        (is (= 4 (count (keys (first tokens)))))))
+        (is (string? (:last-used-at (first tokens))))
+        (is (= 5 (count (keys (first tokens)))))))
     (testing "list tokens: no auth"
       (test-http
        {:status 403

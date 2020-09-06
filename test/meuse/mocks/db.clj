@@ -61,12 +61,13 @@
                   (search [this query-string] search))))
 
 (defn token-mock
-  [{:keys [by-user create delete get-token-user-role]}]
+  [{:keys [by-user create delete get-token-user-role set-last-used]}]
   (protocol/spy ITokenDB
                 (reify ITokenDB
                   (by-user [this user-name] by-user)
                   (create [this token] create)
                   (delete [this user-name token-name] delete)
+                  (set-last-used [this token-id] set-last-used)
                   (get-token-user-role [this token] get-token-user-role))))
 
 (defn user-mock

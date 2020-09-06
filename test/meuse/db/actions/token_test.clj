@@ -84,3 +84,18 @@
       (is (auth-token/valid? token db-token))
       (is (= user-name (:users/name db-token)))
       (is (= "tech" (:roles/name db-token))))))
+
+(deftest set-last-used-test
+  (let [user-name "user2"
+        validity 10
+        token-name "mytoken"
+        token (token-db/create database {:user user-name
+                                         :validity validity
+                                         :name token-name})
+        db-token-fn (fn [] (->> (token-db/by-user database user-name)
+                                (filter #(= (:tokens/name %) token-name))
+                                first))
+        db-token (db-token-fn)]
+    (is (nil? (:tokens/last_used_at db-token)))
+    (token-db/set-last-used database (:tokens/id db-token))
+    (is (inst? (:tokens/last_used_at (db-token-fn))))))

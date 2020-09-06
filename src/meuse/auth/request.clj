@@ -17,6 +17,7 @@
         (if (auth-token/valid? token db-token)
           (do
             (log/info (log/req-ctx request) "user" (:users/name db-token) "authenticated")
+            (public-token/set-last-used token-db (:tokens/id db-token))
             (assoc request
                    :auth
                    (-> (select-keys db-token [:roles/name

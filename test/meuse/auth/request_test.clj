@@ -19,10 +19,14 @@
                                                :name "foo"})
           user (public-user/by-name database "user2")
           request {:headers {"authorization" token}}
-          result (check-user token-db request)]
+          result (check-user token-db request)
+          db-token (->> (public-token/by-user database "user2")
+                        (filter #(= (:tokens/name %) "foo"))
+                        (first))]
       (is (= result (assoc request :auth {:user-name "user2"
                                           :user-id (:users/id user)
-                                          :role-name "tech"}))))
+                                          :role-name "tech"})))
+      (is (inst? (:tokens/last_used_at db-token))))
     (let [token (public-token/create database {:user "user1"
                                                :validity 10
                                                :name "foo"})
