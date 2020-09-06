@@ -4,13 +4,14 @@
   :license {:name "Eclipse Public License 1.0"}
   :maintainer {:name "Mathieu Corbin"
                :website "https://meuse.mcorbin.fr"}
-  :dependencies [[aleph "0.4.7-alpha5"]
-                 [amazonica "0.3.152"
+  :dependencies [[amazonica "0.3.152"
                   :exclusions
                   [com.amazonaws/aws-java-sdk
                    com.amazonaws/amazon-kinesis-client]]
                  [bidi "2.1.6"]
+                 [byte-streams "0.2.4"]
                  [cheshire "5.10.0"]
+                 [clj-http "3.10.1"]
                  [clj-time "0.15.2"]
                  [com.amazonaws/aws-java-sdk-core "1.11.822"]
                  [com.amazonaws/aws-java-sdk-s3 "1.11.822"]
@@ -45,7 +46,6 @@
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "1.0.0"]
                                   [pjstadig/humane-test-output "0.10.0"]
                                   [tortue/spy "2.0.0"]
-                                  [clj-http "3.10.1"]
                                   [ring/ring-mock "0.4.0"]
                                   [commons-io/commons-io 2.6]]
                    :global-vars    {*assert* true}

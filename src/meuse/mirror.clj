@@ -4,9 +4,9 @@
             [meuse.crate-file :refer [->CrateStore]]
             [meuse.log :as log]
             [meuse.store.protocol :as store]
-            [aleph.http :as http]
             [byte-streams :as bs]
-            [mount.core :refer [defstate]]))
+            [mount.core :refer [defstate]]
+            [clj-http.client :as http]))
 
 (defstate mirror-store
   :start
@@ -19,9 +19,8 @@
   "Download a crate file."
   [crate-name version]
   (let [url (str crates-io-base-url "/" crate-name "/" version "/download")]
-    (-> @(http/get url)
-        :body
-        (bs/to-byte-array))))
+    (-> (http/get url {:as :byte-array})
+        :body)))
 
 (defn download-and-save
   "Download a crate file, save it in the crate mirror store, and return the

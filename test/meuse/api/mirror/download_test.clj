@@ -1,10 +1,9 @@
 (ns meuse.api.mirror.download-test
-  (:require [manifold.deferred :as d]
-            [meuse.api.mirror.download :refer :all]
+  (:require [meuse.api.mirror.download :refer :all]
             [meuse.mocks.store :as mock]
-            [spy.assert :as assert]
             [spy.core :as spy]
             [spy.protocol :as protocol]
+            [clj-http.client :as http]
             [clojure.test :refer :all]))
 
 (deftest download-test
@@ -25,8 +24,8 @@
     (let [store-mock (mock/store-mock {:exists false})
           crate-file (.getBytes "foobar")]
       ;; ugly
-      (with-redefs [aleph.http/get (spy/stub
-                                    (d/success-deferred {:body crate-file}))]
+      (with-redefs [http/get (spy/stub
+                                    {:body crate-file})]
         (is (= {:status 200
                 :body crate-file}
                (download
@@ -38,5 +37,6 @@
                                    {:name "foo"
                                     :vers "1.0.0"}
                                    crate-file))
-        (is (spy/called-once-with? aleph.http/get
-                                   "https://crates.io/api/v1/crates/foo/1.0.0/download"))))))
+        (is (spy/called-once-with? http/get
+                                   "https://crates.io/api/v1/crates/foo/1.0.0/download"
+                                   {:as :byte-array}))))))
