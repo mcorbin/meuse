@@ -6,6 +6,6 @@
    :leave (fn [ctx]
             (if (coll? (get-in ctx [:response :body]))
               (-> (update-in ctx [:response :body] json/generate-string)
-                  (update-in [:response :headers] assoc :content-type
+                  (update-in [:response :headers] assoc "content-type"
                              "application/json"))
               ctx))})
