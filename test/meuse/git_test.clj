@@ -29,4 +29,4 @@
     (with-redefs [clojure.java.shell/sh (spy/spy (spy/stub {:exit 0}))]
       (pull git)
       (assert/called-once-with? clojure.java.shell/sh
-                                "git" "-C" tmp-dir "pull" "origin/master"))))
+                                "git" "-C" tmp-dir "pull" "origin" "master"))))

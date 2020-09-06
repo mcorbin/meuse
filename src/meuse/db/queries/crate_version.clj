@@ -126,3 +126,9 @@
 (defn top-n-downloads
   [n]
   (first-n-order-by n [:v.download_count :desc]))
+
+(defn delete
+  [id]
+  (-> (h/delete-from :crates_versions)
+      (h/where [:= :id id])
+      (sql/format)))

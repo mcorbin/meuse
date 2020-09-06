@@ -106,7 +106,7 @@
     ;; crate
     (defmethod crates-api! :new
       [request]
-      (new/new crate-db git crate-file-store request))
+      (new/new crate-db crate-version-db git crate-file-store request))
 
     (defmethod crates-api! :yank
       [request]

@@ -24,9 +24,9 @@
                 :v.document_vectors
                 :v.crate_id)
       (h/from [:crates :c])
-      (h/left-join [:crates_versions :v] [:and
-                                          [:= :c.id :v.crate_id]
-                                          [:= :v.version crate-version]])
+      (h/join [:crates_versions :v] [:and
+                                     [:= :c.id :v.crate_id]
+                                     [:= :v.version crate-version]])
       (h/where [:= :c.name crate-name])
       sql/format))
 

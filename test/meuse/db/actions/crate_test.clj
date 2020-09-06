@@ -12,6 +12,10 @@
 (use-fixtures :once system-fixture)
 (use-fixtures :each db-clean-fixture table-fixture)
 
+(deftest by-name-and-version-test
+  (is (map? (by-name-and-version database "crate1" "1.1.0")))
+  (is (nil? (by-name-and-version database "crate1" "1.2.0"))))
+
 (deftest create-test
   (let [crate {:name "test1"
                :vers "0.1.3"
