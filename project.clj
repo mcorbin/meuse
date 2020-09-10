@@ -1,7 +1,7 @@
 (defproject meuse "1.0.0"
   :description "A free private Rust registry"
   :url "https://github.com/mcorbin/meuse"
-  :license {:name "Eclipse Public License 1.0"}
+  :license {:name "Eclipse Public License 2.0"}
   :maintainer {:name "Mathieu Corbin"
                :website "https://meuse.mcorbin.fr"}
   :dependencies [[amazonica "0.3.153"
