@@ -30,6 +30,7 @@
             [meuse.front.pages.crates :as crates-page]
             [meuse.front.pages.index :as index-page]
             [meuse.front.pages.search :as search-page]
+            [meuse.front.pages.tokens :as tokens-page]
             [meuse.git :refer [git]]
             [meuse.mirror :refer [mirror-store]]))
 
@@ -162,6 +163,11 @@
     (defmethod front-page! :search
       [request]
       (search-page/page search-db
+                        request))
+
+    (defmethod front-page! :tokens
+      [request]
+      (tokens-page/page token-db
                         request))
 
     (defmethod front-page! :crate

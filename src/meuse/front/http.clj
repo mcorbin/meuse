@@ -14,6 +14,7 @@
    #"/search" {:get ::search}
    #"/categories" {:get ::categories}
    #"/crates" {:get ::crates}
+   #"/tokens" {:get ::tokens}
    [#"/categories/?" :category] {:get ::crates-category}
    [#"/crates/?" :name] {:get ::crate}})
 

@@ -35,14 +35,17 @@
      [:span {:class "menu-element"} "·"]
      [:span {:class "menu-element"} [:a {:href "/front/categories"} "Categories"]]
      (when-not public-frontend
-       [:span {:class "menu-element"} "·"]
-       [:span {:class "menu-element"}
-        [:form {:id "logout"
-                :action "/front/logout"
-                :method "post"}
-         [:a {:href "javascript:{}"
-              :onclick "document.getElementById('logout').submit(); return false;"}
-          "Logout"]]])]]])
+       [:span
+        [:span {:class "menu-element"} "·"]
+        [:span {:class "menu-element"} [:a {:href "/front/tokens"} "Tokens"]]
+        [:span {:class "menu-element"} "·"]
+        [:span {:class "menu-element"}
+         [:form {:id "logout"
+                 :action "/front/logout"
+                 :method "post"}
+          [:a {:href "javascript:{}"
+               :onclick "document.getElementById('logout').submit(); return false;"}
+           "Logout"]]]])]]])
 
 (def footer
   [:footer {:class "container"}

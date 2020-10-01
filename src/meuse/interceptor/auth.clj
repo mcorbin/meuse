@@ -35,11 +35,11 @@
     request
 
     :else
-    (do (when-not public-frontend
+    (do (if public-frontend
           ;; users can disable frontend authentication through the
           ;; public flag in the frontend configuration
-          (auth-frontend/valid-cookie? user-db key-spec request))
-        request)))
+          request
+          (auth-frontend/verify-cookie user-db key-spec request)))))
 
 (defn auth-request
   [token-db user-db key-spec public-frontend]

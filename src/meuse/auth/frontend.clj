@@ -55,7 +55,9 @@
                                     (time/now))
                      timestamp)))
 
-(defn valid-cookie?
+(defn verify-cookie
+  "Verifies if the token in the cookies is valid.
+  Returns the request with information about the user."
   [user-db key-spec request]
   (if-let [token (get-in request [:cookies "session-token" :value])]
     (let [decrypted (-> (decrypt token key-spec) extract-data)
@@ -64,5 +66,6 @@
         (throw (error/ex-redirect-login "invalid token" {})))
       (when (expired? decrypted)
         (throw (error/ex-redirect-login "token has expired" {})))
-      true)
+      (assoc request :auth {:user-name (:users/name user)
+                            :user-id (:users/id user)}))
     (throw (error/ex-redirect-login "invalid token" {}))))

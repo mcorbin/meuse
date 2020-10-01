@@ -185,9 +185,11 @@
       (is (thrown? Exception
                    ((:enter itc) {:request request})))))
   (testing "meuse.front.http: valid cookie"
-    (let [user-mock (mocks/user-mock {:by-id #:users{:id user-id}})
+    (let [user-mock (mocks/user-mock {:by-id #:users{:id user-id :name "foo"}})
           itc (auth/auth-request nil user-mock fixtures/default-key-spec nil)
           request {:subsystem :meuse.front.http
+                   :auth {:user-name "foo"
+                          :user-id user-id}
                    :cookies {"session-token"
                              {:value (auth-frontend/generate-token
                                       user-id
@@ -195,7 +197,7 @@
       (Thread/sleep 100)
       (is (= {:request request} ((:enter itc) {:request request})))))
   (testing "meuse.front.http: auth disabled for the frontend"
-    (let [user-mock (mocks/user-mock {:by-id #:users{:id user-id}})
+    (let [user-mock (mocks/user-mock {:by-id #:users{:id user-id :name "foo"}})
           itc (auth/auth-request nil user-mock fixtures/default-key-spec true)
           request {:subsystem :meuse.front.http}]
       (Thread/sleep 100)
