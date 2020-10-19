@@ -1,6 +1,7 @@
 (ns meuse.interceptor.auth
   (:require [meuse.api.crate.http :as crate-http]
             [meuse.api.meuse.http :as meuse-http]
+            [meuse.api.mirror.http :as mirror-http]
             [meuse.auth.request :as auth-request]
             [meuse.auth.frontend :as auth-frontend]))
 
@@ -13,8 +14,10 @@
     (auth-request/check-user token-db request)))
 
 (defmethod check-auth! :meuse.api.mirror.http
-  [request _]
-  request)
+  [request {:keys [token-db]}]
+  (if (mirror-http/skip-auth (:action request))
+    request
+    (auth-request/check-user token-db request)))
 
 (defmethod check-auth! :meuse.api.public.http
   [request _]

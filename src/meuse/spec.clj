@@ -198,6 +198,9 @@
 (s/def :meuse.api.crate.download/download
   (s/keys :req-un [:meuse.api.crate.download/route-params]))
 
+(s/def :meuse.api.crate.mirror/cache
+  (s/keys :req-un [:meuse.api.crate.download/route-params]))
+
 ;; new
 
 (s/def :meuse.api.crate.new/body #(instance? Object %))

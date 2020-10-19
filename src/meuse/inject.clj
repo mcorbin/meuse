@@ -12,6 +12,7 @@
             [meuse.api.meuse.token :as token]
             [meuse.api.meuse.user :as user]
             [meuse.api.mirror.http :refer [mirror-api!]]
+            [meuse.api.mirror.cache :as mirror-cache]
             [meuse.api.mirror.download :as mirror-download]
             [meuse.crate-file :refer [crate-file-store]]
             [meuse.db.public.category :refer [category-db]]
@@ -146,7 +147,10 @@
   (do
     (defmethod mirror-api! :download
       [request]
-      (mirror-download/download mirror-store request))))
+      (mirror-download/download mirror-store request))
+    (defmethod mirror-api! :cache
+      [request]
+      (mirror-cache/cache mirror-store request))))
 
 (defn inject-front-api!
   "Inject multimethods to handle HTTP requests for the front API"

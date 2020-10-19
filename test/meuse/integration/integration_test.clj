@@ -1017,7 +1017,25 @@
        (client/get (str meuse-url "/api/v1/mirror/foo/1.0.0/download")
                    {:content-type :json
                     :headers {}
-                    :throw-exceptions false})))))
+                    :throw-exceptions false})))
+
+    (testing "cache crate file: no auth fails"
+      (test-http
+       {:status 403
+        :body (js {:errors [{:detail "token missing in the header"}]})}
+       (client/post (str meuse-url "/api/v1/mirror/foo/1.0.0/cache")
+                    {:content-type :json
+                     :headers {}
+                     :throw-exceptions false})))
+
+    (testing "cache crate file: works with auth"
+      (test-http
+       {:status 200
+        :body (js {:ok true})}
+       (client/post (str meuse-url "/api/v1/mirror/foo/1.0.0/cache")
+                    {:content-type :json
+                     :headers {"Authorization" integration-token}
+                     :throw-exceptions false})))))
 
 (deftest ^:integration front-api-integration-test
   ;; create a token for an admin user

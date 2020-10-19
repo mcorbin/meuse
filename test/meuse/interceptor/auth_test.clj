@@ -161,10 +161,19 @@
            ((:enter itc) {:request {:subsystem :meuse.api.meuse.http
                                     :action :foo
                                     :headers {"authorization" token-clear}}})))))
-  (testing ":meuse.api.mirror.http"
+  (testing ":meuse.api.mirror.http: skip auth"
     (let [itc (auth/auth-request nil nil nil nil)]
-      (is (= {:request {:subsystem :meuse.api.mirror.http}}
-             ((:enter itc) {:request {:subsystem :meuse.api.mirror.http}})))))
+      (is (= {:request {:subsystem :meuse.api.mirror.http
+                        :action :download}}
+             ((:enter itc) {:request {:subsystem :meuse.api.mirror.http
+                                      :action :download}})))))
+  (testing ":meise.api.mirror.http: auth needed"
+    (let [itc (auth/auth-request nil nil nil nil)]
+      (is (thrown-with-msg?
+           clojure.lang.ExceptionInfo
+           #"token missing in the header"
+           ((:enter itc) {:request {:subsystem :meuse.api.mirror.http
+                                    :action :cache}})))))
   (testing ":meuse.api.public.http"
     (let [itc (auth/auth-request nil nil nil nil)]
       (is (= {:request {:subsystem :meuse.api.public.http}}
