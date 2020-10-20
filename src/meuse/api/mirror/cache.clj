@@ -11,13 +11,13 @@
   (auth-request/check-admin-tech request)
   (let [{:keys [crate-name crate-version]} (:route-params request)]
     (log/infof (log/req-ctx request)
-               "mirror: caching crate crate %s version %s"
+               "mirror: caching crate %s version %s"
                crate-name
                crate-version)
     (if (store/exists mirror-store crate-name crate-version)
       (do
         (log/infof (log/req-ctx request)
-                   "mirror: crate  %s %s already exists in the cache"
+                   "mirror: crate %s %s already exists in the cache"
                    crate-name
                    crate-version)
         {:status 200
