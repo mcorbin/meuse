@@ -37,7 +37,7 @@
                  [org.postgresql/postgresql "42.2.18"]
                  [ragtime "0.8.0"]
                  [ring/ring-core "1.8.2"]
-                 [mcorbin/ring-jetty-adapter "1.8.2"]
+                 [mcorbin/ring-jetty-adapter "1.8.3-mcorbin"]
                  [spootnik/signal "0.2.4"]
                  [spootnik/unilog "0.7.25"]]
   :main ^:skip-aot meuse.core

@@ -58,7 +58,7 @@
                         :http? false
                         :ssl-port (:port http-config)
                         :ssl-context ssl-context
-                        :client-auth :none))
+                        :client-auth :need))
         key-spec (when-not (:public frontend)
                    (auth-frontend/secret-key-spec
                     (:secret frontend)))
