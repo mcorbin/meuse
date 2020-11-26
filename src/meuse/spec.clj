@@ -94,11 +94,12 @@
                             (not (:cert config))
                             (not (:cacert config))))))
 
-(s/def :http/http (s/keys :req-un [:http/port
-                                   :http/address]
-                          :opt-un [:http/key
-                                   :http/cert
-                                   :http/cacert]))
+(s/def :http/http (s/and (s/keys :req-un [:http/port
+                                          :http/address]
+                                 :opt-un [:http/key
+                                          :http/cert
+                                          :http/cacert])
+                         :http/tls))
 
 (defmulti metadata :type)
 
