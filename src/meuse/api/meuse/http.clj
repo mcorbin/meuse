@@ -1,5 +1,6 @@
 (ns meuse.api.meuse.http
-  (:require [meuse.api.default :as default]))
+  (:require [meuse.api.crate :as mac]
+            [meuse.api.default :as default]))
 
 (def skip-auth
   "Skip token auth for these calls."
@@ -17,7 +18,7 @@
    #"/token/?" {:get ::list-tokens}
    [#"/token/?"] {:delete ::delete-token}
    #"/crate/?" {:get ::list-crates}
-   [#"/crate/?" :name] {:get ::get-crate}
+   [#"/crate/?" [mac/crate-regex :name]] {:get ::get-crate}
    #"/check/?" {:get ::check-crates}
    #"/statistics/?" {:get ::statistics}})
 
