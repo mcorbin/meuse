@@ -21,6 +21,7 @@
                  [crypto-random "1.2.0"]
                  [digest "1.4.9"]
                  [environ "1.2.0"]
+                 [exoscale/cloak "0.1.3"]
                  [exoscale/ex "0.3.15"]
                  [exoscale/interceptor "0.1.9"]
                  [exoscale/yummy "0.2.10"]

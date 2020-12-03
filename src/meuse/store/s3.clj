@@ -2,6 +2,7 @@
   "Manipulates the crate files in s3."
   (:require [meuse.store.protocol :refer [ICrateStore]]
             [amazonica.aws.s3 :as s3]
+            [exoscale.cloak :as cloak]
             [clojure.string :as string])
   (:import java.io.ByteArrayInputStream
            org.apache.commons.codec.digest.DigestUtils
@@ -18,7 +19,7 @@
 (defn file-exists?
   "Checks if a crate file exists for a crate name and a version"
   [credentials bucket crate-name version prefix]
-  (s3/does-object-exist credentials
+  (s3/does-object-exist (cloak/unmask credentials)
                         bucket
                         (file-key crate-name version prefix)))
 
@@ -27,7 +28,7 @@
   [credentials bucket crate-name version prefix]
   (IOUtils/toByteArray
    (:object-content
-    (s3/get-object credentials
+    (s3/get-object (cloak/unmask credentials)
                    :bucket-name bucket
                    :key (file-key crate-name version prefix)))))
 
@@ -36,7 +37,7 @@
   [credentials bucket crate-name version crate-file prefix]
   (let [input-stream (ByteArrayInputStream. crate-file)
         digest (DigestUtils/md5 crate-file)]
-    (s3/put-object credentials
+    (s3/put-object (cloak/unmask credentials)
                    :bucket-name bucket
                    :key (file-key crate-name version prefix)
                    :input-stream input-stream
@@ -54,7 +55,7 @@
 (defn s3-versions
   "Returns the versions stored on s3 for a crate."
   [credentials bucket crate-name]
-  (->> (s3/list-objects-v2 credentials
+  (->> (s3/list-objects-v2 (cloak/unmask credentials)
                            {:bucket-name bucket
                             :prefix (str crate-name "/")})
        :object-summaries

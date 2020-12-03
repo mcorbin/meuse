@@ -1,6 +1,7 @@
 (ns meuse.db
   "The database component"
-  (:require [meuse.config :refer [config]]
+  (:require [exoscale.cloak :as cloak]
+            [meuse.config :refer [config]]
             [meuse.log :as log]
             [meuse.metric :as metric]
             [meuse.migration :as migration]
@@ -38,7 +39,7 @@
     (HikariDataSource. config)))
 
 (defstate database
-  :start (let [db-pool (pool (:database config))]
+  :start (let [db-pool (pool (cloak/unmask (:database config)))]
            (migration/migrate! db-pool)
            db-pool)
   :stop (do (log/debug {} "stopping db pool")

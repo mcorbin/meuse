@@ -3,6 +3,7 @@
   (:require [meuse.config :as config]
             [meuse.log :as log]
             [meuse.metric :as metric]
+            [exoscale.cloak :as cloak]
             [exoscale.ex :as ex]
             [mount.core :refer [defstate]]
             [clojure.java.io :as io]
@@ -122,6 +123,6 @@
 
 (defstate git
   :start (condp = (get-in config/config [:metadata :type])
-           "jgit" (build-jgit (:metadata config/config))
+           "jgit" (build-jgit (cloak/unmask (:metadata config/config)))
            "shell" (build-local-git (:metadata config/config))
            (build-local-git (:metadata config/config))))
