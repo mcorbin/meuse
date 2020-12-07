@@ -2,6 +2,7 @@
   (:require [clj-time.core :as time]
             [clj-time.coerce :as coerce]
             [crypto.random :as random]
+            [exoscale.cloak :as cloak]
             [meuse.db.public.user :as db-user]
             [meuse.error :as error])
   (:import java.util.Base64
@@ -16,7 +17,7 @@
 (defn secret-key-spec
   "Creates SecretKeySpec instance from a secret key."
   [secret-key]
-  (SecretKeySpec. (.getBytes secret-key "UTF-8") "AES"))
+  (SecretKeySpec. (.getBytes (cloak/unmask secret-key) "UTF-8") "AES"))
 
 (defn encrypt
   "Encrypt a string using the key spec."

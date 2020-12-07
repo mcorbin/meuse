@@ -5,4 +5,5 @@
 (defmethod public-api! :metrics
   [_]
   {:status 200
+   :headers {"Content-Type" "text/plain"}
    :body (.getBytes (.scrape metric/registry))})

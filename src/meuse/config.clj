@@ -1,6 +1,8 @@
 (ns meuse.config
   "Load the project configuration."
-  (:require [meuse.log :as log]
+  (:require [exoscale.cloak :as cloak]
+            [exoscale.ex :as ex]
+            [meuse.log :as log]
             [meuse.spec :as spec]
             [environ.core :refer [env]]
             [mount.core :refer [defstate]]
@@ -28,6 +30,10 @@
                                         path)]
                      (log/error {} e error-msg)
                      (stop!)))})]
+    (when-let [front-secret (get-in config [:frontend :secret])]
+      (when (< (count front-secret) spec/frontend-secret-min-size)
+        (throw (ex/ex-incorrect (format "The frontend secret is too small (minimum size is %d"
+                                        spec/frontend-secret-min-size)))))
     (start-logging! (:logging config))
     (log/info {} "config loaded, logger started !")
     config))

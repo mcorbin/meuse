@@ -1,6 +1,7 @@
 (ns meuse.spec
   "Specs of the project"
-  (:require [meuse.semver :as semver]
+  (:require exoscale.cloak
+            [meuse.semver :as semver]
             [clojure.java.io :as io]
             [clojure.spec.alpha :as s]))
 
@@ -21,6 +22,11 @@
                      (let [file (io/file path)]
                        (and (.exists file)
                             (.isDirectory file)))))
+
+(s/def ::string-or-secret
+  (s/or :str ::non-empty-string
+        :secret :exoscale.cloak/secret))
+
 ;; crate
 
 (s/def :crate/name ::non-empty-string)
@@ -58,7 +64,7 @@
 ;; config
 
 (s/def :db/user ::non-empty-string)
-(s/def :db/password ::non-empty-string)
+(s/def :db/password ::string-or-secret)
 (s/def :db/host ::non-empty-string)
 (s/def :db/port pos-int?)
 (s/def :db/name ::non-empty-string)
@@ -114,7 +120,7 @@
                    :metadata/url]))
 
 (s/def :metadata/username ::non-empty-string)
-(s/def :metadata/password ::non-empty-string)
+(s/def :metadata/password ::string-or-secret)
 
 (defmethod metadata "jgit"
   [_]
@@ -140,8 +146,8 @@
   [_]
   (s/keys :req-un [:crate/path]))
 
-(s/def :s3/access-key ::non-empty-string)
-(s/def :s3/secret-key ::non-empty-string)
+(s/def :s3/access-key ::string-or-secret)
+(s/def :s3/secret-key ::string-or-secret)
 (s/def :s3/endpoint ::non-empty-string)
 (s/def :s3/bucket ::non-empty-string)
 
@@ -167,7 +173,7 @@
 (s/def :frontend/enabled boolean?)
 
 (def frontend-secret-min-size 20)
-(s/def :frontend/secret (s/and string? #(> (count %) frontend-secret-min-size)))
+(s/def :frontend/secret ::string-or-secret)
 
 (defmulti frontend :public)
 (defmethod frontend true [_]
