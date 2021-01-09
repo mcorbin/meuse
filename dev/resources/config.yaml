@@ -9,7 +9,8 @@ http:
   port: 8855
 logging:
   level: debug
-  console: true
+  console:
+    encoder: json
   overrides:
     org.eclipse.jetty: info
     com.zaxxer.hikari.pool.HikariPool: info
