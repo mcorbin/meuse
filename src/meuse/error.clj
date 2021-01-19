@@ -141,7 +141,6 @@
                e
                "http error"
                status)
-    (metric/http-errors request status)
     {:status status
      :body {:errors [{:detail message}]}}))
 
@@ -155,16 +154,14 @@
   (log/error (merge (log/req-ctx request)
                     (ex-data e))
              e "http error")
-  (metric/http-errors request 500)
   {:status 500
    :body {:errors [{:detail default-msg}]}})
 
 (defn redirect-login-error
   [request ^Exception e]
   (log/error (merge (log/req-ctx request)
-                (ex-data e))
-         e "authentication error")
-  (metric/http-errors request 302)
+                    (ex-data e))
+             e "authentication error")
   {:status 302
    :headers {"Location" "/front/login"}
    :body {:errors [{:detail (.getMessage e)}]}})

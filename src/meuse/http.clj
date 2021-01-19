@@ -13,6 +13,7 @@
             [meuse.interceptor.ring :as itc-ring]
             [meuse.interceptor.response :as itc-response]
             [meuse.interceptor.route :as itc-route]
+            [meuse.interceptor.metric :as itc-metric]
             [meuse.log :as log]
             [exoscale.interceptor :as interceptor]
             [less.awful.ssl :as less-ssl]
@@ -22,7 +23,9 @@
 (defn interceptor-handler
   [crate-config metadata-config token-db user-db key-spec public-frontend]
   (let [interceptors
-        [itc-response/response ;;leave
+        [itc-error/last-error ;; leave
+         itc-response/response ;;leave
+         itc-metric/response-metrics ;; leave
          itc-json/json ;; leave
          itc-error/error ;; error
          itc-id/request-id ;;enter

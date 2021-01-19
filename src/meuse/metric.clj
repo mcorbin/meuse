@@ -68,15 +68,22 @@
            counter (.register builder registry)]
        (.increment counter n)))))
 
-(defn http-errors
-  "updates the http error counter"
-  [request status]
+(defn http-response
+  "updates the http response counter"
+  [ctx]
   (when (started?)
-    (increment! :http.errors
-                {:unit "errors"
-                 :description "http errors"
-                 :tags ["uri" (str (:uri request))
-                        "method"  (str (some-> request
-                                               :request-method
-                                               name))
-                        "status" (str status)]})))
+    (let [request (:request ctx)
+          status (str (:status (:response ctx)))
+          uri (if (= "404" status)
+                "?"
+                (str (:uri request)))
+          method (str (or (some-> request
+                                  :request-method
+                                  name)
+                          "null"))]
+      (increment! :http.responses.total
+                  {:unit "errors"
+                   :description "http errors"
+                   :tags ["uri" uri
+                          "method"  method
+                          "status" status]}))))

@@ -54,12 +54,12 @@
 
 (defmethod route! :meuse.api.crate.http
   [request]
-  (metric/with-time :http.requests (https-tags request)
+  (metric/with-time :http.request.duration (https-tags request)
     (crate-http/crates-api! request)))
 
 (defmethod route! :meuse.api.mirror.http
   [request]
-  (metric/with-time :http.requests (https-tags request)
+  (metric/with-time :http.request.duration (https-tags request)
     (mirror-http/mirror-api! request)))
 
 (defmethod route! :meuse.api.public.http
@@ -68,7 +68,7 @@
 
 (defmethod route! :meuse.api.meuse.http
   [request]
-  (metric/with-time :http.requests (https-tags request)
+  (metric/with-time :http.request.duration (https-tags request)
     (meuse-http/meuse-api! (-> (req/convert-body-edn request)))))
 
 (defn front-route!
