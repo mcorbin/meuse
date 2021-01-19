@@ -21,9 +21,7 @@
    :error (fn [ctx e]
             (try
               (metric/increment! :http.fatal.error.total
-                                 {:unit "errors"
-                                  :description "fatal http error"
-                                  :tags []})
+                                 {})
               (log/error {} e "fatal error")
               (assoc ctx :response {:status 500
                                     :body {:error err/default-msg}})

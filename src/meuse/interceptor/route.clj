@@ -1,5 +1,6 @@
 (ns meuse.interceptor.route
-  (:require meuse.api.crate.download
+  (:require [clojure.string :as string]
+            meuse.api.crate.download
             [meuse.api.crate.http :as crate-http]
             [meuse.api.default :as default]
             [meuse.api.meuse.http :as meuse-http]
@@ -47,20 +48,34 @@
 
 (defn https-tags
   [request]
-  ["uri" (:uri request)
+  {"uri" (:uri request)
    "method" (-> request
                 :request-method
-                name)])
+                name)})
 
 (defmethod route! :meuse.api.crate.http
   [request]
-  (metric/with-time :http.request.duration (https-tags request)
-    (crate-http/crates-api! request)))
+  ;; avoid generating 1 metric/crate to download
+  (let [metric-tags (if (string/includes? (:uri request) "/download")
+                      {:uri "/api/v1/crate/download"
+                       :method (-> request
+                                   :request-method
+                                   name)}
+                      (https-tags request))]
+    (metric/with-time :http.request.duration metric-tags
+      (crate-http/crates-api! request))))
 
 (defmethod route! :meuse.api.mirror.http
   [request]
-  (metric/with-time :http.request.duration (https-tags request)
-    (mirror-http/mirror-api! request)))
+  ;; avoid generating 1 metric/crate to download
+  (let [metric-tags (if (string/includes? (:uri request) "/download")
+                      {:uri "/api/v1/mirror/download"
+                       :method (-> request
+                                   :request-method
+                                   name)}
+                      (https-tags request))]
+    (metric/with-time :http.request.duration metric-tags
+      (mirror-http/mirror-api! request))))
 
 (defmethod route! :meuse.api.public.http
   [request]

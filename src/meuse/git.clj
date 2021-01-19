@@ -27,7 +27,7 @@
 (defn git-cmd
   [path args]
   (log/debug {} "git command" (string/join " " args))
-  (metric/with-time :git.local ["command" (first args)]
+  (metric/with-time :git.shell {"command" (first args)}
     (let [result (apply shell/sh "git" "-C" path args)]
       (log/debug {} "git command status code=" (:exit result)
                  "out=" (:out result)
@@ -65,19 +65,19 @@
                                ^CredentialsProvider credentials]
   IGit
   (add [this]
-    (metric/with-time :git.jgit ["command" "add"]
+    (metric/with-time :git.jgit {"command" "add"}
       (doto (.add git)
         (.addFilepattern ".")
         (.call))))
   (commit [this msg-header msg-body]
-    (metric/with-time :git.jgit ["command" "commit"]
+    (metric/with-time :git.jgit {"command" "commit"}
       (doto (.commit git)
         (.setMessage (str msg-header "\n\n" msg-body))
         (.call))))
   (get-lock [this]
     lock)
   (pull [this]
-    (metric/with-time :git.jgit ["command" "pull"]
+    (metric/with-time :git.jgit {"command" "pull"}
       (let [[remote branch] (string/split target #"/")]
         (doto (.pull git)
           (.setCredentialsProvider credentials)
@@ -85,17 +85,17 @@
           (.setRemoteBranchName branch)
           (.call)))))
   (reset-hard [this]
-    (metric/with-time :git.jgit ["command" "reset"]
+    (metric/with-time :git.jgit {"command" "reset"}
       (doto (.reset git)
         (.setMode ResetCommand$ResetType/HARD)
         (.call))))
   (clean [this]
-    (metric/with-time :git.jgit ["command" "clean"]
+    (metric/with-time :git.jgit {"command" "clean"}
       (doto (.clean git)
         (.setCleanDirectories true)
         (.call))))
   (push [this]
-    (metric/with-time :git.jgit ["command" "push"]
+    (metric/with-time :git.jgit {"command" "push"}
       (let [[remote branch] (string/split target #"/")
             ref-spec (RefSpec. branch)]
         (doto (.push git)

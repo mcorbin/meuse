@@ -1,5 +1,6 @@
 (ns meuse.metric
-  (:require [mount.core :refer [defstate]])
+  (:require [clojure.string :as string]
+            [mount.core :refer [defstate]])
   (:import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics
            io.micrometer.core.instrument.binder.jvm.JvmGcMetrics
            io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics
@@ -35,12 +36,20 @@
   []
   (instance? MeterRegistry registry))
 
+(defn ->tags
+  "Converts a map of tags to an array of string"
+  [tags]
+  (into-array String
+              (->> tags
+                   (map (fn [[k v]] [(name k) (name v)]))
+                   flatten)))
+
 (defn get-timer!
   "get a timer by name and tags"
   [n tags]
   (.register (doto (Timer/builder (name n))
                (.publishPercentiles (double-array [0.5 0.75 0.98 0.99]))
-               (.tags (into-array tags)))
+               (.tags (->tags tags)))
              registry))
 
 (defmacro with-time
@@ -57,14 +66,12 @@
 
 (defn increment!
   "increments a counter"
-  ([counter config]
-   (increment! counter config 1))
-  ([counter {:keys [tags unit description]} n]
+  ([counter tags]
+   (increment! counter tags 1))
+  ([counter tags n]
    (when (started?)
      (let [builder (doto (Counter/builder (name counter))
-                     (.baseUnit unit)
-                     (.description description)
-                     (.tags (into-array tags)))
+                     (.tags (->tags tags)))
            counter (.register builder registry)]
        (.increment counter n)))))
 
@@ -74,16 +81,24 @@
   (when (started?)
     (let [request (:request ctx)
           status (str (:status (:response ctx)))
-          uri (if (= "404" status)
-                "?"
-                (str (:uri request)))
+          uri (cond
+                (= "404" status) "?"
+
+                ;; avoid generating 1 metric/crate to download
+                (and (string/includes? (:uri request) "/download")
+                     (string/includes? (:uri request) "/mirror/"))
+                "/api/v1/mirror/download"
+
+                (string/includes? (:uri request) "/download")
+                "/api/v1/crate/download"
+
+                :else (str (:uri request)))
+
           method (str (or (some-> request
                                   :request-method
                                   name)
                           "null"))]
       (increment! :http.responses.total
-                  {:unit "errors"
-                   :description "http errors"
-                   :tags ["uri" uri
-                          "method"  method
-                          "status" status]}))))
+                  {"uri" uri
+                   "method" method
+                   "status" status}))))
