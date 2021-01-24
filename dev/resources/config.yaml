@@ -1,6 +1,6 @@
 database:
   user: "meuse"
-  password: "meuse"
+  password: !secret "meuse"
   host: "127.0.0.1"
   port: 5432
   name: "meuse"
@@ -17,6 +17,10 @@ logging:
     org.apache.http: error
     io.netty.buffer.PoolThreadCache: error
     org.eclipse.jgit.internal.storage.file.FileSnapshot: info
+    com.amazonaws.auth.AWS4Signer: warn
+    com.amazonaws.retry.ClockSkewAdjuster: warn
+    com.amazonaws.request: warn
+    com.amazonaws.requestId: warn
 metadata:
   type: "shell"
   path: "/home/mathieu/prog/rust/testregistry"
@@ -27,5 +31,5 @@ crate:
   path: "/home/mathieu/prog/rust/crates"
 frontend:
   enabled: true
-  secret: uJo8QrRAANokteN_xVxpP75lc_A5Sw6t
+  secret: !secret uJo8QrRAANokteN_xVxpP75lc_A5Sw6t
   public: false

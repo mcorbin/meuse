@@ -31,7 +31,7 @@
                      (log/error {} e error-msg)
                      (stop!)))})]
     (when-let [front-secret (get-in config [:frontend :secret])]
-      (when (< (count front-secret) spec/frontend-secret-min-size)
+      (when (< (count (cloak/unmask front-secret)) spec/frontend-secret-min-size)
         (throw (ex/ex-incorrect (format "The frontend secret is too small (minimum size is %d"
                                         spec/frontend-secret-min-size)))))
     (start-logging! (:logging config))
