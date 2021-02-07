@@ -15,7 +15,7 @@
   "Start the application using mount."
   []
   (mount/start)
-  (log/info {} "Ecoute, on t'connait pas, mais laisse nous t'dire que tu t'prepares des nuits blanches, des migraines... des \"nervous breakdown\"w comme on dit de nos jours.")
+  (log/info {} "Ecoute, on t'connait pas, mais laisse nous t'dire que tu t'prepares des nuits blanches, des migraines... des \"nervous breakdown\" comme on dit de nos jours.")
   :ready)
 
 (defn -main

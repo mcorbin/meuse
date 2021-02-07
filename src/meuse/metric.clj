@@ -9,11 +9,13 @@
            io.micrometer.core.instrument.binder.system.UptimeMetrics
            io.micrometer.core.instrument.binder.system.ProcessorMetrics
            io.micrometer.core.instrument.Counter
+           io.micrometer.core.instrument.Gauge
            io.micrometer.core.instrument.MeterRegistry
            io.micrometer.core.instrument.Metrics
            io.micrometer.core.instrument.Timer
            io.micrometer.prometheus.PrometheusConfig
-           io.micrometer.prometheus.PrometheusMeterRegistry))
+           io.micrometer.prometheus.PrometheusMeterRegistry
+           java.util.function.Supplier))
 
 (defn registry-component
   []
@@ -43,6 +45,19 @@
               (->> tags
                    (map (fn [[k v]] [(name k) (name v)]))
                    flatten)))
+
+(defn ^Supplier gauge-fn-wrapper [gauge-fn]
+  (reify Supplier
+    (get [this]
+      (gauge-fn))))
+
+(defn create-gauge!
+  "Create a gauge."
+  [n tags gauge-fn]
+  (if (started?)
+    (.register (doto (Gauge/builder (name n) (gauge-fn-wrapper gauge-fn))
+                 (.tags (->tags tags)))
+               registry)))
 
 (defn get-timer!
   "get a timer by name and tags"

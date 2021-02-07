@@ -15,6 +15,7 @@
             [meuse.interceptor.route :as itc-route]
             [meuse.interceptor.metric :as itc-metric]
             [meuse.log :as log]
+            meuse.statistics
             [exoscale.interceptor :as interceptor]
             [less.awful.ssl :as less-ssl]
             [mount.core :refer [defstate]]
