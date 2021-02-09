@@ -21,7 +21,8 @@
 (defn create-publish-request
   [metadata crate-file]
   (let [metadata (-> metadata json/generate-string .getBytes)
-        metadata-length [(bit-and (unchecked-byte (count metadata)) 0xFF)
+        size (count metadata)
+        metadata-length [(bit-and (unchecked-byte size) 0xFF)
                          (byte 0)
                          (byte 0)
                          (byte 0)]
@@ -43,7 +44,7 @@
        (nil? (check-size (byte-array 10) 11)))))
 
 (deftest request->crate-test
-  (testing "valid request"
+  (testing "valid request without renaming"
     (let [crate-file "random content"
           metadata {:name "bar"
                     :vers "1.0.1"
@@ -51,15 +52,38 @@
                     :foo "bar"
                     :deps [{:version_req "0.1.0"
                             :foo "bar"
-                            :explicit_name_in_toml "toto"}]
+                            :name "foo"}]
                     :cksum (digest/sha-256 crate-file)}
           request (create-publish-request metadata crate-file)]
       (is (= {:raw-metadata metadata
               :git-metadata {:name "bar"
                              :vers "1.0.1"
                              :yanked false
-                             :deps [{:req "0.1.0"
-                                     :package "toto"}]
+                             :deps [{:name "foo"
+                                     :req "0.1.0"}]
+                             :cksum (digest/sha-256 crate-file)}
+              :crate-file (String. (.getBytes crate-file))}
+             (-> (request->crate request)
+                 (update :crate-file #(String. #^bytes %)))))))
+  (testing "valid request with renaming"
+    (let [crate-file "random content"
+          metadata {:name "bar"
+                    :vers "1.0.1"
+                    :yanked false
+                    :foo "bar"
+                    :deps [{:version_req "0.1.0"
+                            :foo "bar"
+                            :name "foo"
+                            :explicit_name_in_toml "renamed"}]
+                    :cksum (digest/sha-256 crate-file)}
+          request (create-publish-request metadata crate-file)]
+      (is (= {:raw-metadata metadata
+              :git-metadata {:name "bar"
+                             :vers "1.0.1"
+                             :yanked false
+                             :deps [{:name "renamed"
+                                     :req "0.1.0"
+                                     :package "foo"}]
                              :cksum (digest/sha-256 crate-file)}
               :crate-file (String. (.getBytes crate-file))}
              (-> (request->crate request)

@@ -20,15 +20,27 @@
                                     (alength #^bytes byte-array))))))
 
 (def git-metadata-keys [:name :vers :deps :cksum :features :yanked :links])
-(def deps-metadata-keys [:name :version_req :features :optional :default_features :target :kind :registry :explicit_name_in_toml])
-(def deps-keys-renamed {:version_req :req
-                        :explicit_name_in_toml :package})
+(def deps-metadata-keys [:name :version_req :features :optional :default_features :target :kind :registry :package])
+(def deps-keys-renamed {:version_req :req})
+
+(defn handler-crate-renaming
+  "Handle renaming for a dependency.
+  :explicit_name_in_toml is the new name of the dependency if the dependency
+  is renamed. If set, the git metadata should have this value in :name and
+  the old/real name in :package"
+  [dep]
+  (if-let [new-name (:explicit_name_in_toml dep)]
+    (assoc dep
+           :name new-name
+           :package (:name dep))
+    dep))
 
 (defn raw-metadata->metadata
   "Converts the raw metadata from `cargo publish` into metadata which will be
   stored in the Git repository."
   [raw-metadata]
   (-> (select-keys raw-metadata git-metadata-keys)
+      (update :deps (fn [deps] (map handler-crate-renaming deps)))
       (update :deps (fn [deps] (map #(select-keys % deps-metadata-keys) deps)))
       (update :deps (fn [deps] (map #(set/rename-keys % deps-keys-renamed) deps)))))
 
