@@ -33,14 +33,14 @@
                  [org.clojure/clojure "1.10.3"]
                  [org.clojure/java.jdbc "0.7.12"]
                  [seancorfield/next.jdbc "1.2.659"]
-                 [org.clojure/tools.logging "1.1.0"]
+                 [org.clojure/tools.logging "1.2.2"]
                  [org.eclipse.jgit/org.eclipse.jgit "5.7.0.202003110725-r"]
                  [org.postgresql/postgresql "42.2.24"]
                  [ragtime "0.8.1"]
                  [ring/ring-core "1.9.4"]
                  [ring/ring-jetty-adapter "1.9.4"]
                  [spootnik/signal "0.2.4"]
-                 [spootnik/unilog "0.7.28"]]
+                 [spootnik/unilog "0.7.29"]]
   :main ^:skip-aot meuse.core
   :target-path "target/%s"
   :source-paths ["src"]
