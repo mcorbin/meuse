@@ -2,7 +2,7 @@
 
 docker run -p 5432:5432 -e POSTGRES_DB=meuse -e POSTGRES_USER=meuse \
        -e POSTGRES_PASSWORD=meuse \
-       postgres:11.4
+       postgres:14.4
 
 # psql -h localhost -d meuse -p 5432 -U meuse
 

@@ -1,4 +1,4 @@
-FROM clojure:openjdk-11-lein as build-env
+FROM clojure:openjdk-17-lein as build-env
 
 ADD . /app
 WORKDIR /app
@@ -7,7 +7,7 @@ RUN lein uberjar
 
 # -----------------------------------------------------------------------------
 
-from openjdk:11
+from openjdk:17
 
 RUN groupadd -r meuse && useradd -r -s /bin/false -g meuse meuse
 RUN mkdir /app
