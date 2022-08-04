@@ -48,32 +48,23 @@
 
 (defn https-tags
   [request]
-  {"uri" (:uri request)
+  {"handler" (format "%s/%s"
+                     (-> request :handler namespace)
+                     (-> request :handler name))
    "method" (-> request
                 :request-method
                 name)})
 
 (defmethod route! :meuse.api.crate.http
   [request]
-  ;; avoid generating 1 metric/crate to download
-  (let [metric-tags (if (string/includes? (:uri request) "/download")
-                      {:uri "/api/v1/crate/download"
-                       :method (-> request
-                                   :request-method
-                                   name)}
-                      (https-tags request))]
+  (let [metric-tags (https-tags request)]
     (metric/with-time :http.request.duration metric-tags
       (crate-http/crates-api! request))))
 
 (defmethod route! :meuse.api.mirror.http
   [request]
   ;; avoid generating 1 metric/crate to download
-  (let [metric-tags (if (string/includes? (:uri request) "/download")
-                      {:uri "/api/v1/mirror/download"
-                       :method (-> request
-                                   :request-method
-                                   name)}
-                      (https-tags request))]
+  (let [metric-tags (https-tags request)]
     (metric/with-time :http.request.duration metric-tags
       (mirror-http/mirror-api! request))))
 

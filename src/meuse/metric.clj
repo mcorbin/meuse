@@ -96,24 +96,18 @@
   (when (started?)
     (let [request (:request ctx)
           status (str (:status (:response ctx)))
-          uri (cond
-                (= "404" status) "?"
+          handler (cond
+                    (= "404" status) "?"
 
-                ;; avoid generating 1 metric/crate to download
-                (and (string/includes? (:uri request) "/download")
-                     (string/includes? (:uri request) "/mirror/"))
-                "/api/v1/mirror/download"
-
-                (string/includes? (:uri request) "/download")
-                "/api/v1/crate/download"
-
-                :else (str (:uri request)))
+                    :else (format "%s/%s"
+                                  (-> request :handler namespace)
+                                  (-> request :handler name)))
 
           method (str (or (some-> request
                                   :request-method
                                   name)
                           "null"))]
       (increment! :http.responses.total
-                  {"uri" uri
+                  {"handler" handler
                    "method" method
                    "status" status}))))
