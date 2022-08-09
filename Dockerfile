@@ -1,4 +1,4 @@
-FROM clojure:openjdk-17-lein as build-env
+FROM clojure:temurin-17-lein-focal as build-env
 
 ADD . /app
 WORKDIR /app
@@ -7,7 +7,7 @@ RUN lein uberjar
 
 # -----------------------------------------------------------------------------
 
-from openjdk:17
+from eclipse-temurin:17-focal
 
 RUN groupadd -r meuse && useradd -r -s /bin/false -g meuse meuse
 RUN mkdir /app
