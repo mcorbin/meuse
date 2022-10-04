@@ -11,7 +11,7 @@ from eclipse-temurin:17-focal
 
 RUN groupadd -r meuse && useradd -r -s /bin/false -g meuse meuse
 RUN mkdir /app
-COPY --from=build-env /app/target/uberjar/meuse-*-standalone.jar /app/meuse.jar
+COPY --from=build-env /app/target/*uberjar/meuse-*-standalone.jar /app/meuse.jar
 
 RUN chown -R meuse:meuse /app
 
