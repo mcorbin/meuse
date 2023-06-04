@@ -1,5 +1,6 @@
 (ns meuse.front.pages.crate
-  (:require [meuse.db.public.crate :as public-crate]))
+  (:require [meuse.db.public.crate :as public-crate]
+            [markdown.core :as md]))
 
 ; missing metadata:
 ;   - features
@@ -82,7 +83,8 @@
          [:span.hl-string \" version-str \"]]]
 
        [:div.readme
-        ;; TODO: show README
+        (when-let [readme (:readme metadata)]
+          (md/md-to-html-string readme))
         ]]
 
       ;; right column
