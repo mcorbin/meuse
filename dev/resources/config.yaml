@@ -23,12 +23,12 @@ logging:
     com.amazonaws.requestId: warn
 metadata:
   type: "shell"
-  path: "/home/mcorbin/prog/rust/testregistry"
+  path: "registry"
   target: "origin/master"
   url: "https://github.com/mcorbin/testregistry"
 crate:
   store: "filesystem"
-  path: "/home/mcorbin/prog/rust/crates"
+  path: "crates"
 frontend:
   enabled: true
   secret: !secret uJo8QrRAANokteN_xVxpP75lc_A5Sw6t
